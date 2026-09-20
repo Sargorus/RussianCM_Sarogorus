@@ -22,7 +22,7 @@
     - type: CaptureObjective
       hoistTime: 8
       maxHoldTimes: 10
-      pointIncrementTime: 360
+      pointIncrementTime: 180
       visibleOnMap: true
       flagInitialHealth: 100
     - type: NavMapBeacon
@@ -57,7 +57,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -99,7 +99,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -129,7 +129,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 15
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -248,7 +248,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 20
-    pointIncrementTime: 800
+    pointIncrementTime: 300
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -277,7 +277,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 20
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -307,7 +307,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 20
-    pointIncrementTime: 800
+    pointIncrementTime: 300
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -337,7 +337,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 20
-    pointIncrementTime: 800
+    pointIncrementTime: 300
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -367,7 +367,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 20
-    pointIncrementTime: 800
+    pointIncrementTime: 300
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -399,7 +399,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -429,7 +429,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -459,7 +459,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -489,7 +489,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -519,7 +519,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -549,7 +549,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -579,7 +579,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -609,7 +609,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -639,7 +639,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -669,7 +669,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -700,7 +700,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -730,7 +730,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -760,7 +760,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -790,7 +790,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon
@@ -820,7 +820,7 @@
   - type: CaptureObjective
     hoistTime: 8
     maxHoldTimes: 10
-    pointIncrementTime: 360
+    pointIncrementTime: 180
     visibleOnMap: true
     flagInitialHealth: 100
   - type: NavMapBeacon

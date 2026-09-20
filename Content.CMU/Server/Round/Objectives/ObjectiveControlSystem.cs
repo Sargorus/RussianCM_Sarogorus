@@ -339,7 +339,19 @@ public sealed partial class ObjectiveControlSystem : EntitySystem
             _logs.Info($"[OBJ-CTRL] Neutral: Found {neutralCandidates.Count} candidates, max allowed = {neutralCap}");
 
             if (neutralCandidates.Count > neutralCap)
-                neutralCandidates = WeightedRandomPick(neutralCandidates, neutralCap);
+            {
+                // CMU14: keep at least three flag-capture objectives active when that many are available
+                var captureCandidates = neutralCandidates
+                    .Where(x => TryComp<CaptureObjectiveComponent>(x.Uid, out _))
+                    .ToList();
+                var chosenCapture = WeightedRandomPick(captureCandidates, Math.Min(3, captureCandidates.Count));
+                var chosenCaptureUids = chosenCapture.Select(x => x.Uid).ToHashSet();
+                neutralCandidates = chosenCapture
+                    .Concat(WeightedRandomPick(
+                        neutralCandidates.Where(x => !chosenCaptureUids.Contains(x.Uid)).ToList(),
+                        Math.Max(0, neutralCap - chosenCapture.Count)))
+                    .ToList();
+            }
 
             foreach (var (uid, obj) in neutralCandidates)
             {
