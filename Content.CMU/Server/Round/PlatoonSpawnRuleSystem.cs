@@ -60,6 +60,7 @@ public sealed partial class PlatoonSpawnRuleSystem : GameRuleSystem<PlatoonSpawn
         }
     }
 
+    // Frozen at round start so mid-round votes for the next round can't swap this round's platoons.
     private PlatoonPrototype? _roundGovforPlatoon;
     public PlatoonPrototype? RoundGovforPlatoon
     {
