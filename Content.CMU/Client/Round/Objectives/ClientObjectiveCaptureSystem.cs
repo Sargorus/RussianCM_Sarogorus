@@ -27,7 +27,6 @@ public sealed partial class ClientObjectiveCaptureSystem : EntitySystem
         if (!TryComp<SpriteComponent>(ent, out var sprite))
             return;
 
-        // The flag sprite is a single layer defined by the wall flag prototypes.
         _sprite.LayerSetRsiState((ent, sprite), 0, ent.Comp.CurrentSpriteState);
     }
 }

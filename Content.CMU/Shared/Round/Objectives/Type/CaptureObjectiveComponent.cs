@@ -6,7 +6,6 @@ namespace Content.Shared.CMU14.Round.Objectives.Type;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
 public sealed partial class CaptureObjectiveComponent : Robust.Shared.GameObjects.Component
 {
-
     public const string NeutralFlagState = "uaflag";
 
     public enum CaptureObjectiveStatus
@@ -41,19 +40,12 @@ public sealed partial class CaptureObjectiveComponent : Robust.Shared.GameObject
     public string OpforFlagState = "uaflag";
     public Dictionary<string, int> TimesIncrementedPerFaction { get; set; } = new();
 
-
     [AutoNetworkedField] public string CurrentSpriteState = NeutralFlagState;
 
     [AutoNetworkedField] public string ControllerDisplayName = string.Empty;
 
-    /// <summary>
-    /// Name of the platoon/subunit that captured the flag, when applicable. Empty otherwise.
-    /// </summary>
     [AutoNetworkedField] public string ControllerPlatoonName = string.Empty;
 
-    /// <summary>
-    /// Time left until the next points increment, in seconds. Updated by the server each tick.
-    /// </summary>
     [AutoNetworkedField] public float TimeUntilNextIncrement;
 
     public FlagActionState ActionState = FlagActionState.Idle;

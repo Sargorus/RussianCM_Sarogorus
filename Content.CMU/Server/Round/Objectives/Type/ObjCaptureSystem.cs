@@ -69,7 +69,7 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
             "govfor" => string.IsNullOrEmpty(govforFlag) ? CaptureObjectiveComponent.NeutralFlagState : govforFlag,
             "opfor" => string.IsNullOrEmpty(opforFlag) ? CaptureObjectiveComponent.NeutralFlagState : opforFlag,
             "clf" => "clfflag",
-            _ => string.Empty, // unknown faction: leave the sprite unchanged
+            _ => string.Empty,
         };
     }
 
@@ -248,7 +248,6 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
                 continue;
             if (string.IsNullOrEmpty(comp.CurrentController))
                 continue;
-            // Only award points when the current controller belongs to one of the objective factions.
             if (!IsObjectiveFaction(comp.CurrentController, objComp))
                 continue;
 
