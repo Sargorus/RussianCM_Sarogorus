@@ -39,7 +39,7 @@ namespace Content.Server.CMU14.Round.Commands
                 shell.WriteError($"Platoon prototype not found: {args[0]}");
                 return;
             }
-            platoonSys.SelectedOpforPlatoon = platoon;
+            platoonSys.SetOpforForRound(platoon);
             shell.WriteLine($"Opfor platoon set to: {platoon.Name} ({platoon.ID})");
         }
 
@@ -77,7 +77,7 @@ namespace Content.Server.CMU14.Round.Commands
                 shell.WriteError($"Platoon prototype not found: {args[0]}");
                 return;
             }
-            platoonSys.SelectedGovforPlatoon = platoon;
+            platoonSys.SetGovforForRound(platoon);
             shell.WriteLine($"Govfor platoon set to: {platoon.Name} ({platoon.ID})");
         }
 

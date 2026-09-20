@@ -89,8 +89,8 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
     {
         return faction.ToLowerInvariant() switch
         {
-            "govfor" => _platoonSpawnRuleSystem.SelectedGovforPlatoon?.Name ?? string.Empty,
-            "opfor" => _platoonSpawnRuleSystem.SelectedOpforPlatoon?.Name ?? string.Empty,
+            "govfor" => _platoonSpawnRuleSystem.RoundGovforPlatoon?.Name ?? string.Empty,
+            "opfor" => _platoonSpawnRuleSystem.RoundOpforPlatoon?.Name ?? string.Empty,
             _ => string.Empty,
         };
     }
@@ -192,8 +192,8 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
 
     public override void Update(float frameTime)
     {
-        var govforPlatoon = _platoonSpawnRuleSystem.SelectedGovforPlatoon;
-        var opforPlatoon = _platoonSpawnRuleSystem.SelectedOpforPlatoon;
+        var govforPlatoon = _platoonSpawnRuleSystem.RoundGovforPlatoon;
+        var opforPlatoon = _platoonSpawnRuleSystem.RoundOpforPlatoon;
         var govforFlag = govforPlatoon?.PlatoonFlag ?? "uaflag";
         var opforFlag = opforPlatoon?.PlatoonFlag ?? "uaflag_worn";
         if (!string.IsNullOrEmpty(govforFlag) && govforFlag == opforFlag)

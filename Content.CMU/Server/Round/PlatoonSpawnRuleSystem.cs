@@ -60,6 +60,32 @@ public sealed partial class PlatoonSpawnRuleSystem : GameRuleSystem<PlatoonSpawn
         }
     }
 
+    private PlatoonPrototype? _roundGovforPlatoon;
+    public PlatoonPrototype? RoundGovforPlatoon
+    {
+        get => _roundGovforPlatoon;
+        private set => _roundGovforPlatoon = value;
+    }
+
+    private PlatoonPrototype? _roundOpforPlatoon;
+    public PlatoonPrototype? RoundOpforPlatoon
+    {
+        get => _roundOpforPlatoon;
+        private set => _roundOpforPlatoon = value;
+    }
+
+    public void SetGovforForRound(PlatoonPrototype platoon)
+    {
+        SelectedGovforPlatoon = platoon;
+        RoundGovforPlatoon = platoon;
+    }
+
+    public void SetOpforForRound(PlatoonPrototype platoon)
+    {
+        SelectedOpforPlatoon = platoon;
+        RoundOpforPlatoon = platoon;
+    }
+
     protected override void Started(EntityUid uid, PlatoonSpawnRuleComponent component, GameRuleComponent gameRule, GameRuleStartedEvent args)
     {
         base.Started(uid, component, gameRule, args);
@@ -84,6 +110,9 @@ public sealed partial class PlatoonSpawnRuleSystem : GameRuleSystem<PlatoonSpawn
         // Store the resolved selections back onto the system so other systems can access them
         SelectedGovforPlatoon = govPlatoon;
         SelectedOpforPlatoon = opPlatoon;
+
+        RoundGovforPlatoon = govPlatoon;
+        RoundOpforPlatoon = opPlatoon;
 
         // --- SHIP VENDOR MARKER LOGIC ---
         if ((planetComp.GovforInShip || planetComp.OpforInShip))
@@ -602,5 +631,7 @@ public sealed partial class PlatoonSpawnRuleSystem : GameRuleSystem<PlatoonSpawn
         // Clear selections on rule end/restart so they don't persist across restarts
         SelectedGovforPlatoon = null;
         SelectedOpforPlatoon = null;
+        RoundGovforPlatoon = null;
+        RoundOpforPlatoon = null;
     }
 }
