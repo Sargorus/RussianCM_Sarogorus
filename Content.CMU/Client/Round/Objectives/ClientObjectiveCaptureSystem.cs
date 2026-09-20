@@ -1,52 +1,33 @@
 using Content.Shared.CMU14.Round.Objectives.Type;
+using Robust.Client.GameObjects;
 using Robust.Shared.GameStates;
 
 namespace Content.Client.CMU14.Round.Objectives;
 
 public sealed partial class ClientObjectiveCaptureSystem : EntitySystem
 {
-    private ISawmill _sawmill = default!;
+    [Dependency] private readonly SpriteSystem _sprite = default!;
 
     public override void Initialize()
     {
         base.Initialize();
-        _sawmill = Logger.GetSawmill("client-capture-obj");
-        SubscribeLocalEvent<CaptureObjectiveComponent, ComponentStartup>(OnCaptureObjectiveStartup);
-        SubscribeLocalEvent<CaptureObjectiveComponent, ComponentHandleState>(OnCaptureObjectiveState);
+        SubscribeLocalEvent<CaptureObjectiveComponent, AfterAutoHandleStateEvent>(OnCaptureObjectiveState);
     }
 
-    private void OnCaptureObjectiveStartup(EntityUid uid, CaptureObjectiveComponent comp, ref ComponentStartup args)
+    private void OnCaptureObjectiveState(Entity<CaptureObjectiveComponent> ent, ref AfterAutoHandleStateEvent args)
     {
-        UpdateFlagSpriteState(uid, comp);
+        UpdateFlagSpriteState(ent);
     }
 
-    private void OnCaptureObjectiveState(EntityUid uid, CaptureObjectiveComponent comp, ref ComponentHandleState args)
+    private void UpdateFlagSpriteState(Entity<CaptureObjectiveComponent> ent)
     {
-        UpdateFlagSpriteState(uid, comp);
-    }
-
-    private void UpdateFlagSpriteState(EntityUid flagUid, CaptureObjectiveComponent comp)
-    {
-        if (!TryComp<AppearanceComponent>(flagUid, out _))
+        if (string.IsNullOrEmpty(ent.Comp.CurrentSpriteState))
             return;
 
-        var faction = comp.CurrentController.ToLowerInvariant();
-        string? spriteState = null;
+        if (!TryComp<SpriteComponent>(ent, out var sprite))
+            return;
 
-        if (faction == "govfor")
-        {
-            spriteState = comp.GovforFlagState;
-        }
-        else if (faction == "opfor")
-        {
-            spriteState = comp.OpforFlagState;
-        }
-        else if (faction == "clf")
-        {
-            spriteState = "clfflag";
-        }
-        if (string.IsNullOrEmpty(spriteState))
-            spriteState = "uaflag";
-        _sawmill.Debug($"[CLIENT CAPTURE OBJ] Set sprite state for {flagUid} to {spriteState} (controller: {faction})");
+        // The flag sprite is a single layer defined by the wall flag prototypes.
+        _sprite.LayerSetRsiState((ent, sprite), 0, ent.Comp.CurrentSpriteState);
     }
 }

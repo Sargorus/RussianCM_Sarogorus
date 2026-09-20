@@ -3,9 +3,12 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared.CMU14.Round.Objectives.Type;
 
-[RegisterComponent, NetworkedComponent]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState(true)]
 public sealed partial class CaptureObjectiveComponent : Robust.Shared.GameObjects.Component
 {
+
+    public const string NeutralFlagState = "uaflag";
+
     public enum CaptureObjectiveStatus
     {
         Failed,
@@ -28,7 +31,7 @@ public sealed partial class CaptureObjectiveComponent : Robust.Shared.GameObject
     [DataField] public string Airfield { get; private set; } = string.Empty;
     [DataField] public float HoistTime { get; private set; } = 5.0f;
 
-    public string CurrentController = string.Empty;
+    [AutoNetworkedField] public string CurrentController = string.Empty;
     public int TimesIncremented = 0;
 
     [DataField] public float FlagInitialHealth { get; private set; } = 100f;
@@ -37,6 +40,21 @@ public sealed partial class CaptureObjectiveComponent : Robust.Shared.GameObject
     public string GovforFlagState = "uaflag_worn";
     public string OpforFlagState = "uaflag";
     public Dictionary<string, int> TimesIncrementedPerFaction { get; set; } = new();
+
+
+    [AutoNetworkedField] public string CurrentSpriteState = NeutralFlagState;
+
+    [AutoNetworkedField] public string ControllerDisplayName = string.Empty;
+
+    /// <summary>
+    /// Name of the platoon/subunit that captured the flag, when applicable. Empty otherwise.
+    /// </summary>
+    [AutoNetworkedField] public string ControllerPlatoonName = string.Empty;
+
+    /// <summary>
+    /// Time left until the next points increment, in seconds. Updated by the server each tick.
+    /// </summary>
+    [AutoNetworkedField] public float TimeUntilNextIncrement;
 
     public FlagActionState ActionState = FlagActionState.Idle;
     public EntityUid? ActionUser;

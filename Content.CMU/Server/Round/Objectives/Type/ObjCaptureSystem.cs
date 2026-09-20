@@ -41,21 +41,57 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
     private void OnReset(EntityUid uid, CaptureObjectiveComponent comp, ref ObjectiveResetEvent args)
     {
         comp.CurrentController = string.Empty;
+        comp.ControllerDisplayName = string.Empty;
+        comp.ControllerPlatoonName = string.Empty;
         comp.TimesIncremented = 0;
         comp.TimesIncrementedPerFaction.Clear();
         comp.ActionState = CaptureObjectiveComponent.FlagActionState.Idle;
         comp.ActionUser = null;
         comp.ActionUserFaction = null;
+        SetRemainingTime(uid, comp, 0f);
         Dirty(uid, comp);
     }
 
-    private string? GetPlatoonNameForFaction(string faction)
+    private void SetRemainingTime(EntityUid uid, CaptureObjectiveComponent comp, float remaining)
+    {
+        if (Math.Abs(comp.TimeUntilNextIncrement - remaining) < 0.01f)
+            return;
+
+        comp.TimeUntilNextIncrement = remaining;
+        Dirty(uid, comp);
+    }
+
+    private static string ResolveFlagSpriteState(string controller, string govforFlag, string opforFlag)
+    {
+        return controller.ToLowerInvariant() switch
+        {
+            "" => CaptureObjectiveComponent.NeutralFlagState,
+            "govfor" => string.IsNullOrEmpty(govforFlag) ? CaptureObjectiveComponent.NeutralFlagState : govforFlag,
+            "opfor" => string.IsNullOrEmpty(opforFlag) ? CaptureObjectiveComponent.NeutralFlagState : opforFlag,
+            "clf" => "clfflag",
+            _ => string.Empty, // unknown faction: leave the sprite unchanged
+        };
+    }
+
+    private string GetFactionDisplayName(string faction)
     {
         return faction.ToLowerInvariant() switch
         {
-            "govfor" => _platoonSpawnRuleSystem.SelectedGovforPlatoon?.Name,
-            "opfor" => _platoonSpawnRuleSystem.SelectedOpforPlatoon?.Name,
-            _ => null
+            "govfor" => Loc.GetString("cmu-capture-objective-faction-govfor"),
+            "opfor" => Loc.GetString("cmu-capture-objective-faction-opfor"),
+            "clf" => Loc.GetString("cmu-capture-objective-faction-clf"),
+            "weyu" => Loc.GetString("cmu-capture-objective-faction-weyu"),
+            _ => faction,
+        };
+    }
+
+    private string GetFactionSubunitName(string faction)
+    {
+        return faction.ToLowerInvariant() switch
+        {
+            "govfor" => _platoonSpawnRuleSystem.SelectedGovforPlatoon?.Name ?? string.Empty,
+            "opfor" => _platoonSpawnRuleSystem.SelectedOpforPlatoon?.Name ?? string.Empty,
+            _ => string.Empty,
         };
     }
 
@@ -110,10 +146,8 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
         comp.ActionUser = args.User;
         comp.ActionUserFaction = allowed;
 
-        var platoonName = GetPlatoonNameForFaction(allowed);
-        var displayName = !string.IsNullOrEmpty(platoonName) ? platoonName : allowed;
         _popup.PopupEntity(
-            Loc.GetString("cmu-capture-objective-begin-raising", ("faction", displayName)),
+            Loc.GetString("cmu-capture-objective-begin-raising", ("faction", GetFactionDisplayName(allowed))),
             uid,
             args.User,
             PopupType.Medium);
@@ -133,16 +167,23 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
         if (!string.IsNullOrEmpty(comp.CurrentController))
         {
             comp.CurrentController = string.Empty;
+            comp.ControllerDisplayName = string.Empty;
+            comp.ControllerPlatoonName = string.Empty;
+            _timeSinceLastIncrement.Remove(uid);
+            SetRemainingTime(uid, comp, 0f);
+            Dirty(uid, comp);
             _popup.PopupEntity(Loc.GetString("cmu-capture-objective-lowered"), uid, popupUser, PopupType.Medium);
         }
         else
         {
             comp.CurrentController = args.Faction;
-            var allowed = comp.CurrentController;
-            var platoonName = GetPlatoonNameForFaction(allowed);
-            var displayName = !string.IsNullOrEmpty(platoonName) ? platoonName : allowed;
+            comp.ControllerDisplayName = GetFactionDisplayName(comp.CurrentController);
+            comp.ControllerPlatoonName = GetFactionSubunitName(comp.CurrentController);
+            _timeSinceLastIncrement[uid] = 0f;
+            SetRemainingTime(uid, comp, comp.PointIncrementTime);
+            Dirty(uid, comp);
             _popup.PopupEntity(
-                Loc.GetString("cmu-capture-objective-raised", ("faction", displayName)),
+                Loc.GetString("cmu-capture-objective-raised", ("faction", comp.ControllerDisplayName)),
                 uid,
                 popupUser,
                 PopupType.Medium);
@@ -154,9 +195,9 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
         var govforPlatoon = _platoonSpawnRuleSystem.SelectedGovforPlatoon;
         var opforPlatoon = _platoonSpawnRuleSystem.SelectedOpforPlatoon;
         var govforFlag = govforPlatoon?.PlatoonFlag ?? "uaflag";
-        var opforFlag = opforPlatoon?.PlatoonFlag ?? "uaflagworn";
+        var opforFlag = opforPlatoon?.PlatoonFlag ?? "uaflag_worn";
         if (!string.IsNullOrEmpty(govforFlag) && govforFlag == opforFlag)
-            opforFlag = "uaflagworn";
+            opforFlag = "uaflag_worn";
 
         var query = EntityQueryEnumerator<CaptureObjectiveComponent, CMUObjectiveComponent>();
         while (query.MoveNext(out var uid, out var comp, out var objComp))
@@ -178,6 +219,10 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
                         if (!string.IsNullOrEmpty(comp.CurrentController))
                         {
                             comp.CurrentController = string.Empty;
+                            comp.ControllerDisplayName = string.Empty;
+                            comp.ControllerPlatoonName = string.Empty;
+                            SetRemainingTime(uid, comp, 0f);
+                            Dirty(uid, comp);
                             _popup.PopupEntity(Loc.GetString("cmu-capture-objective-damage-lowered"), uid, PopupType.Medium);
                         }
                     }
@@ -188,6 +233,13 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
             comp.GovforFlagState = govforFlag;
             comp.OpforFlagState = opforFlag;
 
+            var spriteState = ResolveFlagSpriteState(comp.CurrentController, govforFlag, opforFlag);
+            if (comp.CurrentSpriteState != spriteState)
+            {
+                comp.CurrentSpriteState = spriteState;
+                Dirty(uid, comp);
+            }
+
             if (!objComp.Active)
                 continue;
             if (comp.MaxHoldTimes > 0 && comp.TimesIncremented >= comp.MaxHoldTimes)
@@ -196,9 +248,20 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
                 continue;
             if (string.IsNullOrEmpty(comp.CurrentController))
                 continue;
+            // Only award points when the current controller belongs to one of the objective factions.
+            if (!IsObjectiveFaction(comp.CurrentController, objComp))
+                continue;
 
             _timeSinceLastIncrement.TryAdd(uid, 0f);
             _timeSinceLastIncrement[uid] += frameTime;
+
+            var remaining = Math.Max(0, comp.PointIncrementTime - _timeSinceLastIncrement[uid]);
+            if (Math.Ceiling(comp.TimeUntilNextIncrement) != Math.Ceiling(remaining))
+            {
+                comp.TimeUntilNextIncrement = remaining;
+                Dirty(uid, comp);
+            }
+
             if (!(_timeSinceLastIncrement[uid] >= comp.PointIncrementTime))
                 continue;
 
@@ -220,5 +283,17 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
             if (comp.MaxHoldTimes > 0 && comp.TimesIncremented >= comp.MaxHoldTimes)
                 ObjCtrl.CompleteObjectiveForFaction(uid, objComp, comp.CurrentController, sawmill: _logs);
         }
+    }
+
+    private static bool IsObjectiveFaction(string faction, CMUObjectiveComponent objComp)
+    {
+        if (string.IsNullOrEmpty(faction))
+            return false;
+
+        if (objComp.Factions.Count == 0)
+            return true;
+
+        var key = faction.ToLowerInvariant();
+        return objComp.Factions.Any(f => f.ToLowerInvariant() == key);
     }
 }
