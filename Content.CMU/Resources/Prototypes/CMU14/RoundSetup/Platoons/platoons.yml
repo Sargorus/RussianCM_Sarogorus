@@ -6,7 +6,7 @@
   reqlist: USCMCargoCatalog
   vendorSet: USCM
   platoonPatch: /Textures/CMU14/Clothing/Patches/uscm_patch.rsi/icon.png
-  #platoonflag:  uaflag
+  PlatoonFlag: cmflag
   languages:
     - English
   CompatibleDropships:
@@ -331,6 +331,7 @@
   name: UPP Naval Infantry
   lorePrimer: AU14PrimerPlatoonUPP
   Allegiance: UPP
+  PlatoonFlag: uppflag
   languages:
     - Russian
     - German
@@ -1626,6 +1627,7 @@
   name: TWE Royal Marine Commandos
   lorePrimer: AU14PrimerPlatoonRMC
   Allegiance: TWE
+  PlatoonFlag: tweflag
   languages:
     - Japanese
     - English
