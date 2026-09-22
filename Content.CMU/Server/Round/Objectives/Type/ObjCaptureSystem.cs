@@ -5,7 +5,6 @@ using Content.Shared.CMU14.Round.Objectives;
 using Content.Shared.CMU14.Round.Objectives.Type;
 using Content.Shared.CMU14.Round.Objectives.Components;
 using Content.Shared.Damage;
-using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.NPC.Components;
 using Content.Shared.Popups;
@@ -15,11 +14,9 @@ namespace Content.Server.CMU14.Round.Objectives.Type;
 public sealed partial class ObjCaptureSystem : ObjectiveSystem
 {
     [Dependency] private PopupSystem _popup = default!;
-    [Dependency] private DamageableSystem _damageable = default!;
     [Dependency] private PlatoonSpawnRuleSystem _platoonSpawnRuleSystem = default!;
 
     private readonly Dictionary<EntityUid, float> _timeSinceLastIncrement = new();
-    private readonly Dictionary<EntityUid, float> _lastSlashDamage = new();
     private static readonly string[] HoistAllowedFactions = ["govfor", "opfor", "clf", "weyu"];
 
     public override void Initialize()
@@ -29,12 +26,12 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
         SubscribeLocalEvent<CaptureObjectiveComponent, CaptureHoistFlagStartedEvent>(OnFlagHoistStarted);
         SubscribeLocalEvent<CaptureObjectiveComponent, CaptureHoistFlagDoAfterEvent>(OnHoistFlagDoAfter);
         SubscribeLocalEvent<CaptureObjectiveComponent, ObjectiveResetEvent>(OnReset);
+        SubscribeLocalEvent<CaptureObjectiveComponent, DamageChangedEvent>(OnFlagDamaged);
     }
 
     public override void Shutdown()
     {
         _timeSinceLastIncrement.Clear();
-        _lastSlashDamage.Clear();
         base.Shutdown();
     }
 
@@ -190,6 +187,27 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
         }
     }
 
+    private void OnFlagDamaged(EntityUid uid, CaptureObjectiveComponent comp, ref DamageChangedEvent args)
+    {
+        if (args.DamageDelta is not { } delta || !delta.DamageDict.TryGetValue("Slash", out var slash) || slash.Value <= 0f)
+            return;
+
+        comp.FlagHealth -= slash.Value;
+        if (comp.FlagHealth > 0f)
+            return;
+
+        comp.FlagHealth = comp.FlagInitialHealth;
+        if (string.IsNullOrEmpty(comp.CurrentController))
+            return;
+
+        comp.CurrentController = string.Empty;
+        comp.ControllerDisplayName = string.Empty;
+        comp.ControllerPlatoonName = string.Empty;
+        SetRemainingTime(uid, comp, 0f);
+        Dirty(uid, comp);
+        _popup.PopupEntity(Loc.GetString("cmu-capture-objective-damage-lowered"), uid, PopupType.Medium);
+    }
+
     public override void Update(float frameTime)
     {
         var govforPlatoon = _platoonSpawnRuleSystem.RoundGovforPlatoon;
@@ -202,34 +220,6 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
         var query = EntityQueryEnumerator<CaptureObjectiveComponent, CMUObjectiveComponent>();
         while (query.MoveNext(out var uid, out var comp, out var objComp))
         {
-            if (TryComp(uid, out DamageableComponent? damageable))
-            {
-                float currentSlash = 0f;
-                var damage = _damageable.GetAllDamage((uid, damageable));
-                if (damage.DamageDict.TryGetValue("Slash", out var slash))
-                    currentSlash = slash.Float();
-                _lastSlashDamage.TryGetValue(uid, out float lastSlash);
-                float delta = currentSlash - lastSlash;
-                if (delta > 0f)
-                {
-                    comp.FlagHealth -= delta;
-                    if (comp.FlagHealth <= 0f)
-                    {
-                        comp.FlagHealth = comp.FlagInitialHealth;
-                        if (!string.IsNullOrEmpty(comp.CurrentController))
-                        {
-                            comp.CurrentController = string.Empty;
-                            comp.ControllerDisplayName = string.Empty;
-                            comp.ControllerPlatoonName = string.Empty;
-                            SetRemainingTime(uid, comp, 0f);
-                            Dirty(uid, comp);
-                            _popup.PopupEntity(Loc.GetString("cmu-capture-objective-damage-lowered"), uid, PopupType.Medium);
-                        }
-                    }
-                }
-                _lastSlashDamage[uid] = currentSlash;
-            }
-
             comp.GovforFlagState = govforFlag;
             comp.OpforFlagState = opforFlag;
 
