@@ -7,8 +7,10 @@ cmu-capture-objective-begin-raising = You begin raising the flag for { $faction 
 cmu-capture-objective-lowered = You have lowered the flag.
 cmu-capture-objective-raised = You have raised the flag for { $faction }.
 cmu-capture-objective-damage-lowered = The flag has been lowered due to heavy damage!
-cmu-capture-objective-faction-govfor = USCM
-cmu-capture-objective-faction-opfor = UA Colonial Marines
+# RuMC edit start
+cmu-capture-objective-faction-govfor = GOFOR
+cmu-capture-objective-faction-opfor = OPFOR
+# RuMC edit end
 cmu-capture-objective-faction-clf = Colonial Liberation Front
 cmu-capture-objective-faction-weyu = WeYu
 cmu-capture-objective-examine-uncontrolled = No faction controls this flag.

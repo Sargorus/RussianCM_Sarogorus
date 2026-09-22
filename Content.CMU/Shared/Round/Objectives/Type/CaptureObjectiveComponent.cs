@@ -33,11 +33,11 @@ public sealed partial class CaptureObjectiveComponent : Robust.Shared.GameObject
     [AutoNetworkedField] public string CurrentController = string.Empty;
     public int TimesIncremented = 0;
 
-    [DataField] public float FlagInitialHealth { get; private set; } = 100f;
+    [DataField] public float FlagInitialHealth { get; private set; } = 50f;
     public float FlagHealth = 20f;
 
-    public string GovforFlagState = "uaflag_worn";
-    public string OpforFlagState = "uaflag";
+    public string GovforFlagState = "uaflag";
+    public string OpforFlagState = "uaflag_worn";
     public Dictionary<string, int> TimesIncrementedPerFaction { get; set; } = new();
 
     [AutoNetworkedField] public string CurrentSpriteState = NeutralFlagState;

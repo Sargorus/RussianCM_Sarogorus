@@ -5,6 +5,7 @@ using Content.Shared.CMU14.Round.Objectives;
 using Content.Shared.CMU14.Round.Objectives.Type;
 using Content.Shared.CMU14.Round.Objectives.Components;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Components; // RuMC edit: типы урона по флагу
 using Content.Shared.Damage.Systems;
 using Content.Shared.NPC.Components;
 using Content.Shared.Popups;
@@ -47,6 +48,11 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
         comp.ActionUserFaction = null;
         SetRemainingTime(uid, comp, 0f);
         Dirty(uid, comp);
+        // RuMC edit start
+        // Сбрасываем прочность флага и делаем его неуязвимым (опущен/нейтрален).
+        comp.FlagHealth = comp.FlagInitialHealth;
+        SetFlagDamageable(uid, false);
+        // RuMC edit end
     }
 
     private void SetRemainingTime(EntityUid uid, CaptureObjectiveComponent comp, float remaining)
@@ -57,6 +63,29 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
         comp.TimeUntilNextIncrement = remaining;
         Dirty(uid, comp);
     }
+
+    // RuMC edit start
+    // Флаг уязвим, только пока он поднят и контролируется фракцией.
+    // Когда флаг опущен (нейтрален) — у него нет Damageable, поэтому атаки по нему
+    // проходят как промах, и урон просто не наносится. Включаем/выключаем компоненты динамически.
+    // Нужны ОБА компонента: Damageable — чтобы атака не считалась промахом, а Injurable —
+    // чтобы урон действительно применялся (урон сохраняется только через DamageDealtEvent,
+    // который подписан на InjurableComponent). Без Injurable урон у флага обнуляется,
+    // и клиент показывает "не может нанести урон".
+    private void SetFlagDamageable(EntityUid uid, bool enabled)
+    {
+        if (enabled)
+        {
+            EnsureComp<DamageableComponent>(uid);
+            EnsureComp<InjurableComponent>(uid);
+        }
+        else
+        {
+            RemComp<DamageableComponent>(uid);
+            RemComp<InjurableComponent>(uid);
+        }
+    }
+    // RuMC edit end
 
     private static string ResolveFlagSpriteState(string controller, string govforFlag, string opforFlag)
     {
@@ -169,6 +198,8 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
             _timeSinceLastIncrement.Remove(uid);
             SetRemainingTime(uid, comp, 0f);
             Dirty(uid, comp);
+            // RuMC edit: флаг опущен — снова неуязвим.
+            SetFlagDamageable(uid, false);
             _popup.PopupEntity(Loc.GetString("cmu-capture-objective-lowered"), uid, popupUser, PopupType.Medium);
         }
         else
@@ -179,6 +210,9 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
             _timeSinceLastIncrement[uid] = 0f;
             SetRemainingTime(uid, comp, comp.PointIncrementTime);
             Dirty(uid, comp);
+            // RuMC edit: во время поднятия восстанавливаем прочность флага и делаем его уязвимым.
+            comp.FlagHealth = comp.FlagInitialHealth;
+            SetFlagDamageable(uid, true);
             _popup.PopupEntity(
                 Loc.GetString("cmu-capture-objective-raised", ("faction", comp.ControllerDisplayName)),
                 uid,
@@ -189,22 +223,29 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
 
     private void OnFlagDamaged(EntityUid uid, CaptureObjectiveComponent comp, ref DamageChangedEvent args)
     {
-        if (args.DamageDelta is not { } delta || !delta.DamageDict.TryGetValue("Slash", out var slash) || slash.Value <= 0f)
+        // RuMC edit: любые типы урона (не только Slash) должны опускать поднятый флаг.
+        if (args.DamageDelta is not { } delta || delta.GetTotal() <= 0)
             return;
 
-        comp.FlagHealth -= slash.Value;
+        comp.FlagHealth -= delta.GetTotal().Float();
         if (comp.FlagHealth > 0f)
             return;
 
         comp.FlagHealth = comp.FlagInitialHealth;
         if (string.IsNullOrEmpty(comp.CurrentController))
+        {
+            // Страховка: даже если добили уже нейтральный флаг — он остаётся неуязвимым.
+            SetFlagDamageable(uid, false);
             return;
+        }
 
         comp.CurrentController = string.Empty;
         comp.ControllerDisplayName = string.Empty;
         comp.ControllerPlatoonName = string.Empty;
         SetRemainingTime(uid, comp, 0f);
         Dirty(uid, comp);
+        // RuMC edit: флаг сбит уроном — снова опущен и неуязвим.
+        SetFlagDamageable(uid, false);
         _popup.PopupEntity(Loc.GetString("cmu-capture-objective-damage-lowered"), uid, PopupType.Medium);
     }
 
@@ -212,8 +253,12 @@ public sealed partial class ObjCaptureSystem : ObjectiveSystem
     {
         var govforPlatoon = _platoonSpawnRuleSystem.RoundGovforPlatoon;
         var opforPlatoon = _platoonSpawnRuleSystem.RoundOpforPlatoon;
-        var govforFlag = govforPlatoon?.PlatoonFlag ?? "uaflag";
-        var opforFlag = opforPlatoon?.PlatoonFlag ?? "uaflag_worn";
+        // RuMC edit start
+        // Если у взвода не задан свой флаг (PlatoonFlag пуст), используем дефолт:
+        // ГОФОР подымает обычный флаг UA, ОПФОР — порванный (uaflag_worn).
+        var govforFlag = string.IsNullOrEmpty(govforPlatoon?.PlatoonFlag) ? "uaflag" : govforPlatoon.PlatoonFlag;
+        var opforFlag = string.IsNullOrEmpty(opforPlatoon?.PlatoonFlag) ? "uaflag_worn" : opforPlatoon.PlatoonFlag;
+        // RuMC edit end
         if (!string.IsNullOrEmpty(govforFlag) && govforFlag == opforFlag)
             opforFlag = "uaflag_worn";
 

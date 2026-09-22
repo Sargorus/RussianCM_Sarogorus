@@ -1,4 +1,5 @@
-# Capture objectives
+# RuMC edit
+# Цели захвата
 cmu-capture-objective-already-hoisting = Флаг уже поднимают!
 cmu-capture-objective-already-lowering = Флаг уже опускают!
 cmu-capture-objective-begin-lowering = Вы начинаете опускать флаг...
@@ -7,8 +8,8 @@ cmu-capture-objective-begin-raising = Вы начинаете поднимать
 cmu-capture-objective-lowered = Вы опустили флаг.
 cmu-capture-objective-raised = Вы подняли флаг за { $faction }.
 cmu-capture-objective-damage-lowered = Флаг был опущен из-за сильных повреждений!
-cmu-capture-objective-faction-govfor = Правительственные силы
-cmu-capture-objective-faction-opfor = Противоборствующие силы
+cmu-capture-objective-faction-govfor = ГОВФОР
+cmu-capture-objective-faction-opfor = ОПФОР
 cmu-capture-objective-faction-clf = Колониальный освободительный фронт
 cmu-capture-objective-faction-weyu = Вейланд-Ютани
 cmu-capture-objective-examine-uncontrolled = Этот флаг не контролирует ни одна фракция.
@@ -21,7 +22,8 @@ cmu-capture-objective-examine-until-increment = До начисления очк
 cmu-capture-objective-duration-seconds = { $seconds } с
 cmu-capture-objective-duration-minutes-seconds = { $minutes } мин { $seconds } с
 
-# Interact objectives
+# RuMC edit
+# Цели взаимодействия
 cmu-interact-objective-need-tool = Для этого шага вам нужен { $tool }.
 cmu-interact-objective-completed = [color=green]Это уже выполнено.[/color]
 cmu-interact-objective-use-tool = Используйте [color=cyan]{ $tool }[/color] на этом.

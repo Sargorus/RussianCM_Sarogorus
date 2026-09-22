@@ -24,7 +24,7 @@
       maxHoldTimes: 10
       pointIncrementTime: 360
       visibleOnMap: true
-      flagInitialHealth: 100
+      flagInitialHealth: 50
     - type: NavMapBeacon
       text: Main Street
 
@@ -59,7 +59,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Super market
 
@@ -101,7 +101,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Tunnel
 
@@ -131,7 +131,7 @@
     maxHoldTimes: 15
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Desert
 
@@ -193,7 +193,7 @@
     maxHoldTimes: 20
     pointIncrementTime: 180
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Solar Farms
 
@@ -221,7 +221,7 @@
     maxHoldTimes: 20
     pointIncrementTime: 400
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Hermits Cabin
   - type: AreaLabel
@@ -250,7 +250,7 @@
     maxHoldTimes: 20
     pointIncrementTime: 800
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Admins Office
   - type: AreaLabel
@@ -279,7 +279,7 @@
     maxHoldTimes: 20
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Abandoned Camp
 
@@ -309,7 +309,7 @@
     maxHoldTimes: 20
     pointIncrementTime: 800
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Basement
   - type: AreaLabel
@@ -339,7 +339,7 @@
     maxHoldTimes: 20
     pointIncrementTime: 800
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Roof
   - type: AreaLabel
@@ -369,7 +369,7 @@
     maxHoldTimes: 20
     pointIncrementTime: 800
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Middle Floor
   - type: AreaLabel
@@ -401,7 +401,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: PAEK-500 Reactor Control
 
@@ -431,7 +431,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: PAEK-500 Coolant Control
 
@@ -461,7 +461,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: PAEK-500 Engine Control
 
@@ -491,7 +491,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: PAEK-500 Turbine Control
 
@@ -521,7 +521,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Colony Operations Room
 
@@ -551,7 +551,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: UAS-1 Mining Site
 
@@ -581,7 +581,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Geothermal Generators
 
@@ -611,7 +611,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Spaceport
 
@@ -641,7 +641,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: AC-170 Cargo Depot
 
@@ -671,7 +671,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Cargo Pier
 
@@ -702,7 +702,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Biodome Theta
 
@@ -732,7 +732,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Biodome Gamma
 
@@ -762,7 +762,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Biodome Sigma
 
@@ -792,7 +792,7 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Station Administration
 
@@ -822,6 +822,6 @@
     maxHoldTimes: 10
     pointIncrementTime: 360
     visibleOnMap: true
-    flagInitialHealth: 100
+    flagInitialHealth: 50
   - type: NavMapBeacon
     text: Research Complex
