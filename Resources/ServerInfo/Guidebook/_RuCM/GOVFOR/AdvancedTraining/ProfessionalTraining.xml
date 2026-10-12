@@ -1,0 +1,22 @@
+<Document>
+  # Профессиональная подготовка GOVFOR
+
+  Выберите специальность своей роли. Каждое пособие объясняет основную работу, предлагает практическую задачу и ведёт к отдельной методике оценки. Профессиональная квалификация дополняет требуемый военный уровень, а не заменяет его; степень знаний определяется реальными обязанностями должности.
+
+  Для специалиста достаточна безопасная надёжная штатная работа. Не требуется быть лучшим игроком сервера, проходить обязательный таймер или учить формулировки наизусть. Инструктор объясняет, показывает, даёт попробовать, исправляет и проверяет самостоятельное действие. Отметки и аттестация оформляются отдельно в личном деле уполномоченным лицом.
+  <!-- end-course-text -->
+  <GOVFORLocalizedText Key="rucm-guide-advanced-references"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCourseMedical"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCourseFieldEngineering"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCourseTechnicalEngineering"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCourseLogistics"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCourseHeavyWeapons"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCourseProfessionalCommunications"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCourseAviation"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCourseVehicleCrew"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCourseDroneOperator"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCourseMilitaryPolice"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCourseIntelligence"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORProfessionalAssessments"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORTrainingQualifications"/>
+</Document>

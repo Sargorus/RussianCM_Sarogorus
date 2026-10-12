@@ -19,6 +19,7 @@ public sealed partial class RankChangerSystem : EntitySystem
     [Dependency] private IPrototypeManager _prototypes = default!;
     [Dependency] private SharedContainerSystem _containers = default!;
     [Dependency] private SharedMarineSystem _marine = default!;
+    [Dependency] private InventorySystem _inventory = default!;
 
     public override void Initialize()
     {
@@ -29,7 +30,10 @@ public sealed partial class RankChangerSystem : EntitySystem
         SubscribeLocalEvent<RankChangerComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<RankChangerComponent, GotEquippedHandEvent>(OnEquippedHand);
         SubscribeLocalEvent<RankChangerComponent, GotUnequippedHandEvent>(OnUnequippedHand);
-
+        SubscribeLocalEvent<RankChangerComponent, EntGotInsertedIntoContainerMessage>(OnAccessoryInserted);
+        SubscribeLocalEvent<RankChangerComponent, EntGotRemovedFromContainerMessage>(OnAccessoryRemoved);
+        SubscribeLocalEvent<DidEquipEvent>(OnUniformEquipped);
+        SubscribeLocalEvent<DidUnequipEvent>(OnUniformUnequipped);
     }
 
     private void OnEquipped(Entity<RankChangerComponent> ent, ref GotEquippedEvent args)
@@ -45,7 +49,58 @@ public sealed partial class RankChangerSystem : EntitySystem
     private void OnShutdown(Entity<RankChangerComponent> ent, ref ComponentShutdown args)
     {
         if (_containers.TryGetContainingContainer(ent.Owner, out var container))
-            RevertRank(container.Owner, ent.Comp);
+            RevertRank(TryGetUniformWearer(container, out var wearer) ? wearer : container.Owner, ent.Comp);
+    }
+
+    private void OnAccessoryInserted(Entity<RankChangerComponent> ent, ref EntGotInsertedIntoContainerMessage args)
+    {
+        if (TryGetUniformWearer(args.Container, out var wearer))
+            ApplyRank(wearer, ent.Comp);
+    }
+
+    private void OnAccessoryRemoved(Entity<RankChangerComponent> ent, ref EntGotRemovedFromContainerMessage args)
+    {
+        if (TryGetUniformWearer(args.Container, out var wearer))
+            RevertRank(wearer, ent.Comp);
+    }
+
+    private bool TryGetUniformWearer(BaseContainer accessories, out EntityUid wearer)
+    {
+        wearer = default;
+        var uniform = accessories.Owner;
+        if (!TryComp<UniformAccessoryHolderComponent>(uniform, out var holder)
+            || accessories.ID != holder.ContainerId
+            || !_containers.TryGetContainingContainer(uniform, out var inventory)
+            || !_inventory.TryGetSlotEntity(inventory.Owner, "jumpsuit", out var equipped)
+            || equipped != uniform)
+            return false;
+
+        wearer = inventory.Owner;
+        return true;
+    }
+
+    private void OnUniformEquipped(DidEquipEvent args)
+    {
+        if ((args.SlotFlags & SlotFlags.INNERCLOTHING) == 0
+            || !TryComp<UniformAccessoryHolderComponent>(args.Equipment, out var holder)
+            || !_containers.TryGetContainer(args.Equipment, holder.ContainerId, out var accessories))
+            return;
+
+        foreach (var accessory in accessories.ContainedEntities)
+            if (TryComp<RankChangerComponent>(accessory, out var changer))
+                ApplyRank(args.EquipTarget, changer);
+    }
+
+    private void OnUniformUnequipped(DidUnequipEvent args)
+    {
+        if ((args.SlotFlags & SlotFlags.INNERCLOTHING) == 0
+            || !TryComp<UniformAccessoryHolderComponent>(args.Equipment, out var holder)
+            || !_containers.TryGetContainer(args.Equipment, holder.ContainerId, out var accessories))
+            return;
+
+        foreach (var accessory in accessories.ContainedEntities)
+            if (TryComp<RankChangerComponent>(accessory, out var changer))
+                RevertRank(args.EquipTarget, changer);
     }
 
     public void ApplyRank(EntityUid wearer, RankChangerComponent comp)

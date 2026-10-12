@@ -1,0 +1,4 @@
+- type: jobRequirementOverride
+  id: RuCMInsurgencyQualifications
+  jobs: {}
+  antags: {}

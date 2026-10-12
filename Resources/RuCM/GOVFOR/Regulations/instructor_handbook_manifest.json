@@ -1,0 +1,162 @@
+{
+  "id": "RuCMGOVFORInstructorHandbook",
+  "source": "Resources/RuCM/GOVFOR/Regulations/InstructorHandbook.md",
+  "chapters": [
+    {
+      "id": "RuCMGOVFORInstructorHandbookWork",
+      "title": "Работа инструктора",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Work.xml",
+      "checklist_item": null,
+      "references": [
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORRecruitCourse"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookLesson",
+      "title": "Как проводить занятие",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Lesson.xml",
+      "checklist_item": null,
+      "references": [
+        "RuCMGOVFORRecruitCourseIntroduction",
+        "RuCMGOVFORTrainingQualifications"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookAssessment",
+      "title": "Как принимать зачёт",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Assessment.xml",
+      "checklist_item": null,
+      "references": [
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORRecruitCourseReference",
+        "AU14SOP",
+        "AU14UCMJ"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookMilitaryRegulations",
+      "title": "Общевоинская подготовка",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/MilitaryRegulations.xml",
+      "checklist_item": "military_regulations",
+      "references": [
+        "RuCMGOVFORRecruitCourseMilitaryRegulations",
+        "AU14SOP",
+        "AU14UCMJ",
+        "RuCMGOVFORDrillRegulations"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookDrill",
+      "title": "Строевая подготовка",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Drill.xml",
+      "checklist_item": "drill",
+      "references": [
+        "RuCMGOVFORRecruitCourseDrill",
+        "RuCMGOVFORDrillRegulations"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookCommunications",
+      "title": "Связь",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Communications.xml",
+      "checklist_item": "communications",
+      "references": [
+        "RuCMGOVFORRecruitCourseCommunications",
+        "RuCMGOVFORCommunications"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookFirearms",
+      "title": "Огневая подготовка",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Firearms.xml",
+      "checklist_item": "firearms",
+      "references": [
+        "RuCMGOVFORRecruitCourseFirearms",
+        "AU14SOP"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookTactics",
+      "title": "Тактическая подготовка",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Tactics.xml",
+      "checklist_item": "tactics",
+      "references": [
+        "RuCMGOVFORRecruitCourseTactics",
+        "RuCMGOVFORUnitCommand"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookFirstAid",
+      "title": "Военно-медицинская подготовка",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/FirstAid.xml",
+      "checklist_item": "first_aid",
+      "references": [
+        "RuCMGOVFORRecruitCourseFirstAid",
+        "AU14SOP"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookTopography",
+      "title": "Военная топография",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Topography.xml",
+      "checklist_item": "topography",
+      "references": [
+        "RuCMGOVFORRecruitCourseTopography",
+        "RuCMGOVFORCommunications"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookEngineeringBasics",
+      "title": "Инженерная подготовка",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/EngineeringBasics.xml",
+      "checklist_item": "engineering_basics",
+      "references": [
+        "RuCMGOVFORRecruitCourseEngineeringBasics",
+        "AU14SOP"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookFieldExercise",
+      "title": "Учебные сборы",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/FieldExercise.xml",
+      "checklist_item": "field_exercise",
+      "references": [
+        "RuCMGOVFORRecruitCourseFieldExercise",
+        "RuCMGOVFORTrainingQualifications"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookGroup",
+      "title": "Группа, дисциплина и объективность",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Group.xml",
+      "checklist_item": null,
+      "references": [
+        "RuCMGOVFORRecruitCourseTactics",
+        "RuCMGOVFORDrillRegulations",
+        "AU14UCMJ"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookCertification",
+      "title": "Аттестация",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Certification.xml",
+      "checklist_item": null,
+      "references": [
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORRecruitCourseReference"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORInstructorHandbookReference",
+      "title": "Памятка инструктора",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Reference.xml",
+      "checklist_item": null,
+      "references": [
+        "RuCMGOVFORRecruitCourse",
+        "RuCMGOVFORTrainingQualifications"
+      ]
+    }
+  ],
+  "validation": "Not run at the user request"
+}

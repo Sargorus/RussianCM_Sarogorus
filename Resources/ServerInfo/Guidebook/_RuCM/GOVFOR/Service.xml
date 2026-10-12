@@ -1,0 +1,6 @@
+<Document>
+  <GOVFORLocalizedText Key="rucm-guide-index-service"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCommunications"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORUnitCommand"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORTrainingQualifications"/>
+</Document>

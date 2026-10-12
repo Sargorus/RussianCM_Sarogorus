@@ -2,7 +2,7 @@ using Robust.Shared.Timing;
 
 namespace Content.Shared.CMU14.Callsigns;
 
-// a faction member's assigned radio callsign ("ALPHA 6", "HAVOC ROMEO"), assigned
+// a faction member's assigned radio callsign ("SABRE 01", "CHAOS 04"), assigned
 // automatically at spawn from job and squad.
 //
 // deliberately NOT networked: a networked callsign ships every faction member's

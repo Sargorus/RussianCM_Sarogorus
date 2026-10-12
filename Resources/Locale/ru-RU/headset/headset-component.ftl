@@ -1,6 +1,10 @@
 # Chat window radio wrap (prefix and postfix)
-chat-radio-message-wrap = [color={ $color }]{ $channel }: [font={ $fontType } size={ $fontSize }][BubbleHeader]{ $name }[/BubbleHeader] { $verb}, "{ $message }"[/font][/color]
-chat-radio-message-wrap-bold = [color={ $color }]{ $channel }: [font={ $fontType } size={ $fontSize }][BubbleHeader]{ $name }[/BubbleHeader] { $verb}, [bold]"{ $message }"[/bold][/font][/color]
+# CMU14 Radio Begin: radio chat shows quoted speech without automatic sender identity.
+# chat-radio-message-wrap = [color={ $color }]{ $channel }: [font={ $fontType } size={ $fontSize }][BubbleHeader]{ $name }[/BubbleHeader] { $verb}, "{ $message }"[/font][/color]
+# chat-radio-message-wrap-bold = [color={ $color }]{ $channel }: [font={ $fontType } size={ $fontSize }][BubbleHeader]{ $name }[/BubbleHeader] { $verb}, [bold]"{ $message }"[/bold][/font][/color]
+chat-radio-message-wrap = [color={ $color }]{ $channel }: [font={ $fontType } size={ $fontSize }]"{ $message }"[/font][/color]
+chat-radio-message-wrap-bold = [color={ $color }]{ $channel }: [font={ $fontType } size={ $fontSize }][bold]"{ $message }"[/bold][/font][/color]
+# CMU14 End
 
 examine-headset-default-channel = Канал по умолчанию этой гарнитуры [color={ $color }]{ $channel }[/color].
 

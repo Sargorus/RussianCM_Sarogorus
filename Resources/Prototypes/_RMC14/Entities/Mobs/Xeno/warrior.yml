@@ -83,9 +83,6 @@
     max: 500
     evolvesTo:
     - RMCXenoCrusher
-    # CMU14
-    - CMXenoWarlock
-    # CMU14
     - CMXenoPraetorian
     strains:
     - CMXenoWarriorBulwark

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# CMU14 Begin: downstream changelog assembly and Russian Discord delivery.
 """
 Extract changelog .yml parts from merged PRs via their :cl: blocks.
 
@@ -12,6 +13,7 @@ usage: update_changelog_parts.py <parts-dir> [--changelog-file FILE]
 
 import argparse
 import datetime
+import hashlib
 import os
 import re
 from pathlib import Path
@@ -23,7 +25,7 @@ CATEGORY_MAIN = "Main"
 GITHUB_API_URL = "https://api.github.com"
 FALLBACK_DATE = "2025-06-01T00:00:00Z"
 INITIAL_LOOKBACK_DAYS = 30
-REPOSITORY_OVERLAP_DAYS = 2
+REPOSITORY_OVERLAP_DAYS = 7
 
 COMMENT_RE = re.compile(r"<!--.*?-->", re.DOTALL)
 HEADER_RE = re.compile(
@@ -67,6 +69,10 @@ def make_session(token: str) -> requests.Session:
 
 
 def parse_time(value: str) -> datetime.datetime:
+    # Historical upstream files contain dates such as 2024-1-4; normalize only
+    # that known representation, while still rejecting genuinely invalid dates.
+    value = re.sub(r"^(\d{4})-(\d{1,2})-(\d{1,2})(?=T|$)",
+                   lambda m: f"{m[1]}-{int(m[2]):02d}-{int(m[3]):02d}", str(value))
     parsed = datetime.datetime.fromisoformat(value.replace("Z", "+00:00"))
     if parsed.tzinfo is None:
         parsed = parsed.replace(tzinfo=datetime.timezone.utc)
@@ -105,11 +111,13 @@ def get_scan_start(entries: list[dict], repo: str, explicit_start: str | None) -
     return FALLBACK_DATE
 
 
-def get_merged_prs(sess: requests.Session, repo: str, since: str) -> list[dict]:
+def get_merged_prs(sess: requests.Session, repo: str, since: str, base: str | None = None) -> list[dict]:
     prs = []
     page = 1
     while True:
         q = f"repo:{repo} is:pr is:merged merged:>={since}"
+        if base:
+            q += f" base:{base}"
         resp = sess.get(
             f"{GITHUB_API_URL}/search/issues",
             params={
@@ -119,6 +127,7 @@ def get_merged_prs(sess: requests.Session, repo: str, since: str) -> list[dict]:
                 "per_page": 100,
                 "page": page,
             },
+            timeout=30,
         )
         resp.raise_for_status()
         items = resp.json()["items"]
@@ -132,7 +141,7 @@ def get_merged_prs(sess: requests.Session, repo: str, since: str) -> list[dict]:
 
 
 def fetch_pr(sess: requests.Session, repo: str, number: int) -> dict:
-    resp = sess.get(f"{GITHUB_API_URL}/repos/{repo}/pulls/{number}")
+    resp = sess.get(f"{GITHUB_API_URL}/repos/{repo}/pulls/{number}", timeout=30)
     resp.raise_for_status()
     return resp.json()
 
@@ -195,7 +204,9 @@ def write_part(
     if labels:
         part["labels"] = labels
 
-    path = os.path.join(parts_dir, f"pr-{pr_number}.yml")
+    # Local and upstream repositories can use the same PR number in the shared Parts directory.
+    namespace = hashlib.sha256(url.rstrip("/").encode()).hexdigest()[:12]
+    path = os.path.join(parts_dir, f"pr-{pr_number}-{namespace}.yml")
     if os.path.exists(path):
         print(f"Part for PR #{pr_number} already exists, skipping.")
         return False
@@ -224,7 +235,8 @@ def main():
 
     print(f"Fetching PRs from {repo} merged since {since}")
     sess = make_session(token)
-    prs = get_merged_prs(sess, repo, since)
+    base = os.environ.get("GITHUB_BASE_BRANCH")
+    prs = get_merged_prs(sess, repo, since, base)
     print(f"Found {len(prs)} merged PRs")
 
     written = 0
@@ -235,6 +247,8 @@ def main():
             continue
 
         pr = fetch_pr(sess, repo, item["number"])
+        if base and pr.get("base", {}).get("ref") != base:
+            continue
         body = pr.get("body") or ""
         result = parse_cl_block(body, pr["user"]["login"])
         if result is None:
@@ -247,7 +261,7 @@ def main():
             print(f"PR #{pr['number']}: no merged_at value, skipping")
             continue
 
-        time = merged_at.replace("Z", ".0000000+00:00")
+        time = format_time(parse_time(merged_at))
         labels = [label["name"] for label in pr.get("labels", []) if label.get("name")]
         if write_part(
             args.parts_dir,
@@ -267,3 +281,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+# CMU14 End

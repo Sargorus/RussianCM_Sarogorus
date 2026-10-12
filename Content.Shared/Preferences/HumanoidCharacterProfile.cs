@@ -7,6 +7,7 @@ using Content.Shared._RMC14.Xenonids.Name;
 using Content.Shared.CMU14.Allegiance;
 using Content.Shared.CMU14.Origin;
 using Content.Shared.CMU14.Threats;
+using Content.Shared.CMU14.Yautja;
 using Content.Shared.CCVar;
 using Content.Shared.Clothing;
 using Content.Shared.Chat.Prototypes;
@@ -133,9 +134,10 @@ namespace Content.Shared.Preferences
         [DataField]
         public ProtoId<EmoteSoundsPrototype> Voice { get; set; } = DefaultVoice;
 
+        // CMU14 TTS Begin: shared voice preference and validation.
         public const string DefaultTTSVoice = "PUCHKOW";
         [DataField]
-        public string TTSVoice { get; set; } = DefaultTTSVoice;
+        public string TTSVoice { get; set; } = Content.Shared.Corvax.TTS.CMUTTSVoiceSelection.RandomVoice;
 
         public HumanoidCharacterProfile WithTTSVoice(string voice)
         {
@@ -144,20 +146,22 @@ namespace Content.Shared.Preferences
 
         public static bool IsSelectableTTSVoice(Content.Shared.Corvax.TTS.TTSVoicePrototype voice)
         {
-            return voice.RoundStart && !voice.SponsorOnly;
+            return Content.Shared.Corvax.TTS.CMUTTSVoiceSelection.IsSelectable(voice);
         }
 
-        public static string ValidateTTSVoice(string? voice, IPrototypeManager prototypes)
+        public static string ValidateTTSVoice(string? voice, IPrototypeManager prototypes, Sex? sex = null)
         {
             if (Content.Shared.Corvax.TTS.CustomTTSVoice.TryGetSpeaker(voice, out _))
                 return voice!;
 
             return !string.IsNullOrWhiteSpace(voice) &&
                    prototypes.TryIndex<Content.Shared.Corvax.TTS.TTSVoicePrototype>(voice, out var prototype) &&
-                   IsSelectableTTSVoice(prototype)
+                   Content.Shared.Corvax.TTS.CMUTTSVoiceSelection.IsSelectable(prototype, sex)
                 ? voice
-                : DefaultTTSVoice;
+                : Content.Shared.Corvax.TTS.CMUTTSVoiceSelection.RandomVoice;
         }
+
+        // CMU14 End
 
         [DataField]
         public Gender Gender { get; private set; } = Gender.Male;
@@ -258,6 +262,8 @@ namespace Content.Shared.Preferences
         [DataField]
         public ProtoId<PlatoonPrototype>? Platoon { get; private set; } = null;
 
+        [DataField]
+        public YautjaCharacterProfile YautjaProfile { get; private set; } = YautjaCharacterProfile.Default;
         /// <summary>
         /// Whether this character is a synthetic. Requires the synthetic job whitelist to
         /// set to true; if true, the character will only be resolved into synthetic jobs.
@@ -333,7 +339,8 @@ namespace Content.Shared.Preferences
             string height = "",
             int weight = 160,
             BuildType build = BuildType.Average,
-            bool hideMetaInformation = false)
+            bool hideMetaInformation = false,
+            YautjaCharacterProfile? yautjaProfile = null)
         {
             Name = name;
             FlavorText = flavortext;
@@ -364,6 +371,7 @@ namespace Content.Shared.Preferences
             _gamemodeJobPriorities = NormalizeGamemodeJobPriorities(gamemodeJobPriorities);
             _gamemodeAntagPreferences = NormalizeGamemodeSetPreferences(gamemodeAntagPreferences);
             _gamemodeThreatPreferences = NormalizeGamemodeSetPreferences(gamemodeThreatPreferences);
+            YautjaProfile = yautjaProfile?.Clone() ?? YautjaCharacterProfile.Default;
             ShortExamine = shortExamine;
             FullDescription = fullDescription;
             MedicalRecord = medicalRecord;
@@ -376,7 +384,7 @@ namespace Content.Shared.Preferences
             HideMetaInformation = hideMetaInformation;
         }
 
-        private static string NormalizePreferenceGamemode(string? gamemode)
+        private static string NormalizePreferenceGamemode(string? gamemode) // CMU14 Method
         {
             if (string.IsNullOrWhiteSpace(gamemode))
                 return string.Empty;
@@ -386,6 +394,8 @@ namespace Content.Shared.Preferences
                 "insurgency" => "Insurgency",
                 "colonyfall" => "ColonyFall",
                 "distresssignal" => "DistressSignal",
+                // CMU14: Force on Force roles, hijacking, announcements and identification.
+                "forceonforce" => "ForceOnForce",
                 _ => gamemode.Trim()
             };
         }
@@ -513,9 +523,13 @@ namespace Content.Shared.Preferences
                 other.Height,
                 other.Weight,
                 other.Build,
-                other.HideMetaInformation)
+                other.HideMetaInformation,
+                other.YautjaProfile)
         {
             TTSVoice = other.TTSVoice;
+            // CMU14: Force on Force roles, hijacking, announcements and identification.
+            FoFSide = other.FoFSide;
+            FoFFallback = other.FoFFallback;
         }
 
         /// <summary>
@@ -688,6 +702,13 @@ namespace Content.Shared.Preferences
 
             profile.Sex = (randomizeCfg & RandomizeCfg.Sex) != 0 ? RandomSex(speciesProto) : baseProfile.Sex;
             profile.Voice = speciesProto.DefaultSoundsBySex[(int)profile.Sex];
+            // CMU14 TTS Begin: give randomized humanoids a voice matching their sex.
+            var ttsVoices = Content.Shared.Corvax.TTS.CMUTTSVoiceSelection.GetRandomVoices(
+                prototypeManager.EnumeratePrototypes<Content.Shared.Corvax.TTS.TTSVoicePrototype>(), profile.Sex);
+            profile.TTSVoice = (randomizeCfg & RandomizeCfg.Sex) != 0 && ttsVoices.Length > 0
+                ? IoCManager.Resolve<IRobustRandom>().Pick(ttsVoices).ID
+                : ValidateTTSVoice(baseProfile.TTSVoice, prototypeManager, profile.Sex);
+            // CMU14 End
             profile.Gender = (randomizeCfg & RandomizeCfg.Gender) != 0 ? RandomGender(profile.Sex) : baseProfile.Gender;
             profile.Name = (randomizeCfg & RandomizeCfg.Name) != 0 ? RandomName(speciesProto, profile.Gender) : baseProfile.Name;
             profile.Age = (randomizeCfg & RandomizeCfg.Age) != 0 ? RandomAge(speciesProto) : baseProfile.Age;
@@ -855,6 +876,11 @@ namespace Content.Shared.Preferences
             {
                 Platoon = platoon
             };
+        }
+
+        public HumanoidCharacterProfile WithYautjaProfile(YautjaCharacterProfile profile)
+        {
+            return new(this) { YautjaProfile = profile.Clone() };
         }
 
         public HumanoidCharacterProfile WithSynthetic(bool synthetic)
@@ -1230,6 +1256,8 @@ namespace Content.Shared.Preferences
             if (Gender != other.Gender) return false;
             if (Species != other.Species) return false;
             if (PreferenceUnavailable != other.PreferenceUnavailable) return false;
+            // CMU14: Force on Force roles, hijacking, announcements and identification.
+            if (FoFSide != other.FoFSide || FoFFallback != other.FoFFallback) return false;
             if (SpawnPriority != other.SpawnPriority) return false;
             if (SquadPreference != other.SquadPreference) return false;
             if (!_jobPriorities.SequenceEqual(other._jobPriorities)) return false;
@@ -1247,6 +1275,28 @@ namespace Content.Shared.Preferences
             if (Allegiance != other.Allegiance) return false;
             if (Origin != other.Origin) return false;
             if (Platoon != other.Platoon) return false;
+            if (!YautjaProfile.Appearance.Equals(other.YautjaProfile.Appearance) ||
+                YautjaProfile.Name != other.YautjaProfile.Name ||
+                YautjaProfile.Age != other.YautjaProfile.Age ||
+                YautjaProfile.Sex != other.YautjaProfile.Sex ||
+                YautjaProfile.Gender != other.YautjaProfile.Gender ||
+                YautjaProfile.ArmorPrototype != other.YautjaProfile.ArmorPrototype ||
+                YautjaProfile.MaskPrototype != other.YautjaProfile.MaskPrototype ||
+                YautjaProfile.MaskAccessoryPrototype != other.YautjaProfile.MaskAccessoryPrototype ||
+                YautjaProfile.GreavesPrototype != other.YautjaProfile.GreavesPrototype ||
+                YautjaProfile.BracerPrototype != other.YautjaProfile.BracerPrototype ||
+                YautjaProfile.CasterPrototype != other.YautjaProfile.CasterPrototype ||
+                YautjaProfile.ClanRank != other.YautjaProfile.ClanRank ||
+                YautjaProfile.OwnerRank != other.YautjaProfile.OwnerRank ||
+                YautjaProfile.Status != other.YautjaProfile.Status ||
+                YautjaProfile.CapePrototype != other.YautjaProfile.CapePrototype ||
+                YautjaProfile.CapeColor != other.YautjaProfile.CapeColor ||
+                YautjaProfile.TranslatorType != other.YautjaProfile.TranslatorType ||
+                YautjaProfile.InvisibilitySound != other.YautjaProfile.InvisibilitySound ||
+                YautjaProfile.Legacy != other.YautjaProfile.Legacy ||
+                YautjaProfile.Unique != other.YautjaProfile.Unique ||
+                YautjaProfile.FlavorText != other.YautjaProfile.FlavorText)
+                return false;
             if (Synthetic != other.Synthetic) return false;
             if (ShortExamine != other.ShortExamine) return false;
             if (FullDescription != other.FullDescription) return false;
@@ -1302,11 +1352,11 @@ namespace Content.Shared.Preferences
             return true;
         }
 
+        // CMU14 method: validate TTS after normalizing the character's sex.
         public void EnsureValid(ICommonSession session, IDependencyCollection collection)
         {
             var configManager = collection.Resolve<IConfigurationManager>();
             var prototypeManager = collection.Resolve<IPrototypeManager>();
-            TTSVoice = ValidateTTSVoice(TTSVoice, prototypeManager);
             var compFactory = collection.Resolve<IComponentFactory>();
 
             if (!prototypeManager.TryIndex(Species, out var speciesPrototype) || speciesPrototype.RoundStart == false)
@@ -1379,6 +1429,12 @@ namespace Content.Shared.Preferences
             {
                 name = GetName(Species, gender);
             }
+
+            // cmu edit start
+            name = Content.Shared.CMU14.Preferences.CMUCharacterName.Normalize(name,
+                Origin == Content.Shared.CMU14.Preferences.CMUCharacterName.ArtificialWombOrigin,
+                Synthetic);
+            // cmu edit end
 
             string flavortext;
             var maxFlavorTextLength = configManager.GetCVar(CCVars.MaxFlavorTextLength);
@@ -1494,6 +1550,7 @@ namespace Content.Shared.Preferences
             FlavorText = flavortext;
             Age = age;
             Sex = sex;
+            TTSVoice = ValidateTTSVoice(TTSVoice, prototypeManager, sex);
             Voice = voice;
             Gender = gender;
             Appearance = appearance;
@@ -1550,6 +1607,9 @@ namespace Content.Shared.Preferences
             _gamemodeJobPriorities = gamemodeJobPriorities;
 
             PreferenceUnavailable = prefsUnavailableMode;
+            // CMU14: Force on Force roles, hijacking, announcements and identification.
+            if (!Enum.IsDefined(FoFSide)) FoFSide = ForceOnForceSide.Either;
+            if (!Enum.IsDefined(FoFFallback)) FoFFallback = ForceOnForceFallback.StayInLobby;
 
             _antagPreferences.Clear();
             _antagPreferences.UnionWith(antags);
@@ -1567,15 +1627,22 @@ namespace Content.Shared.Preferences
 
             foreach (var (roleName, loadouts) in _loadouts)
             {
-                if (!prototypeManager.HasIndex<RoleLoadoutPrototype>(roleName))
+                // CMU14: concrete pilot jobs can inherit their loadout from a parent job.
+                var resolvedRole = roleName;
+                if (!prototypeManager.HasIndex<RoleLoadoutPrototype>(resolvedRole))
                 {
-                    toRemove.Add(roleName);
-                    continue;
+                    var jobId = roleName.StartsWith("Job") ? roleName.Substring(3) : roleName;
+                    var (_, inherited) = LoadoutSystem.GetJobLoadoutInfo(jobId, prototypeManager);
+                    if (inherited == null)
+                    {
+                        toRemove.Add(roleName);
+                        continue;
+                    }
+                    resolvedRole = inherited.ID;
                 }
 
-                // This happens after we verify the prototype exists
-                // These values are set equal in the database and we need to make sure they're equal here too!
-                loadouts.Role = roleName;
+                // CMU14: preserve the concrete selection key while validating the inherited loadout.
+                loadouts.Role = resolvedRole;
                 loadouts.EnsureValid(this, session, collection);
             }
 
@@ -1724,6 +1791,9 @@ namespace Content.Shared.Preferences
             hashCode.Add((int)ArmorPreference);
             hashCode.Add(SquadPreference);
             hashCode.Add((int)PreferenceUnavailable);
+            // CMU14: Force on Force roles, hijacking, announcements and identification.
+            hashCode.Add(FoFSide);
+            hashCode.Add(FoFFallback);
             hashCode.Add(NamedItems);
             hashCode.Add(PlaytimePerks);
             hashCode.Add(XenoPrefix);

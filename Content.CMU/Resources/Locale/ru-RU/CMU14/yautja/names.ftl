@@ -1,4 +1,4 @@
-# Yautja names sourced from CMSS13 commit e97c5f08fdcfd60743481011e30ccdccc7fd7c88:
+# Имена яутжа взяты из CMSS13 commit e97c5f08fdcfd60743481011e30ccdccc7fd7c88:
 # code/_globalvars/lists/names.dm GLOB.pred_names and GLOB.pred_last_names.
 
 cmu-name-yautja-first-1 = Nu'koir

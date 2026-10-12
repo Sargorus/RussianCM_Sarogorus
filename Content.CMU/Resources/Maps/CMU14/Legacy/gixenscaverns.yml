@@ -5,7 +5,7 @@ meta:
   forkId: ""
   forkVersion: ""
   time: 08/23/2025 01:33:55
-  entityCount: 7774
+  entityCount: 7753
 maps:
 - 2
 grids:
@@ -39007,7 +39007,7 @@ entities:
       rot: -1.5707963267948966 rad
       pos: 79.5,-6.5
       parent: 2
-- proto: RMCCanisterBrokenBase
+- proto: PlasmaCanisterBroken
   entities:
   - uid: 6862
     components:
@@ -39480,7 +39480,7 @@ entities:
     - type: Transform
       pos: 83.69706,242.47818
       parent: 2
-- proto: RMCGeneratorFusionColony
+- proto: CMUGeneratorThermo
   entities:
   - uid: 6927
     components:
@@ -44825,4 +44825,17 @@ entities:
     - type: Transform
       pos: 7.5,29.5
       parent: 2
+- proto: CMUYautjaGroundRelayDestination
+  entities:
+  - uid: 7775
+    components:
+    - type: MetaData
+      name: Gixens Caverns ground relay
+    - type: Transform
+      pos: 78.43822,32.16383
+      parent: 2
+    - type: YautjaRelayDestination
+      kind: Ground
+      id: gixens-caverns.ground.relay
+      displayName: Gixens Caverns Ground Relay
 ...

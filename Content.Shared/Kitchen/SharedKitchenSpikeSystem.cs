@@ -94,7 +94,9 @@ public sealed partial class SharedKitchenSpikeSystem : EntitySystem
     {
         if (args.Cancelled ||
             TryComp<ButcherableComponent>(args.EntityUid, out var butcherable) &&
-            butcherable.Type == ButcheringType.Spike)
+            // CMU14: colonists are Knife-type, the meat rack takes them alongside animals
+            (butcherable.Type == ButcheringType.Spike
+             || butcherable.Type == ButcheringType.Knife))
         {
             return;
         }
@@ -155,7 +157,7 @@ public sealed partial class SharedKitchenSpikeSystem : EntitySystem
 
         if (butcherable.SpawnedEntities.Count == 0)
         {
-            _popupSystem.PopupClient(Loc.GetString("comp-kitchen-spike-butcher-empty", ("victim", Identity.Entity(victim.Value, EntityManager))), ent, args.User, PopupType.MediumCaution);
+            _popupSystem.PopupEntity(Loc.GetString("comp-kitchen-spike-butcher-empty", ("victim", Identity.Entity(victim.Value, EntityManager))), ent, args.User, PopupType.MediumCaution);
             return;
         }
 

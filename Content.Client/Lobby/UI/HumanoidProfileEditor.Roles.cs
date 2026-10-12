@@ -25,6 +25,8 @@ namespace Content.Client.Lobby.UI;
 public sealed partial class HumanoidProfileEditor
 {
     private const string InsurgencyDepartmentId = "AU14DepartmentColonialLiberationFront";
+    private const string ColonistJobId = "AU14JobCivilianColonist";
+    private const string ColonistSpecialLoadoutId = "AU14ColonistSpecialLoadout";
 
     /// <summary>
     /// Temporary override of the selected job, used to preview roles.
@@ -32,6 +34,8 @@ public sealed partial class HumanoidProfileEditor
     public JobPrototype? JobOverride;
 
     private LoadoutWindow? _loadoutWindow;
+    private ColonistSkillEditorWindow? _colonistSkillWindow;
+    private ColonistClothingWindow? _colonistClothingWindow;
     [ViewVariables] private PlatoonRankPreferenceWindow? _rankPreferenceWindow;
 
     private readonly List<(string Gamemode, string JobId, RequirementsSelector Selector)> _jobPriorities = new();
@@ -42,19 +46,30 @@ public sealed partial class HumanoidProfileEditor
     {
         foreach (var (gamemode, jobId, selector) in _jobPriorities)
         {
-            var priority = Profile?.GetJobPriorityForGamemode(gamemode, jobId) ?? JobPriority.Never;
+            // CMU14: faction gameplay fixes.
+            var priority = gamemode == GamemodeForceOnForce && _prototypeManager.TryIndex<JobPrototype>(jobId, out var job)
+                ? Profile?.GetForceOnForceJobPriority(job, _prototypeManager) ?? JobPriority.Never
+                : Profile?.GetJobPriorityForGamemode(gamemode, jobId) ?? JobPriority.Never;
             selector.Select((int) priority);
         }
+    // CMU14: faction gameplay fixes.
+    }
+
+    private void SetJobPriority(string gamemode, string jobId, JobPriority priority)
+    {
+        Profile = gamemode == GamemodeForceOnForce && _prototypeManager.TryIndex<JobPrototype>(jobId, out var job)
+            ? Profile?.WithForceOnForceJobPriority(job, priority, _prototypeManager)
+            : Profile?.WithGamemodeJobPriority(gamemode, jobId, priority);
     }
 
     public void RefreshLoadouts()
     {
-        _loadoutWindow?.Dispose();
+        _loadoutWindow?.Release();
     }
 
     private void OpenLoadout(JobPrototype jobProto, RoleLoadout roleLoadout, RoleLoadoutPrototype roleLoadoutProto)
     {
-        _loadoutWindow?.Dispose();
+        _loadoutWindow?.Release();
         _loadoutWindow = null;
         var collection = IoCManager.Instance;
 
@@ -106,10 +121,142 @@ public sealed partial class HumanoidProfileEditor
         UpdateJobPriorities();
     }
 
+    // Opens the colonist skills window and saves every change to the profile.
+    private void OpenColonistSkillEditor(JobPrototype jobProto, RoleLoadout roleLoadout, RoleLoadoutPrototype roleLoadoutProto)
+    {
+        _colonistSkillWindow?.Dispose();
+        _colonistSkillWindow = null;
+        var collection = IoCManager.Instance;
+
+        if (collection == null || _playerManager.LocalSession == null || Profile == null)
+            return;
+
+        if (!_prototypeManager.TryIndex<RoleLoadoutPrototype>(ColonistSpecialLoadoutId, out var specialLoadoutProto))
+            return;
+
+        JobOverride = jobProto;
+        var session = _playerManager.LocalSession;
+
+        RoleLoadout? specialLoadout = null;
+        if (Profile.Loadouts.TryGetValue(specialLoadoutProto.ID, out var existingSpecial))
+            specialLoadout = existingSpecial.Clone();
+
+        if (specialLoadout == null)
+        {
+            specialLoadout = new RoleLoadout(specialLoadoutProto.ID);
+            specialLoadout.SetDefault(Profile, session, _prototypeManager);
+        }
+
+        _colonistSkillWindow = new ColonistSkillEditorWindow(Profile, roleLoadout, roleLoadoutProto, specialLoadout, specialLoadoutProto, session, collection);
+        _colonistSkillWindow.OpenCenteredLeft();
+
+        var concreteKey = LoadoutSystem.GetJobPrototype(jobProto.ID);
+
+        _colonistSkillWindow.OnLoadoutPressed += (loadoutGroup, loadoutProto) =>
+        {
+            roleLoadout.AddLoadout(loadoutGroup, loadoutProto, _prototypeManager);
+            Profile = Profile!.WithLoadout(concreteKey, roleLoadout);
+            DropUnavailableSpecialLoadout(specialLoadout, specialLoadoutProto, session, collection);
+            _colonistSkillWindow.RefreshLoadouts(Profile, roleLoadout, specialLoadout, session, collection);
+            ReloadPreview();
+            SetDirty();
+        };
+
+        _colonistSkillWindow.OnLoadoutUnpressed += (loadoutGroup, loadoutProto) =>
+        {
+            roleLoadout.RemoveLoadout(loadoutGroup, loadoutProto, _prototypeManager);
+            Profile = Profile!.WithLoadout(concreteKey, roleLoadout);
+            DropUnavailableSpecialLoadout(specialLoadout, specialLoadoutProto, session, collection);
+            _colonistSkillWindow.RefreshLoadouts(Profile, roleLoadout, specialLoadout, session, collection);
+            ReloadPreview();
+            SetDirty();
+        };
+
+        _colonistSkillWindow.OnSpecialLoadoutPressed += (loadoutGroup, loadoutProto) =>
+        {
+            specialLoadout.AddLoadout(loadoutGroup, loadoutProto, _prototypeManager);
+            Profile = Profile!.WithLoadout(specialLoadoutProto.ID, specialLoadout);
+            _colonistSkillWindow.RefreshLoadouts(Profile, roleLoadout, specialLoadout, session, collection);
+            ReloadPreview();
+            SetDirty();
+        };
+
+        _colonistSkillWindow.OnSpecialLoadoutUnpressed += (loadoutGroup, loadoutProto) =>
+        {
+            specialLoadout.RemoveLoadout(loadoutGroup, loadoutProto, _prototypeManager);
+            Profile = Profile!.WithLoadout(specialLoadoutProto.ID, specialLoadout);
+            _colonistSkillWindow.RefreshLoadouts(Profile, roleLoadout, specialLoadout, session, collection);
+            ReloadPreview();
+            SetDirty();
+        };
+
+        _colonistSkillWindow.OnSpecialLoadoutColorChanged += (loadoutGroup, loadoutProto, color) =>
+        {
+            if (!specialLoadout.SelectedLoadouts.TryGetValue(loadoutGroup, out var picks) ||
+                picks.All(pick => pick.Prototype != loadoutProto))
+            {
+                return;
+            }
+
+            specialLoadout.SetCustomLoadout(loadoutGroup, new Loadout { Prototype = loadoutProto, CustomColor = color }, _prototypeManager);
+            Profile = Profile!.WithLoadout(specialLoadoutProto.ID, specialLoadout);
+            _colonistSkillWindow.RefreshLoadouts(Profile, roleLoadout, specialLoadout, session, collection);
+            SetDirty();
+        };
+
+        _colonistSkillWindow.OnClothingEditorRequested += () => OpenColonistClothingEditor(specialLoadout, specialLoadoutProto, collection);
+
+        ReloadPreview();
+        _colonistSkillWindow.OnClose += () =>
+        {
+            _colonistClothingWindow?.Close();
+            JobOverride = null;
+            ReloadPreview();
+        };
+
+        UpdateJobPriorities();
+    }
+
+    // Removes special loadout items whose skill requirements are no longer met after the skills changed.
+    private void DropUnavailableSpecialLoadout(RoleLoadout specialLoadout, RoleLoadoutPrototype specialLoadoutProto, Robust.Shared.Player.ICommonSession session, IDependencyCollection collection)
+    {
+        specialLoadout.EnsureValid(Profile!, session, collection);
+        Profile = Profile!.WithLoadout(specialLoadoutProto.ID, specialLoadout);
+    }
+
+    // Opens the custom clothing window for the special loadout.
+    private void OpenColonistClothingEditor(RoleLoadout specialLoadout, RoleLoadoutPrototype specialLoadoutProto, IDependencyCollection collection)
+    {
+        _colonistClothingWindow?.Dispose();
+
+        var window = new ColonistClothingWindow(specialLoadout, specialLoadoutProto, collection);
+        _colonistClothingWindow = window;
+
+        window.OnApply += (group, loadout) =>
+        {
+            specialLoadout.SetCustomLoadout(group, loadout, _prototypeManager);
+            Profile = Profile!.WithLoadout(specialLoadoutProto.ID, specialLoadout);
+            window.Refresh(specialLoadout);
+            ReloadPreview();
+            SetDirty();
+        };
+
+        window.OnClear += (group, loadoutProto) =>
+        {
+            specialLoadout.RemoveLoadout(group, loadoutProto, _prototypeManager);
+            Profile = Profile!.WithLoadout(specialLoadoutProto.ID, specialLoadout);
+            window.Refresh(specialLoadout);
+            ReloadPreview();
+            SetDirty();
+        };
+
+        window.OpenCenteredRight();
+    }
+
     public void RefreshJobs()
     {
         foreach (var list in GetGamemodeJobLists())
-            list.DisposeAllChildren();
+            list.ReleaseChildren();
 
         _jobCategories.Clear();
         _jobPriorities.Clear();
@@ -146,6 +293,8 @@ public sealed partial class HumanoidProfileEditor
                 foreach (var (target, gamemode, sectionKey, sectionTitle) in
                          GetJobSections(department, job, departmentName))
                 {
+                    if (!job.IsAvailableInCharacterSetup(gamemode)) // CMU14: hide training roles outside their preset.
+                        continue;
                     AddJobSelector(
                         target,
                         gamemode,
@@ -225,7 +374,8 @@ public sealed partial class HumanoidProfileEditor
         selector.OnSelected += selectedPriority =>
         {
             var selectedJobPriority = (JobPriority) selectedPriority;
-            Profile = Profile?.WithGamemodeJobPriority(gamemode, job.ID, selectedJobPriority);
+            // CMU14: faction gameplay fixes.
+            SetJobPriority(gamemode, job.ID, selectedJobPriority);
 
             foreach (var (otherGamemode, jobId, other) in _jobPriorities)
             {
@@ -242,7 +392,8 @@ public sealed partial class HumanoidProfileEditor
                     continue;
 
                 other.Select((int) JobPriority.Medium);
-                Profile = Profile?.WithGamemodeJobPriority(gamemode, jobId, JobPriority.Medium);
+                // CMU14: faction gameplay fixes.
+                SetJobPriority(gamemode, jobId, JobPriority.Medium);
             }
 
             ReloadPreview();
@@ -283,6 +434,35 @@ public sealed partial class HumanoidProfileEditor
             };
         }
 
+        Button? skillsButton = null;
+        if (job.ID == ColonistJobId && loadoutProto != null)
+        {
+            skillsButton = new Button
+            {
+                Text = Loc.GetString("colonist-skill-editor-button"),
+                HorizontalAlignment = HAlignment.Right,
+                VerticalAlignment = VAlignment.Center,
+                Margin = new Thickness(3f, 3f, 0f, 0f),
+                MinWidth = 90,
+                StyleClasses = { StyleNano.StyleClassCrtButton },
+            };
+
+            skillsButton.OnPressed += _ =>
+            {
+                RoleLoadout? loadout = null;
+                if (Profile?.Loadouts.TryGetValue(loadoutKey, out var existing) == true)
+                    loadout = existing.Clone();
+
+                if (loadout == null)
+                {
+                    loadout = new RoleLoadout(loadoutProto.ID);
+                    loadout.SetDefault(Profile, _playerManager.LocalSession, _prototypeManager);
+                }
+
+                OpenColonistSkillEditor(job, loadout, loadoutProto);
+            };
+        }
+
         var rankEntry = BuildRankPreferenceJobEntry(job);
         var rankButton = new Button
         {
@@ -299,6 +479,8 @@ public sealed partial class HumanoidProfileEditor
         _jobPriorities.Add((gamemode, job.ID, selector));
         jobContainer.AddChild(selector);
         jobContainer.AddChild(loadoutButton);
+        if (skillsButton != null)
+            jobContainer.AddChild(skillsButton);
         jobContainer.AddChild(rankButton);
         CrtLobbyTheme.Apply(jobContainer);
         category.AddChild(jobContainer);
@@ -306,6 +488,8 @@ public sealed partial class HumanoidProfileEditor
 
     private IEnumerable<BoxContainer> GetGamemodeJobLists()
     {
+        // CMU14: shared FoF role priorities.
+        yield return FoFJobList;
         yield return InsurgencyGovernmentJobList;
         yield return InsurgencyInsurgentJobList;
         yield return InsurgencyCivilianJobList;
@@ -374,6 +558,14 @@ public sealed partial class HumanoidProfileEditor
         JobPrototype job,
         string departmentName)
     {
+        // CMU14: shared FoF role priorities.
+        if (department.Faction == "govfor")
+        {
+            var (key, title) = GetMilitaryJobSegment(job);
+            // CMU14: faction gameplay fixes.
+            yield return (FoFJobList, GamemodeForceOnForce, $"fof-{key}", title);
+        }
+
         if (department.Faction == "govfor")
         {
             var (segmentKey, segmentTitle) = GetMilitaryJobSegment(job);
@@ -425,9 +617,11 @@ public sealed partial class HumanoidProfileEditor
 
         if (!IsRoundStartThreatAssignmentJob(job))
             yield break;
-
-        yield return (ColonyThreatJobList, GamemodeColonyFall, "colony-threat", "Threat Jobs");
-        yield return (DistressThreatJobList, GamemodeDistressSignal, "distress-threat", "Threat Jobs");
+        // CMU14 hardcode Localization Begin: fix hardcode localization for forks
+        var threatJobsTitle = Loc.GetString("humanoid-profile-editor-threat-jobs-section");
+        yield return (ColonyThreatJobList, GamemodeColonyFall, "colony-threat", threatJobsTitle);
+        yield return (DistressThreatJobList, GamemodeDistressSignal, "distress-threat", threatJobsTitle);
+        // CMU14 hardcode Localization End
     }
 
     private static int CompareDepartmentsForCharacterSetup(DepartmentPrototype? x, DepartmentPrototype? y)
@@ -479,6 +673,8 @@ public sealed partial class HumanoidProfileEditor
         var id = job.ID;
         var name = job.LocalizedName;
 
+        if (job.RoundRole is "DropshipPilot" or "DropshipCrewChief") // CMU14: flightcrew section
+            return ("flightcrew", Loc.GetString("cmu-humanoid-profile-editor-segment-flightcrew"));
         if (id is "AU14JobGOVFORVehicleCommander")
             return ("flight", Loc.GetString("humanoid-profile-editor-segment-flight"));
         if (ContainsAny(id, name, "MilitaryDoctor"))
@@ -523,10 +719,11 @@ public sealed partial class HumanoidProfileEditor
         {
             "command" => 0,
             "officer" => 1,
-            "flight" => 2,
-            "support" => 3,
-            "leader" => 4,
-            _ => 5,
+            "flightcrew" => 2, // CMU14: flightcrew section
+            "flight" => 3,
+            "support" => 4,
+            "leader" => 5,
+            _ => 6,
         };
     }
 
@@ -544,9 +741,9 @@ public sealed partial class HumanoidProfileEditor
 
     public void RefreshAntags()
     {
-        InsurgencyAntagList.DisposeAllChildren();
-        ColonyAntagList.DisposeAllChildren();
-        DistressAntagList.DisposeAllChildren();
+        InsurgencyAntagList.ReleaseChildren();
+        ColonyAntagList.ReleaseChildren();
+        DistressAntagList.ReleaseChildren();
         _antagPreferences.Clear();
 
         PopulateAntagPreferences(InsurgencyAntagList, GamemodeInsurgency);
@@ -697,7 +894,7 @@ public sealed partial class HumanoidProfileEditor
 
             platoonOptions.Add(new PlatoonRankOptions(
                 platoon.ID,
-                platoon.Name,
+                Loc.GetString(platoon.Name), // CMU14: Hardcode localization
                 platoon.PlatoonPatch,
                 ranks));
         }
@@ -713,26 +910,32 @@ public sealed partial class HumanoidProfileEditor
     {
         if (platoon.ChevronOverrides != null)
         {
-            foreach (var (overrideJob, overrideChevrons) in platoon.ChevronOverrides)
-            {
-                if (!JobInheritsFrom(job.ID, overrideJob.Id))
-                    continue;
+            // CMU14: prefer the override for the closest ancestor job, not the first match
+            var best = platoon.ChevronOverrides
+                .Select(pair => (Chevrons: pair.Value, Distance: InheritanceDistance(job.ID, pair.Key.Id)))
+                .Where(pair => pair.Distance != null)
+                .OrderBy(pair => pair.Distance)
+                .FirstOrDefault();
 
-                return overrideChevrons.ToDictionary(pair => pair.Key.Id, pair => pair.Value);
-            }
+            if (best.Chevrons != null)
+                return best.Chevrons.ToDictionary(pair => pair.Key.Id, pair => pair.Value);
         }
 
         return job.Chevrons;
     }
 
-    private bool JobInheritsFrom(string jobId, string ancestorId)
+    // CMU14 method
+    private int? InheritanceDistance(string jobId, string ancestorId)
     {
         if (jobId == ancestorId)
-            return true;
+            return 0;
         if (!_prototypeManager.TryIndex<JobPrototype>(jobId, out var job) || job.Parents == null)
-            return false;
+            return null;
 
-        return job.Parents.Any(parent => JobInheritsFrom(parent, ancestorId));
+        return job.Parents
+            .Select(parent => InheritanceDistance(parent, ancestorId))
+            .Where(distance => distance != null)
+            .Min() + 1;
     }
 
     private (bool Unlocked, string? RequirementsText) EvaluateChevronRequirements(

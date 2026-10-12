@@ -1,5 +1,6 @@
 - type: job
-  parent: CMJobBase
+  parent: RMCJobRibbonBase
+  displayWeight: 18
   id: AU14JobCivilianHeadPhysician
   roundSide: Civilian
   roundForce: COLONY
@@ -27,18 +28,18 @@
   canBeAntag: false
   playTimeTracker: AU14JobCivilianHeadPhysician
   requirements:
-  - !type:DepartmentTimeRequirement
-    department: AU14DepartmentColonyMedical
-    time: 36000 # 10 hours
-  - !type:OverallPlaytimeRequirement
-    time: 86400 # 24 hours
+  - !type:TotalJobsTimeRequirement
+    group: CMUJobsMedical
+    time: 10800 # 3 hours
   - !type:AgeRequirement
-    requiredAge: 25
+    requiredAge: 30
   - !type:TraitsRequirement
     inverted: true
     traits:
     - NonResuscitable
     - NoEnglish
+    - CMUAlcoholic
+    - CMUDrugAddict
   ranks:
     RMCRankCivilianDoctor: []
   startingGear: AU14GearCivilianHeadPhysician
@@ -61,10 +62,12 @@
 - type: startingGear
   id: AU14GearCivilianHeadPhysician
   equipment:
-    ears: CMHeadsetColony
+    ears: CMUHeadsetColonyMedical
   storage:
     back:
     - AU14StampHPHY
+  inhand:
+  - CMUMobilePhone
 
 - type: entity
   parent: CMSpawnPointJobBase

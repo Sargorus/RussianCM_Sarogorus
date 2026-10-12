@@ -34,7 +34,7 @@ namespace Content.Shared.Localizations
             _loc.LoadCulture(culture);
             _loc.LoadCulture(fallbackCulture);
 
-            _loc.SetFallbackCluture(fallbackCulture);
+            _loc.SetFallbackCulture(fallbackCulture);
 
             AddContentFunctions(culture);
             AddContentFunctions(fallbackCulture);

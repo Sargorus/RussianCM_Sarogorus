@@ -14,6 +14,7 @@ using Content.Shared.GameTicking;
 namespace Content.Server.Corvax.TTS;
 
 // RuCM TTS
+// CMU14 class: TTS voice selection, ordered delivery and playback.
 public sealed partial class TTSSystem : EntitySystem
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
@@ -21,8 +22,7 @@ public sealed partial class TTSSystem : EntitySystem
     [Dependency] private readonly TTSManager _ttsManager = default!;
     [Dependency] private readonly ChatSystem _chat = default!;
     private uint _roundGeneration;
-
-    private const int MaxMessageChars = 200;
+    private static readonly TimeSpan MaxSpeechAge = TimeSpan.FromSeconds(15);
 
     private bool _isEnabled;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -46,11 +46,14 @@ public sealed partial class TTSSystem : EntitySystem
 
         SubscribeLocalEvent<EntitySpokeEvent>(OnSpoke);
         SubscribeNetworkEvent<RequestPreviewTTSEvent>(OnRequestPreviewTTS);
+        InitializeVoices();
         InitializeReferenceVoices();
         InitializeChannels();
         SubscribeLocalEvent<RoundRestartCleanupEvent>(_ =>
         {
             _roundGeneration++;
+            _speechQueue.Reset();
+            ResetDeliveryOrder();
             _radioDeliveries.Clear();
             foreach (var user in _referenceVoiceCooldowns.Keys.ToArray())
             {
@@ -64,6 +67,8 @@ public sealed partial class TTSSystem : EntitySystem
     {
         _roundGeneration++;
         _isEnabled = false;
+        _speechQueue.Reset();
+        ResetDeliveryOrder();
         ShutdownReferenceVoices();
         _cfg.UnsubValueChanged(
             CCCVars.TTSEnabled,
@@ -76,13 +81,27 @@ public sealed partial class TTSSystem : EntitySystem
     {
         _isEnabled = enabled;
         if (!enabled)
+        {
             _roundGeneration++;
+            _speechQueue?.Reset();
+            ResetDeliveryOrder();
+        }
+    }
+
+    private void ResetDeliveryOrder()
+    {
+        _deliveryOrder.Reset();
+        _radioOrder.Reset();
+        _announcementOrder.Reset();
     }
 
     private void OnSpoke(EntitySpokeEvent args)
     {
         if (TryComp<TTSComponent>(args.VoiceSource ?? args.Source, out var tts))
+        {
+            EnsureVoiceAssigned((args.VoiceSource ?? args.Source, tts));
             OnEntitySpoke(args.Source, tts, args);
+        }
     }
 
     private async void OnEntitySpoke(
@@ -93,15 +112,18 @@ public sealed partial class TTSSystem : EntitySystem
         if (!_isEnabled)
             return;
 
-        // Радио подключим отдельно.
         if (args.Channel != null)
             return;
 
         if (string.IsNullOrWhiteSpace(args.Message))
             return;
 
-        if (args.Message.Length > MaxMessageChars)
+        if (args.Message.Length > 4000)
             return;
+
+        var roundGeneration = _roundGeneration;
+        var requestedAt = _timing.RealTime;
+        using var delivery = _deliveryOrder.Reserve(args.VoiceSource ?? uid);
 
         var voiceId = component.VoicePrototypeId;
 
@@ -114,8 +136,10 @@ public sealed partial class TTSSystem : EntitySystem
 
         if (CustomTTSVoice.TryGetSpeaker(voiceId, out _))
             await EnsureReferenceVoiceCatalogLoaded();
+        if (!_isEnabled || roundGeneration != _roundGeneration || TerminatingOrDeleted(uid))
+            return;
 
-        if (!TryResolveSpeaker(voiceId, out var speaker))
+        if (!TryResolveSpeaker(voiceId, out var speaker, GetSpeakerSex(args.VoiceSource ?? uid)))
         {
             Logger.Warning(
                 $"TTS voice prototype '{voiceId}' was not found.");
@@ -138,12 +162,15 @@ public sealed partial class TTSSystem : EntitySystem
         if (recipients.Count == 0 && muffledRecipients.Count == 0)
             return;
 
-        var roundGeneration = _roundGeneration;
-        var soundData = recipients.Count > 0 ? await GenerateSpeech(speaker, text) : null;
-        var muffledData = muffledRecipients.Count > 0 ? await GenerateSpeech(speaker, args.ObfuscatedMessage!) : null;
+        var soundTask = recipients.Count > 0 ? GenerateSpeech(speaker, text) : System.Threading.Tasks.Task.FromResult<byte[]?>(null);
+        var muffledTask = muffledRecipients.Count > 0 ? GenerateSpeech(speaker, args.ObfuscatedMessage!) : System.Threading.Tasks.Task.FromResult<byte[]?>(null);
+        var soundData = await soundTask;
+        var muffledData = await muffledTask;
+        await delivery.Previous;
 
         if (!_isEnabled ||
-            roundGeneration != _roundGeneration || !Exists(uid) || TerminatingOrDeleted(uid))
+            roundGeneration != _roundGeneration || _timing.RealTime - requestedAt >= MaxSpeechAge ||
+            !Exists(uid) || TerminatingOrDeleted(uid))
             return;
 
         var currentRecipients = _chat.GetLocalTTSRecipients(uid, args.Language, args.TransmitRange, whisper, ignoreXenos: args.IgnoreXenos);
@@ -168,6 +195,8 @@ public sealed partial class TTSSystem : EntitySystem
         if (!_isEnabled || string.IsNullOrWhiteSpace(ev.VoiceId) || ev.VoiceId.Length > 128)
             return;
 
+        var generation = _roundGeneration;
+        var requestedAt = _timing.RealTime;
         var limit = _previewLimits.GetValue(args.SenderSession, _ => new PreviewLimit());
         if (limit.Pending)
             return;
@@ -188,11 +217,14 @@ public sealed partial class TTSSystem : EntitySystem
             else if (!_prototypeManager.TryIndex<TTSVoicePrototype>(ev.VoiceId, out var voice) ||
                      !HumanoidCharacterProfile.IsSelectableTTSVoice(voice))
                 return;
+            if (!_isEnabled || generation != _roundGeneration)
+                return;
             if (!TryResolveSpeaker(ev.VoiceId, out var speaker))
                 return;
             var data = await GenerateSpeech(speaker,
                 Loc.GetString("tts-preview-text"));
-            if (_isEnabled && data is { Length: > 0 } &&
+            if (_isEnabled && generation == _roundGeneration && _timing.RealTime - requestedAt < MaxSpeechAge &&
+                data is { Length: > 0 } &&
                 args.SenderSession.Status == Robust.Shared.Enums.SessionStatus.InGame)
                 RaiseNetworkEvent(new PlayTTSEvent(data), args.SenderSession);
         }

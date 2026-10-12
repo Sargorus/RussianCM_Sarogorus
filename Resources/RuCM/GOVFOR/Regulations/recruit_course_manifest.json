@@ -1,0 +1,74 @@
+{
+  "id": "RuCMGOVFORRecruitCourse",
+  "source": "Resources/RuCM/GOVFOR/Regulations/RecruitCourse.md",
+  "source_sha256": "d53dcdcbe036b2951a84a8d89872769042f14387843e87d4d817d81f7b56bf96",
+  "prose_sha256": "17c043eb4be579b3ad27a2136dba52463b390b65b0b21a13353e17fb2d70c99a",
+  "chapters": [
+    {
+      "id": "RuCMGOVFORRecruitCourseIntroduction",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Introduction.xml",
+      "checklist_item": null,
+      "prose_sha256": "4a8bc709e494c572a66eb5a7130a5081cd7446315a6c3d21573884afa3109666"
+    },
+    {
+      "id": "RuCMGOVFORRecruitCourseMilitaryRegulations",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/MilitaryRegulations.xml",
+      "checklist_item": "military_regulations",
+      "prose_sha256": "e595eda708479eb27ffe5d148c3e9cc2668c78e31f446c027cf9f7d0f1b78a8d"
+    },
+    {
+      "id": "RuCMGOVFORRecruitCourseDrill",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Drill.xml",
+      "checklist_item": "drill",
+      "prose_sha256": "d1900140959a3f17d4d2f4ee8028ae082e7d4b8902df4a3c9f21599edb62418e"
+    },
+    {
+      "id": "RuCMGOVFORRecruitCourseCommunications",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Communications.xml",
+      "checklist_item": "communications",
+      "prose_sha256": "87e00c4f721ac5e2c73e82e447adb4ff108af88cbedc36dd53bd62c631151a4c"
+    },
+    {
+      "id": "RuCMGOVFORRecruitCourseFirearms",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Firearms.xml",
+      "checklist_item": "firearms",
+      "prose_sha256": "817da925ccbbc915165cc54cafcec976697beaf4b04300d217812f305703dfc4"
+    },
+    {
+      "id": "RuCMGOVFORRecruitCourseTactics",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Tactics.xml",
+      "checklist_item": "tactics",
+      "prose_sha256": "7001b06a685f352cbe7c92e2b9a464577b48ab30532d229503f1d69fceca0bba"
+    },
+    {
+      "id": "RuCMGOVFORRecruitCourseFirstAid",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/FirstAid.xml",
+      "checklist_item": "first_aid",
+      "prose_sha256": "52e00ae029cabfad5bdfdb659e1963a773730328cc939b4e7c87e330cb63af59"
+    },
+    {
+      "id": "RuCMGOVFORRecruitCourseTopography",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Topography.xml",
+      "checklist_item": "topography",
+      "prose_sha256": "645e5fb66788d811cb15e99e6ca93d85e037afb5842b560fd5ca09da7c755c8e"
+    },
+    {
+      "id": "RuCMGOVFORRecruitCourseEngineeringBasics",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/EngineeringBasics.xml",
+      "checklist_item": "engineering_basics",
+      "prose_sha256": "36cef1868aa47d2958ece8e04e4401800f79d7bb651150308b0c53bee1668912"
+    },
+    {
+      "id": "RuCMGOVFORRecruitCourseFieldExercise",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/FieldExercise.xml",
+      "checklist_item": "field_exercise",
+      "prose_sha256": "30500730e5188bea3285c6a0305d13ce15e5a41bc0b3a8dd0799b3b88021e5f8"
+    },
+    {
+      "id": "RuCMGOVFORRecruitCourseReference",
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Reference.xml",
+      "checklist_item": null,
+      "prose_sha256": "ef8c0c7bc2c1fc33ce58eebb3f1d4d225462cc8002f917a18bef937abd12f563"
+    }
+  ]
+}

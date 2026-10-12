@@ -456,8 +456,7 @@ public sealed partial class TunableFrequencySystem : EntitySystem
         var messageText = FormattedMessage.EscapeText(message);
 
         var wrapped = $"[color=#5B9BD5][bold]FREQ {frequencyText}[/bold][/color] " +
-                      $"[color=#C8D2E8]{senderName}[/color] " +
-                      $"says, \"{messageText}\"";
+                      $"[color=#C8D2E8]\"{messageText}\"[/color]";
 
         // same marker the channel radio puts on a foreign-language line, so a direct
         // frequency does not quietly read as plain speech

@@ -1,0 +1,14 @@
+rucm-recruit-job-name = GOVFOR Recruit
+rucm-recruit-job-description = Begin recruit training with a Drill Instructor. An unarmed training job with uniform, radio, handbook and base access. Available in Insurgency without playtime or qualification requirements.
+rucm-recruit-supervisors = the Drill Instructor and GOVFOR command
+rucm-recruit-prefix = Recruit
+rucm-recruit-department-name = GOVFOR Training Group
+rucm-recruit-department-description = Initial training for enlisted clearance. Available in Insurgency.
+rucm-recruit-arrival = You have arrived as a GOVFOR recruit. Find a Drill Instructor or contact command. Open your handbook or Guides → GOVFOR → Training → Recruit Course. Your personal record shows required skills. An instructor assesses your skills and separately awards enlisted clearance; receiving clearance does not automatically change your current job. Training weapons are issued under instructor supervision.
+rucm-recruit-unavailable = The recruit job is available only in Insurgency on a prepared GOVFOR base. It is disabled or has no safe arrival point. Choose another available role or contact administration.
+ent-RuCMIDCardGOVFORRecruit = GOVFOR recruit identification card
+    .desc = Training identification with GOVFOR base access. Grants no armory or professional department access.
+ent-RuCMGuidebookGOVFORRecruit = GOVFOR recruit training handbook
+    .desc = Open it to read the recruit course and GOVFOR regulations. Reading grants no qualification.
+ent-RuCMSpawnPointGOVFORRecruit = GOVFOR recruit training spawn
+    .desc = A training arrival point for GOVFOR recruits.

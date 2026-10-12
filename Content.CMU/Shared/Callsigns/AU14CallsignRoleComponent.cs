@@ -1,20 +1,15 @@
 namespace Content.Shared.CMU14.Callsigns;
 
-// added via the job's roundComponents to claim a fixed callsign suffix
-// (6 = leader, 5 = 2IC, 7 = senior NCO, ROMEO = RTO, OPS = staff)
+// Preferred station number from the job radio data (game conventions, not rank codes).
 [RegisterComponent]
 public sealed partial class AU14CallsignRoleComponent : Component
 {
-    // empty = keep the automatic numbered suffix, only the tag/element applies
+    // empty = keep the automatic numbered suffix, only the element applies
     [DataField]
     public string Suffix = string.Empty;
 
     [DataField]
     public bool CommandElement;
-
-    // short role tag shown before the callsign on radio, e.g. "SL" -> (SL) ALPHA 6
-    [DataField]
-    public string? RadioTag;
 
     // directory console section this role is listed under (AIR, MP, MEDICAL, INTEL);
     // null = command element or squad as usual

@@ -1,0 +1,18 @@
+<Document>
+  <GOVFORLocalizedText Key="rucm-guide-instructor-purpose"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookWork"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookLesson"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookAssessment"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookMilitaryRegulations"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookDrill"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookCommunications"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookFirearms"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookTactics"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookFirstAid"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookTopography"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookEngineeringBasics"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookFieldExercise"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookGroup"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookCertification"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbookReference"/>
+</Document>

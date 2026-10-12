@@ -1,4 +1,4 @@
-﻿using Content.Shared._RMC14.Evasion;
+using Content.Shared._RMC14.Evasion;
 using Content.Shared.Damage.Systems;
 using Robust.Shared.Timing;
 using Content.Shared.Jittering;
@@ -8,10 +8,10 @@ namespace Content.Shared.CMU;
 
 public sealed partial class DamageEvasionSystem : EntitySystem
 {
-    [Dependency] private readonly EvasionSystem _evasion = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly SharedJitteringSystem _jitter = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private EvasionSystem _evasion = default!;
+    [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private SharedJitteringSystem _jitter = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
 
     private readonly HashSet<EntityUid> _activeEntities = new();
 
@@ -61,6 +61,9 @@ public sealed partial class DamageEvasionSystem : EntitySystem
         Entity<DamageEvasionComponent> ent,
         ref DamageChangedEvent args)
     {
+        if (_timing.ApplyingState)
+            return;
+
         if (!args.DamageIncreased || args.DamageDelta == null)
             return;
 

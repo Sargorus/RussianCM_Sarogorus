@@ -1,0 +1,6 @@
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORDrillRegulations
+  name: rucm-guide-entry-govfor-drill-regulations
+  priority: 3
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/DrillRegulations.xml"

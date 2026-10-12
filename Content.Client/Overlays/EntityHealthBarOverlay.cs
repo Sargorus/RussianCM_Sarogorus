@@ -8,6 +8,7 @@ using Content.Shared.FixedPoint;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Overlays;
 using Content.Shared.ParaDrop;
 using Content.Shared.StatusIcon;
 using Content.Shared.StatusIcon.Components;
@@ -27,6 +28,7 @@ public sealed class EntityHealthBarOverlay : Overlay
 {
     private readonly IEntityManager _entManager;
     private readonly IPrototypeManager _prototype;
+    private readonly ShaderInstance _shader; // CMU14: HUD lighting.
 
     private readonly SharedTransformSystem _transform;
     private readonly MobStateSystem _mobStateSystem;
@@ -40,13 +42,15 @@ public sealed class EntityHealthBarOverlay : Overlay
 
     private readonly EntityQuery<CrashLandingComponent> _crashLandingQuery;
     private readonly EntityQuery<ParaDroppingComponent> _paraDroppingQuery;
+    private readonly EntityQuery<HideHealthBarComponent> _hideHealthBarQuery;
     private readonly HashSet<Entity<MobThresholdsComponent>> _healthCandidates = new();
     private readonly Dictionary<EntityUid, CachedHealthProgress> _progressCache = new();
 
     private static readonly TimeSpan HealthProgressCacheLifetime = TimeSpan.FromSeconds(0.25);
     private const int MaxCachedHealthEntities = 512;
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
+    // CMU14: keep health bars below foliage and subject to world lighting and FOV.
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
     public HashSet<string> DamageContainers = new();
     public ProtoId<HealthIconPrototype>? StatusIcon;
 
@@ -54,6 +58,9 @@ public sealed class EntityHealthBarOverlay : Overlay
     {
         _entManager = entManager;
         _prototype = prototype;
+        // CMU14: shaded HUD bars below foliage.
+        _shader = _prototype.Index<ShaderPrototype>("shaded").Instance();
+        ZIndex = (int) Content.Shared.DrawDepth.DrawDepth.OverMobs;
         _timing = timing;
         _transform = _entManager.System<SharedTransformSystem>();
         _mobStateSystem = _entManager.System<MobStateSystem>();
@@ -65,11 +72,13 @@ public sealed class EntityHealthBarOverlay : Overlay
         _crashLandingQuery = _entManager.GetEntityQuery<CrashLandingComponent>();
         _paraDroppingQuery = _entManager.GetEntityQuery<ParaDroppingComponent>();
         _damageable = _entManager.System<DamageableSystem>();
+        _hideHealthBarQuery = _entManager.GetEntityQuery<HideHealthBarComponent>();
     }
 
     protected override void Draw(in OverlayDrawArgs args)
     {
         var handle = args.WorldHandle;
+        handle.UseShader(_shader); // CMU14: HUD lighting.
         var rotation = args.Viewport.Eye?.Rotation ?? Angle.Zero;
         var xformQuery = _entManager.GetEntityQuery<TransformComponent>();
         var metaQuery = _entManager.GetEntityQuery<MetaDataComponent>();
@@ -95,6 +104,9 @@ public sealed class EntityHealthBarOverlay : Overlay
         {
             var uid = candidate.Owner;
             var mobThresholdsComponent = candidate.Comp;
+            if (_hideHealthBarQuery.HasComp(uid))
+                continue;
+
             if (!mobQuery.TryGetComponent(uid, out var mobStateComponent) ||
                 !damageQuery.TryGetComponent(uid, out var damageableComponent) ||
                 !injurableQuery.TryGetComponent(uid, out var injurableComponent) ||
@@ -177,6 +189,7 @@ public sealed class EntityHealthBarOverlay : Overlay
         }
 
         handle.SetTransform(Matrix3x2.Identity);
+        handle.UseShader(null); // CMU14: reset HUD shader.
     }
 
     private (float ratio, bool inCrit)? GetCachedProgress(

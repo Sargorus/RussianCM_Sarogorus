@@ -1,3 +1,4 @@
+using Content.Client.CMU14.UserInterface;
 #pragma warning disable RA0002 // Integration regression intentionally inspects restricted component state.
 
 using System.Reflection;
@@ -25,7 +26,7 @@ public sealed class ActionIconMigrationRegressionTest : GameTest
     [
         "ActionXenoBase",
         "ActionZombieSummonerOpen",
-        "ActionAbominationSpiderLeap",
+        "ActionBiomorphSpiderLeap", // CMU14
         "ActionMarineBase",
         "ActionVehicleToggleView",
         "ActionVehicleLock",
@@ -49,7 +50,7 @@ public sealed class ActionIconMigrationRegressionTest : GameTest
 
                 AssertBackground("ActionXenoBase", "template_active_big");
                 AssertBackground("ActionZombieSummonerOpen", "template_active_big");
-                AssertBackground("ActionAbominationSpiderLeap", "template_active_big");
+                AssertBackground("ActionBiomorphSpiderLeap", "template_active_big"); // CMU14
                 AssertBackground("RMCActionToggleRecoil", "template_on_big");
 
                 AssertStyle("ActionVehicleToggleView", ItemActionIconStyle.BigAction);
@@ -397,7 +398,7 @@ public sealed class ActionIconMigrationRegressionTest : GameTest
             finally
             {
                 selecting.SetValue(controller, null);
-                button.Dispose();
+                button.Release();
             }
         });
 

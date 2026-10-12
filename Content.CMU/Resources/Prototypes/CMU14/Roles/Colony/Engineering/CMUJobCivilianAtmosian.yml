@@ -1,5 +1,6 @@
 - type: job
-  parent: CMJobBase
+  parent: RMCJobRibbonBase
+  displayWeight: 12
   id: CMUJobCivilianAtmosian
   name: cmu-colony-name-atmosian
   description: cmu-colony-description-atmosian
@@ -10,7 +11,7 @@
   startingGear: CMUGearCivilianAtmosian
   icon: "AU14JobIconColonyEngineer"
   supervisors: au14-job-supervisors-colonyadministrator
-  spawnMenuRoleName: Colony Atmospheric Technician
+  spawnMenuRoleName: cmu-spawn-role-colony-atmospheric-technician
   playTimeTracker: CMUJobCivilianAtmosian
   ranks:
     RMCRankCivilian: []
@@ -33,7 +34,7 @@
   requirements:
   - !type:DepartmentTimeRequirement
     department: AU14DepartmentEngineering
-    time: 7200 # 2 hours
+    time: 18000 # 5 hours
   accessGroups:
   - Colonist
   - auengi
@@ -48,7 +49,7 @@
     head: RMCHardhatOrange
     jumpsuit: AU14CivilianWeYuEngineerClothes
     outerClothing: CMUArmorFirefighter
-    mask: CMMaskGas
+    mask: CMUMaskGas
     suitstorage: RMCGasTankOxygenFilled
     shoes: RMCBootsCorporate
     pocket1: CMUAtmosScanner
@@ -68,6 +69,7 @@
     - RMCCableCoil
     - CMAPCElectronics
     - ClothingOuterVestTank
+    - CMUFireHelmet
 
 - type: roleLoadout
   id: JobCMUJobCivilianAtmosian

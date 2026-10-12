@@ -49,4 +49,3 @@ public sealed partial class XenoAcidSystem : SharedXenoAcidSystem
         args.Cancelled = true;
     }
 }
-

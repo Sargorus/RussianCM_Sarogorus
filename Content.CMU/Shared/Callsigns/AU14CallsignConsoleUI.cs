@@ -90,6 +90,27 @@ public static class AU14Callsigns
     public const int MaxWordLength = 10;
     public const int MaxSuffixLength = 8;
 
+    // Canonical numeric station identifiers: leading zeroes must not create aliases.
+    public static bool TryNormalizeNumber(string input, out string number)
+    {
+        number = string.Empty;
+        var trimmed = input.Trim();
+        if (trimmed.Length == 0 || trimmed.Length > MaxSuffixLength)
+            return false;
+
+        foreach (var character in trimmed)
+        {
+            if (!char.IsAsciiDigit(character))
+                return false;
+        }
+
+        if (!int.TryParse(trimmed, out var value) || value == 0)
+            return false;
+
+        number = value.ToString("D2", System.Globalization.CultureInfo.InvariantCulture);
+        return true;
+    }
+
     // factions that run callsigns at all
     public static readonly HashSet<string> Factions =
         new(StringComparer.OrdinalIgnoreCase) { "govfor", "opfor", "clf" };

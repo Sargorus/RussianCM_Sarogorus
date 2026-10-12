@@ -1,0 +1,677 @@
+{
+  "source": "Resources/RuCM/GOVFOR/Regulations/AdvancedTraining.md",
+  "pages": [
+    {
+      "id": "RuCMGOVFORSergeantCourse",
+      "suffix": "SergeantCourse",
+      "title": "Курс сержанта GOVFOR",
+      "english": "GOVFOR Sergeant Course",
+      "qualification": "sergeant",
+      "references": [
+        "RuCMGOVFORUnitCommand",
+        "RuCMGOVFORSergeantAssessment",
+        "RuCMGOVFORCommunications",
+        "AU14SOP",
+        "AU14UCMJ",
+        "RuCMGOVFORDrillRegulations",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/SergeantCourse.xml",
+      "checklist_items": [
+        "tactics",
+        "firearms",
+        "military_regulations",
+        "teaching",
+        "topography",
+        "drill",
+        "unit_command"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORSergeantAssessment",
+      "suffix": "SergeantAssessment",
+      "title": "Методика аттестации сержантов",
+      "english": "Sergeant Assessment Method",
+      "qualification": "sergeant",
+      "references": [
+        "RuCMGOVFORSergeantCourse",
+        "RuCMGOVFORUnitCommand",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/SergeantAssessment.xml",
+      "checklist_items": [
+        "tactics",
+        "firearms",
+        "military_regulations",
+        "teaching",
+        "topography",
+        "drill",
+        "unit_command"
+      ]
+    },
+    {
+      "id": "RuCMGOVFOROfficerCourse",
+      "suffix": "OfficerCourse",
+      "title": "Курс офицера GOVFOR",
+      "english": "GOVFOR Officer Course",
+      "qualification": "officer",
+      "references": [
+        "RuCMGOVFORUnitCommand",
+        "AU14SOP",
+        "AU14UCMJ",
+        "RuCMGOVFOROfficerAssessment",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/OfficerCourse.xml",
+      "checklist_items": [
+        "tactics",
+        "firearms",
+        "drill",
+        "military_regulations",
+        "operations",
+        "staff_work",
+        "crisis_management"
+      ]
+    },
+    {
+      "id": "RuCMGOVFOROfficerAssessment",
+      "suffix": "OfficerAssessment",
+      "title": "Методика аттестации офицеров",
+      "english": "Officer Assessment Method",
+      "qualification": "officer",
+      "references": [
+        "RuCMGOVFOROfficerCourse",
+        "RuCMGOVFORUnitCommand",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/OfficerAssessment.xml",
+      "checklist_items": [
+        "tactics",
+        "firearms",
+        "drill",
+        "military_regulations",
+        "operations",
+        "staff_work",
+        "crisis_management"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCourseMedical",
+      "suffix": "CourseMedical",
+      "title": "Медицинская подготовка",
+      "english": "Medical Training",
+      "qualification": "medical",
+      "references": [
+        "RuCMGOVFORAssessmentMedical",
+        "CMUGuideMedical",
+        "CMUGuideMedicalSurgery",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseMedical.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORAssessmentMedical",
+      "suffix": "AssessmentMedical",
+      "title": "Методика: медицинская подготовка",
+      "english": "Assessment: Medical Training",
+      "qualification": "medical",
+      "references": [
+        "RuCMGOVFORCourseMedical",
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "CMUGuideMedical",
+        "CMUGuideMedicalSurgery"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentMedical.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCourseFieldEngineering",
+      "suffix": "CourseFieldEngineering",
+      "title": "Полевая инженерная подготовка",
+      "english": "Field Engineering Training",
+      "qualification": "field_engineering",
+      "references": [
+        "RuCMGOVFORAssessmentFieldEngineering",
+        "CMUGuideEngineering",
+        "CMUGuideEngFortify",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseFieldEngineering.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORAssessmentFieldEngineering",
+      "suffix": "AssessmentFieldEngineering",
+      "title": "Методика: полевая инженерная подготовка",
+      "english": "Assessment: Field Engineering Training",
+      "qualification": "field_engineering",
+      "references": [
+        "RuCMGOVFORCourseFieldEngineering",
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "CMUGuideEngineering",
+        "CMUGuideEngFortify"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentFieldEngineering.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCourseTechnicalEngineering",
+      "suffix": "CourseTechnicalEngineering",
+      "title": "Техническая инженерная подготовка",
+      "english": "Technical Engineering Training",
+      "qualification": "technical_engineering",
+      "references": [
+        "RuCMGOVFORAssessmentTechnicalEngineering",
+        "CMUGuideEngineering",
+        "CMUGuideEngPower",
+        "CMUGuideEngVehicles",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseTechnicalEngineering.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORAssessmentTechnicalEngineering",
+      "suffix": "AssessmentTechnicalEngineering",
+      "title": "Методика: техническая инженерная подготовка",
+      "english": "Assessment: Technical Engineering Training",
+      "qualification": "technical_engineering",
+      "references": [
+        "RuCMGOVFORCourseTechnicalEngineering",
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "CMUGuideEngineering",
+        "CMUGuideEngPower",
+        "CMUGuideEngVehicles"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentTechnicalEngineering.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCourseLogistics",
+      "suffix": "CourseLogistics",
+      "title": "Логистическая подготовка",
+      "english": "Logistics Training",
+      "qualification": "logistics",
+      "references": [
+        "RuCMGOVFORAssessmentLogistics",
+        "RMCRequisitions",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseLogistics.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORAssessmentLogistics",
+      "suffix": "AssessmentLogistics",
+      "title": "Методика: логистическая подготовка",
+      "english": "Assessment: Logistics Training",
+      "qualification": "logistics",
+      "references": [
+        "RuCMGOVFORCourseLogistics",
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "RMCRequisitions"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentLogistics.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCourseHeavyWeapons",
+      "suffix": "CourseHeavyWeapons",
+      "title": "Подготовка по тяжёлому вооружению",
+      "english": "Heavy Weapons Training",
+      "qualification": "heavy_weapons",
+      "references": [
+        "RuCMGOVFORAssessmentHeavyWeapons",
+        "RMCGuideRoleSpec",
+        "CMUGuideMortar",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseHeavyWeapons.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORAssessmentHeavyWeapons",
+      "suffix": "AssessmentHeavyWeapons",
+      "title": "Методика: подготовка по тяжёлому вооружению",
+      "english": "Assessment: Heavy Weapons Training",
+      "qualification": "heavy_weapons",
+      "references": [
+        "RuCMGOVFORCourseHeavyWeapons",
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "RMCGuideRoleSpec",
+        "CMUGuideMortar"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentHeavyWeapons.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCourseProfessionalCommunications",
+      "suffix": "CourseProfessionalCommunications",
+      "title": "Профессиональная подготовка связи",
+      "english": "Professional Communications Training",
+      "qualification": "communications",
+      "references": [
+        "RuCMGOVFORAssessmentProfessionalCommunications",
+        "RuCMGOVFORCommunications",
+        "AU14Comms",
+        "CMUGuideTowers",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseProfessionalCommunications.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORAssessmentProfessionalCommunications",
+      "suffix": "AssessmentProfessionalCommunications",
+      "title": "Методика: профессиональная подготовка связи",
+      "english": "Assessment: Professional Communications Training",
+      "qualification": "communications",
+      "references": [
+        "RuCMGOVFORCourseProfessionalCommunications",
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "RuCMGOVFORCommunications",
+        "AU14Comms",
+        "CMUGuideTowers"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentProfessionalCommunications.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCourseAviation",
+      "suffix": "CourseAviation",
+      "title": "Авиационная подготовка",
+      "english": "Aviation Training",
+      "qualification": "aviation",
+      "references": [
+        "RuCMGOVFORAssessmentAviation",
+        "AU14SOPDropshipsandAircraft",
+        "AU14SOP",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseAviation.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORAssessmentAviation",
+      "suffix": "AssessmentAviation",
+      "title": "Методика: авиационная подготовка",
+      "english": "Assessment: Aviation Training",
+      "qualification": "aviation",
+      "references": [
+        "RuCMGOVFORCourseAviation",
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "AU14SOPDropshipsandAircraft",
+        "AU14SOP"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentAviation.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCourseVehicleCrew",
+      "suffix": "CourseVehicleCrew",
+      "title": "Подготовка экипажа бронетехники",
+      "english": "Armored Vehicle Crew Training",
+      "qualification": "vehicle_crew",
+      "references": [
+        "RuCMGOVFORAssessmentVehicleCrew",
+        "AU14SOPVehicles",
+        "CMUGuideEngVehicles",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseVehicleCrew.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORAssessmentVehicleCrew",
+      "suffix": "AssessmentVehicleCrew",
+      "title": "Методика: подготовка экипажа бронетехники",
+      "english": "Assessment: Armored Vehicle Crew Training",
+      "qualification": "vehicle_crew",
+      "references": [
+        "RuCMGOVFORCourseVehicleCrew",
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "AU14SOPVehicles",
+        "CMUGuideEngVehicles"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentVehicleCrew.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCourseDroneOperator",
+      "suffix": "CourseDroneOperator",
+      "title": "Подготовка оператора БПЛА",
+      "english": "Drone Operator Training",
+      "qualification": "drone_operator",
+      "references": [
+        "RuCMGOVFORAssessmentDroneOperator",
+        "RuCMGOVFORCommunications",
+        "RuCMGOVFORUnitCommand",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseDroneOperator.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORAssessmentDroneOperator",
+      "suffix": "AssessmentDroneOperator",
+      "title": "Методика: подготовка оператора бпла",
+      "english": "Assessment: Drone Operator Training",
+      "qualification": "drone_operator",
+      "references": [
+        "RuCMGOVFORCourseDroneOperator",
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "RuCMGOVFORCommunications",
+        "RuCMGOVFORUnitCommand"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentDroneOperator.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCourseMilitaryPolice",
+      "suffix": "CourseMilitaryPolice",
+      "title": "Подготовка военной полиции",
+      "english": "Military Police Training",
+      "qualification": "military_police",
+      "references": [
+        "RuCMGOVFORAssessmentMilitaryPolice",
+        "AU14UCMJ",
+        "AU14SOP",
+        "RMCGuideRoleMilitaryPolice",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseMilitaryPolice.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORAssessmentMilitaryPolice",
+      "suffix": "AssessmentMilitaryPolice",
+      "title": "Методика: подготовка военной полиции",
+      "english": "Assessment: Military Police Training",
+      "qualification": "military_police",
+      "references": [
+        "RuCMGOVFORCourseMilitaryPolice",
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "AU14UCMJ",
+        "AU14SOP",
+        "RMCGuideRoleMilitaryPolice"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentMilitaryPolice.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCourseIntelligence",
+      "suffix": "CourseIntelligence",
+      "title": "Разведывательная подготовка",
+      "english": "Intelligence Training",
+      "qualification": "intelligence",
+      "references": [
+        "RuCMGOVFORAssessmentIntelligence",
+        "RMCIntel",
+        "RuCMGOVFORCommunications",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseIntelligence.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORAssessmentIntelligence",
+      "suffix": "AssessmentIntelligence",
+      "title": "Методика: разведывательная подготовка",
+      "english": "Assessment: Intelligence Training",
+      "qualification": "intelligence",
+      "references": [
+        "RuCMGOVFORCourseIntelligence",
+        "RuCMGOVFORTrainingQualifications",
+        "RuCMGOVFORInstructorHandbookAssessment",
+        "RMCIntel",
+        "RuCMGOVFORCommunications"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentIntelligence.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCommandingOfficerCourse",
+      "suffix": "CommandingOfficerCourse",
+      "title": "Подготовка Командующего офицера GOVFOR",
+      "english": "GOVFOR Commanding Officer Preparation",
+      "qualification": "commanding_officer",
+      "references": [
+        "RuCMGOVFORCommandingOfficerInterview",
+        "RuCMGOVFOROfficerCourse",
+        "RuCMGOVFORUnitCommand",
+        "AU14SOP",
+        "AU14UCMJ",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [
+        "RuCMGOVFORCommandingOfficerInterview"
+      ],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CommandingOfficerCourse.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORCommandingOfficerInterview",
+      "suffix": "CommandingOfficerInterview",
+      "title": "Методика собеседования Командующего офицера",
+      "english": "Commanding Officer Interview Method",
+      "qualification": "commanding_officer",
+      "references": [
+        "RuCMGOVFORCommandingOfficerCourse",
+        "RuCMGOVFORTrainingQualifications",
+        "AU14SOP",
+        "AU14UCMJ"
+      ],
+      "children": [],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CommandingOfficerInterview.xml",
+      "checklist_items": [
+        "theory",
+        "safety",
+        "practice"
+      ]
+    },
+    {
+      "id": "RuCMGOVFORProfessionalTraining",
+      "suffix": "ProfessionalTraining",
+      "title": "Профессиональная подготовка",
+      "english": "Professional Training",
+      "qualification": null,
+      "references": [
+        "RuCMGOVFORCourseMedical",
+        "RuCMGOVFORCourseFieldEngineering",
+        "RuCMGOVFORCourseTechnicalEngineering",
+        "RuCMGOVFORCourseLogistics",
+        "RuCMGOVFORCourseHeavyWeapons",
+        "RuCMGOVFORCourseProfessionalCommunications",
+        "RuCMGOVFORCourseAviation",
+        "RuCMGOVFORCourseVehicleCrew",
+        "RuCMGOVFORCourseDroneOperator",
+        "RuCMGOVFORCourseMilitaryPolice",
+        "RuCMGOVFORCourseIntelligence",
+        "RuCMGOVFORProfessionalAssessments",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [
+        "RuCMGOVFORCourseMedical",
+        "RuCMGOVFORCourseFieldEngineering",
+        "RuCMGOVFORCourseTechnicalEngineering",
+        "RuCMGOVFORCourseLogistics",
+        "RuCMGOVFORCourseHeavyWeapons",
+        "RuCMGOVFORCourseProfessionalCommunications",
+        "RuCMGOVFORCourseAviation",
+        "RuCMGOVFORCourseVehicleCrew",
+        "RuCMGOVFORCourseDroneOperator",
+        "RuCMGOVFORCourseMilitaryPolice",
+        "RuCMGOVFORCourseIntelligence"
+      ],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/ProfessionalTraining.xml",
+      "checklist_items": []
+    },
+    {
+      "id": "RuCMGOVFORProfessionalAssessments",
+      "suffix": "ProfessionalAssessments",
+      "title": "Методики профессиональной аттестации",
+      "english": "Professional Assessment Methods",
+      "qualification": null,
+      "references": [
+        "RuCMGOVFORAssessmentMedical",
+        "RuCMGOVFORAssessmentFieldEngineering",
+        "RuCMGOVFORAssessmentTechnicalEngineering",
+        "RuCMGOVFORAssessmentLogistics",
+        "RuCMGOVFORAssessmentHeavyWeapons",
+        "RuCMGOVFORAssessmentProfessionalCommunications",
+        "RuCMGOVFORAssessmentAviation",
+        "RuCMGOVFORAssessmentVehicleCrew",
+        "RuCMGOVFORAssessmentDroneOperator",
+        "RuCMGOVFORAssessmentMilitaryPolice",
+        "RuCMGOVFORAssessmentIntelligence",
+        "RuCMGOVFORProfessionalTraining",
+        "RuCMGOVFORTrainingQualifications"
+      ],
+      "children": [
+        "RuCMGOVFORAssessmentMedical",
+        "RuCMGOVFORAssessmentFieldEngineering",
+        "RuCMGOVFORAssessmentTechnicalEngineering",
+        "RuCMGOVFORAssessmentLogistics",
+        "RuCMGOVFORAssessmentHeavyWeapons",
+        "RuCMGOVFORAssessmentProfessionalCommunications",
+        "RuCMGOVFORAssessmentAviation",
+        "RuCMGOVFORAssessmentVehicleCrew",
+        "RuCMGOVFORAssessmentDroneOperator",
+        "RuCMGOVFORAssessmentMilitaryPolice",
+        "RuCMGOVFORAssessmentIntelligence"
+      ],
+      "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/ProfessionalAssessments.xml",
+      "checklist_items": []
+    }
+  ]
+}

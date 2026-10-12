@@ -21,6 +21,7 @@ public sealed partial class HumanoidProfileSystem : EntitySystem
         SubscribeLocalEvent<HumanoidProfileComponent, ExaminedEvent>(OnExamined);
     }
 
+    // CMU14 method: apply and resolve the profile's TTS voice after its sex.
     public void ApplyProfileTo(Entity<HumanoidProfileComponent?> ent, HumanoidCharacterProfile profile)
     {
         if (!Resolve(ent, ref ent.Comp))
@@ -34,7 +35,11 @@ public sealed partial class HumanoidProfileSystem : EntitySystem
 
         SetVoice(ent, profile.Voice);
         if (TryComp<Content.Shared.Corvax.TTS.TTSComponent>(ent, out var tts))
-            tts.VoicePrototypeId = profile.TTSVoice;
+        {
+            tts.VoicePrototypeId = HumanoidCharacterProfile.ValidateTTSVoice(profile.TTSVoice, ProtoMan, profile.Sex);
+            var voiceApplied = new Content.Shared.Corvax.TTS.CMUTTSVoiceAppliedEvent();
+            RaiseLocalEvent(ent, ref voiceApplied);
+        }
 
         if (TryComp<GrammarComponent>(ent, out var grammar))
         {

@@ -130,9 +130,11 @@ namespace Content.Server.Ghost
         private void OnGhostVis(Entity<GhostComponent> ent, ref GetVisMaskEvent args)
         {
             // If component not deleting they can see ghosts.
-            if (ent.Comp.LifeStage <= ComponentLifeStage.Running)
+            if (ent.Comp.LifeStage <= ComponentLifeStage.Running) // CMU14
             {
-                args.VisibilityMask |= (int)VisibilityFlags.Ghost | (int)VisibilityFlags.ImaginaryFriend; // RMC14
+                args.VisibilityMask |= (int)VisibilityFlags.Ghost
+                | (int)VisibilityFlags.ImaginaryFriend
+                | (int)VisibilityFlags.Rider;
             }
         }
 
@@ -457,7 +459,10 @@ namespace Content.Server.Ghost
             }
 
             var xform = Transform(uid);
-            _transformSystem.SetCoordinates(uid, xform, Transform(target).Coordinates);
+            // CMU14 Begin: targets can be children of this ghost; copying their parent would create a cycle.
+            // _transformSystem.SetCoordinates(uid, xform, Transform(target).Coordinates);
+            _transformSystem.SetMapCoordinates((uid, xform), _transformSystem.GetMapCoordinates(target));
+            // CMU14 End
             _transformSystem.AttachToGridOrMap(uid, xform);
             if (_physicsQuery.TryComp(uid, out var physics))
                 _physics.SetLinearVelocity(uid, Vector2.Zero, body: physics);

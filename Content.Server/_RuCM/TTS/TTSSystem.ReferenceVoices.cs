@@ -13,6 +13,7 @@ using Robust.Shared.Enums;
 
 namespace Content.Server.Corvax.TTS;
 
+// CMU14 class: TTS voice selection, ordered delivery and playback.
 public sealed partial class TTSSystem
 {
     [Dependency] private readonly IAdminManager _adminManager = default!;
@@ -293,7 +294,7 @@ public sealed partial class TTSSystem
         RaiseNetworkEvent(new AddReferenceVoiceResponse(speakerName, result), session);
     }
 
-    private bool TryResolveSpeaker(string voiceId, out string speaker)
+    private bool TryResolveSpeaker(string voiceId, out string speaker, Content.Shared.Humanoid.Sex sex = Content.Shared.Humanoid.Sex.Unsexed)
     {
         if (_prototypeManager.TryIndex<TTSVoicePrototype>(voiceId, out var prototype))
         {
@@ -304,11 +305,16 @@ public sealed partial class TTSSystem
         if (CustomTTSVoice.TryGetSpeaker(voiceId, out speaker) && _customVoices.Contains(speaker))
             return true;
         // A deleted custom voice must not leave an existing character permanently silent.
-        if (CustomTTSVoice.TryGetSpeaker(voiceId, out _) && _catalogLoaded &&
-            _prototypeManager.TryIndex<TTSVoicePrototype>(Content.Shared.Preferences.HumanoidCharacterProfile.DefaultTTSVoice, out var fallback))
+        if (CustomTTSVoice.TryGetSpeaker(voiceId, out _) && _catalogLoaded)
         {
-            speaker = fallback.Speaker;
-            return true;
+            var fallbacks = CMUTTSVoiceSelection.GetRandomVoices(_prototypeManager.EnumeratePrototypes<TTSVoicePrototype>(), sex);
+            var fallback = fallbacks.FirstOrDefault(voice => voice.ID == Content.Shared.Preferences.HumanoidCharacterProfile.DefaultTTSVoice)
+                ?? fallbacks.FirstOrDefault();
+            if (fallback != null)
+            {
+                speaker = fallback.Speaker;
+                return true;
+            }
         }
         return false;
     }

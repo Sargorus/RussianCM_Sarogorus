@@ -1,48 +1,46 @@
-<!-- Guidelines: CONTRIBUTING.md at the repository root --> <!-- CMU14 -->
+<!-- Правила: CONTRIBUTING.md в корне репозитория -->
 
-## About the PR
-<!-- What did you change? -->
+## О PR
+<!-- Что вы изменили? -->
 
-## Why / Balance
-<!-- Discuss how this would affect game balance or explain why it was changed. Link any relevant discussions or issues. -->
+## Зачем
+<!-- Опишите, как это повлияет на игровой баланс, или объясните, зачем понадобилось изменение. Приложите ссылки на связанные обсуждения или issues. -->
 
-## Technical details
-<!-- Summary of code changes for easier review. -->
+## Технические детали
+<!-- Краткое описание изменений в коде, чтобы упростить ревью. -->
 
-## Test plan
+## План тестирования
 <!--
-Describe how you tested the pull request, and how someone reviewing this PR can test it themselves.
+Опишите, как вы проверили этот pull request и как рецензент может проверить его сам.
 -->
 
-## Media
-<!-- Attach media if the PR makes ingame changes (clothing, items, features, etc).
-Small fixes/refactors are exempt. Media may be used in progress reports with credit. -->
+## Медиа
+<!-- Приложите медиа, если PR вносит изменения, видимые в игре (одежда, предметы, механики и т. д.).
+Небольшие исправления и рефакторинг освобождаются от этого. Медиа могут использоваться в отчётах о ходе разработки с указанием авторства. -->
 
-## Requirements
-<!-- Confirm the following by placing an X in the brackets [X]: -->
-- [ ] I have read and am following the [contributing guidelines](CONTRIBUTING.md).
-- [ ] I have tested this pull request and written instructions on how to test it.
-- [ ] My tests assert behavior that can break: no locked-in values or mirrored implementation ([CONVENTIONS.md](CONVENTIONS.md#tests)).
-- [ ] Every change outside the CMU zones carries a CMU14 tag; new files and prototypes are in CMU zones.
-- [ ] I have added media to this PR or it does not require an ingame showcase.
-- [ ] I have included a **brief** detail of the major changes for this PR in the changelog below.
-- [ ] By submitting this code and/or assets, I confirm that I either own them or have provided the correct necessary licenses to use and distribute them. I agree to be fully responsible for any legal claims or issues arising from the use of these materials.
-<!-- You should understand that not following the above may get your PR closed at maintainer’s discretion -->
+## Требования
+<!-- Подтвердите каждый пункт, поставив X в скобках [X]: -->
+- [ ] Я прочитал(а) [правила участия в разработке](CONTRIBUTING.md) и следую им.
+- [ ] Я проверил(а) этот pull request и описал(а), как его проверить.
+- [ ] Я добавил(а) медиа к этому PR, либо он не требует показа изменений в игре.
+- [ ] Отправляя этот код и/или ассеты, я подтверждаю, что либо владею ими, либо предоставил(а) необходимые лицензии на их использование и распространение. Я беру на себя полную ответственность за любые юридические претензии и споры, возникающие из-за использования этих материалов.
+<!-- Учтите: несоблюдение перечисленного выше может привести к закрытию вашего PR по решению мейнтейнеров -->
 
-## Breaking changes
-<!-- List any breaking changes, including namespaces, public class/method/field changes, prototype renames; and provide instructions for fixing them.
-This will be posted in #codebase-changes. -->
+## Критические изменения
+<!-- Перечислите все критические изменения, включая пространства имён, изменения публичных классов/методов/полей и переименования прототипов, и опишите, как их исправить.
+Это будет опубликовано в #codebase-changes. -->
 
-**Changelog**
-<!-- Add a Changelog entry to make players aware of new features or changes that could affect gameplay.
-Any of the below listed tags will function, for example admin changes may be listed for admins to see with admin:
-Coding changes with no changes visible in-game may be listed for other contributors with code:
-Changelog must have a singular :cl: symbol at the top, so the bot recognizes the changes and adds them to the game's changelog. -->
+**Список изменений (Changelog)**
+<!-- Добавьте запись в changelog, чтобы игроки узнали о новых возможностях или изменениях, влияющих на игровой процесс.
+Работает любой из перечисленных ниже тегов. Например, изменения для администраторов можно пометить тегом admin:
+Изменения в коде, не видимые в игре, можно пометить тегом code, чтобы о них узнали другие разработчики.
+В начале списка должен быть ровно один символ :cl:, чтобы бот распознал изменения и добавил их в игровой changelog.
+Сам символ :cl: и теги (add, remove, tweak, fix, map, admin, code) нужно оставить на английском - по ним работает бот, переводится только текст записей. -->
 :cl:
-- add: Added fun!
-- remove: Removed fun!
-- tweak: Changed fun!
-- fix: Fixed fun!
-- map: Mapped fun!
-- admin: Admin related change!
-- code: Code related change for contributors!
+- add: Добавлено что-то новое!
+- remove: Удалено что-то лишнее!
+- tweak: Изменено что-то существующее!
+- fix: Исправлено что-то сломанное!
+- map: Изменена карта!
+- admin: Изменение для администраторов!
+- code: Изменение в коде для разработчиков!

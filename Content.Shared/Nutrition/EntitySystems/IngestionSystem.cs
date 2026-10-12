@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Shared.Actions.Events;
 using Content.Shared.Administration.Logs;
 using Content.Shared._RMC14.Chemistry.Reagent;
@@ -26,6 +27,7 @@ using Content.Shared.UserInterface;
 using Content.Shared.Verbs;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio.Systems;
+using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Nutrition.EntitySystems;
@@ -118,6 +120,11 @@ public sealed partial class IngestionSystem : EntitySystem
     private void OnEdibleInteract(Entity<EdibleComponent> entity, ref AfterInteractEvent args)
     {
         if (args.Handled || args.Target == null || !args.CanReach)
+            return;
+
+        // CMU14: severed limbs and organs are surgery items first. An
+        // unclaimed click on a patient must not start a force-feed (BUG-638).
+        if (HasComp<OrganComponent>(entity))
             return;
 
         args.Handled = TryIngest(args.User, args.Target.Value, entity);
@@ -249,7 +256,9 @@ public sealed partial class IngestionSystem : EntitySystem
         var food = args.Ingested;
         var forceFed = args.User != entity.Owner;
 
-        if (!_body.TryGetOrgansWithComponent<StomachComponent>(entity!, out var stomachs))
+        var stomachs = _body.EnumerateOrgans<StomachComponent>(entity!)
+            .Select(organ => new Entity<StomachComponent>(organ.Owner, organ.Comp2)).ToList();
+        if (stomachs.Count == 0)
             return;
 
         // Can we digest the specific item we're trying to eat?
@@ -314,7 +323,9 @@ public sealed partial class IngestionSystem : EntitySystem
         if (!CanConsume(args.User, entity, food, out var solution, out _))
             return;
 
-        if (!_body.TryGetOrgansWithComponent<StomachComponent>(entity!, out var stomachs))
+        var stomachs = _body.EnumerateOrgans<StomachComponent>(entity!)
+            .Select(organ => new Entity<StomachComponent>(organ.Owner, organ.Comp2)).ToList();
+        if (stomachs.Count == 0)
             return;
 
         var forceFed = args.User != entity.Owner;
@@ -488,7 +499,12 @@ public sealed partial class IngestionSystem : EntitySystem
 
         var edible = ProtoMan.Index(entity.Comp.Edible);
 
-        _audio.PlayPredicted(entity.Comp.UseSound ?? edible.UseSound, args.Target, args.User);
+        // CMU14: the local eater still hears bites completed outside client prediction.
+        var sound = entity.Comp.UseSound ?? edible.UseSound;
+        if (_net.IsClient && !_timing.IsFirstTimePredicted)
+            _audio.PlayPvs(sound, args.Target);
+        else
+            _audio.PlayPredicted(sound, args.Target, args.User);
 
         var flavors = _flavorProfile.GetLocalizedFlavorsMessage(entity.Owner, args.Target, args.Split);
 

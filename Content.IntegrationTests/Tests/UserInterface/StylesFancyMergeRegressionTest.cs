@@ -1,3 +1,4 @@
+using Content.Client.CMU14.UserInterface;
 using System.Numerics;
 using Content.Client.Stylesheets;
 using Content.Client.UserInterface.Controls;
@@ -12,6 +13,7 @@ namespace Content.IntegrationTests.Tests.UserInterface;
 public sealed class StylesFancyMergeRegressionTest : GameTest
 {
     [Test]
+    [NonParallelizable] // CMU14: asserts process-global StyleNano CRT state; parallel pairs write it mid-assert
     public async Task NamedSheetsAndCrtPreviewResetKeepGlobalNanoSheetCoherent()
     {
         await Client.WaitAssertion(() =>
@@ -108,7 +110,7 @@ public sealed class StylesFancyMergeRegressionTest : GameTest
             }
             finally
             {
-                window.Dispose();
+                window.Release();
             }
         });
     }

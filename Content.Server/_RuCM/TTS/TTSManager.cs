@@ -1,4 +1,5 @@
 using System.Linq;
+using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -16,6 +17,7 @@ using Robust.Shared.Configuration;
 namespace Content.Server.Corvax.TTS;
 
 // ReSharper disable once InconsistentNaming
+// CMU14 class: TTS voice selection, ordered delivery and playback.
 public sealed class TTSManager
 {
     private static readonly Histogram RequestTimings = Metrics.CreateHistogram(
@@ -40,9 +42,13 @@ public sealed class TTSManager
     private readonly HttpClient _httpClient = new();
 
     private ISawmill _sawmill = default!;
-    private readonly Dictionary<string, byte[]> _cache = new();
-    private readonly List<string> _cacheKeysSeq = new();
+    private readonly Dictionary<string, (byte[] Data, LinkedListNode<string> Node)> _cache = new();
+    private readonly LinkedList<string> _cacheKeysSeq = new();
     private readonly object _cacheLock = new();
+    private const int MaxSoundBytes = 8 * 1024 * 1024;
+    private const int MaxCacheBytes = 64 * 1024 * 1024;
+    private int _cachedBytes;
+    private uint _cacheGeneration;
     private int _maxCachedCount = 200;
     private string _apiUrl = string.Empty;
     private string _apiToken = string.Empty;
@@ -52,11 +58,11 @@ public sealed class TTSManager
         _sawmill = Logger.GetSawmill("tts");
         _cfg.OnValueChanged(CCCVars.TTSMaxCache, val =>
         {
-            _maxCachedCount = val;
+            _maxCachedCount = Math.Clamp(val, 0, 10000);
             ResetCache();
         }, true);
-        _cfg.OnValueChanged(CCCVars.TTSApiUrl, v => _apiUrl = v, true);
-        _cfg.OnValueChanged(CCCVars.TTSApiToken, v => _apiToken = v, true);
+        _cfg.OnValueChanged(CCCVars.TTSApiUrl, v => { _apiUrl = v; ResetCache(); }, true);
+        _cfg.OnValueChanged(CCCVars.TTSApiToken, v => { _apiToken = v; ResetCache(); }, true);
     }
 
     /// <summary>
@@ -64,8 +70,8 @@ public sealed class TTSManager
     /// </summary>
     /// <param name="speaker">Identifier of speaker</param>
     /// <param name="text">SSML formatted text</param>
-    /// <returns>OGG audio bytes or null if failed</returns>
-    public async Task<byte[]?> ConvertTextToSpeech(string speaker, string text)
+    /// <returns>WAV audio bytes or null if failed</returns>
+    public async Task<byte[]?> ConvertTextToSpeech(string speaker, string text, CancellationToken cancellationToken = default)
     {
         WantedCount.Inc();
 
@@ -73,14 +79,18 @@ public sealed class TTSManager
             return null;
 
         var cacheKey = GenerateCacheKey(speaker, text);
+        uint cacheGeneration;
 
         lock (_cacheLock)
         {
+            cacheGeneration = _cacheGeneration;
             if (_cache.TryGetValue(cacheKey, out var cached))
             {
+                _cacheKeysSeq.Remove(cached.Node);
+                _cacheKeysSeq.AddLast(cached.Node);
                 ReusedCount.Inc();
                 _sawmill.Verbose($"Use cached TTS for '{text}' by '{speaker}'");
-                return cached;
+                return cached.Data;
             }
         }
 
@@ -113,11 +123,12 @@ public sealed class TTSManager
         try
         {
             var timeout = _cfg.GetCVar(CCCVars.TTSApiTimeout);
-            using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(timeout));
+            using var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            cts.CancelAfter(TimeSpan.FromSeconds(Math.Clamp(timeout, 1, 60)));
             using var request = new HttpRequestMessage(HttpMethod.Get, requestUri);
             request.Headers.Authorization = new("Bearer", apiToken);
 
-            using var response = await _httpClient.SendAsync(request, cts.Token);
+            using var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, cts.Token);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -131,24 +142,54 @@ public sealed class TTSManager
                 return null;
             }
 
-            var soundData = await response.Content.ReadAsByteArrayAsync(cts.Token);
+            if (response.Content.Headers.ContentLength > MaxSoundBytes)
+            {
+                _sawmill.Warning("TTS audio response exceeds the size limit");
+                return null;
+            }
+            await using var audio = await response.Content.ReadAsStreamAsync(cts.Token);
+            using var memory = new MemoryStream();
+            var buffer = new byte[81920];
+            while (true)
+            {
+                var read = await audio.ReadAsync(buffer, cts.Token);
+                if (read == 0)
+                    break;
+                if (memory.Length + read > MaxSoundBytes)
+                {
+                    _sawmill.Warning("TTS audio response exceeds the size limit");
+                    return null;
+                }
+                memory.Write(buffer, 0, read);
+            }
+            var soundData = memory.ToArray();
+            if (!CustomTTSVoice.IsValidWaveFile(soundData))
+            {
+                _sawmill.Warning("TTS API returned invalid WAV audio");
+                return null;
+            }
 
             lock (_cacheLock)
             {
                 if (_cache.TryGetValue(cacheKey, out var cached))
                 {
                     ReusedCount.Inc();
-                    return cached;
+                    return cached.Data;
                 }
 
-                _cache[cacheKey] = soundData;
-                _cacheKeysSeq.Add(cacheKey);
-
-                if (_cache.Count > _maxCachedCount)
+                // Never restore a deleted reference voice or obsolete endpoint result after ResetCache.
+                if (_maxCachedCount > 0 && cacheGeneration == _cacheGeneration && !cancellationToken.IsCancellationRequested)
                 {
-                    var first = _cacheKeysSeq[0];
-                    _cache.Remove(first);
-                    _cacheKeysSeq.RemoveAt(0);
+                    var node = _cacheKeysSeq.AddLast(cacheKey);
+                    _cache.Add(cacheKey, (soundData, node));
+                    _cachedBytes += soundData.Length;
+                    while (_cache.Count > _maxCachedCount || _cachedBytes > MaxCacheBytes)
+                    {
+                        var first = _cacheKeysSeq.First!;
+                        _cachedBytes -= _cache[first.Value].Data.Length;
+                        _cache.Remove(first.Value);
+                        _cacheKeysSeq.RemoveFirst();
+                    }
                 }
             }
 
@@ -161,7 +202,11 @@ public sealed class TTSManager
 
             return soundData;
         }
-        catch (TaskCanceledException)
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+        {
+            return null;
+        }
+        catch (OperationCanceledException)
         {
             RequestTimings
                 .WithLabels("Timeout")
@@ -329,6 +374,8 @@ public sealed class TTSManager
         {
             _cache.Clear();
             _cacheKeysSeq.Clear();
+            _cachedBytes = 0;
+            _cacheGeneration++;
         }
     }
 

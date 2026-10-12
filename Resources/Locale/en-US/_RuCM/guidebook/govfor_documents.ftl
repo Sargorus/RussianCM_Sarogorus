@@ -1,0 +1,19 @@
+rucm-guide-entry-govfor = GOVFOR Regulations
+rucm-guide-entry-basic = Core Documents
+rucm-guide-entry-service = Service
+rucm-guide-entry-training = Training
+rucm-guide-entry-communications = GOVFOR Service Communication and Radio Handbook
+rucm-guide-entry-command = GOVFOR Unit Command Handbook
+rucm-guide-entry-qualifications = GOVFOR Training and Qualification Regulations
+
+rucm-guide-index-govfor = GOVFOR documents are grouped into core regulations, service handbooks, and training. The approved document bodies are currently available in Russian.
+rucm-guide-index-basic = The existing SOP and military justice code are retained. The drill regulations supplement them with formation and service conduct guidance.
+rucm-guide-index-service = Communication, radio and unit command handbooks, together with the training and qualification regulations.
+rucm-guide-index-training = Start with recruit training, then choose the sergeant or officer course. Professional courses complement the military level. Each course has an assessment method; commanding officer preparation leads to a separate management decision. Reading does not mark dossier progress.
+rucm-guide-open-document = Open document
+rucm-guide-cross-drill = Service radio procedures are set out in the GOVFOR Service Communication and Radio Handbook.
+rucm-guide-cross-communications = Command authority and reporting relationships are set out in the SOP and the GOVFOR Unit Command Handbook.
+rucm-guide-cross-command = Responsibility for disobeying orders and abusing authority is governed by the military justice code.
+rucm-guide-cross-qualifications = Knowledge of the drill regulations, SOP and other applicable documents forms part of the respective training programmes.
+rucm-qualifications-reference-materials = Training materials
+rucm-qualifications-open-material = Open material

@@ -213,7 +213,7 @@ public abstract partial class SharedLanguageLearningSystem : EntitySystem
         return totalWeight > 0 ? totalComprehension / totalWeight : 0f;
     }
 
-    private static readonly Regex WordRegex = new(@"\b[a-zA-Z']+\b");
+    private static readonly Regex WordRegex = new(@"\b[\p{L}']+\b", RegexOptions.Compiled); // RuMC edit
 
     public float GetComprehensionLevel(EntityUid entity, ProtoId<LanguagePrototype> language)
     {

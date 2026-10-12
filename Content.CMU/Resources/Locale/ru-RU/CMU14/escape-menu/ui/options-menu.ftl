@@ -51,3 +51,4 @@ cmu-ui-setup-introduction = Добро пожаловать в CMU! Выбери
 cmu-ui-setup-later = Напомнить в следующий раз
 cmu-ui-setup-save = Сохранить и продолжить
 cmu-ui-setup-open = Открыть настройку интерфейса
+cmu-ui-options-examine-wounds-in-chat = Показывать ранения в чате при осмотре, как в CM13

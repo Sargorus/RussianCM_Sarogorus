@@ -1,4 +1,3 @@
-using Content.Shared.CMU14.Threats.Mobs.Abomination;
 using Content.Shared.CMU14.GasMask;
 using Content.Shared._RMC14.BlurredVision;
 using Content.Shared._RMC14.Slow;
@@ -26,7 +25,7 @@ using Robust.Shared.Network;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Random;
 using Robust.Shared.Timing;
-using AbominationComponent = Content.Shared.CMU14.Threats.Mobs.Abomination.AbominationComponent;
+using BiomorphComponent = Content.Shared.CMU14.Threats.Mobs.Biomorph.BiomorphComponent;
 using NewStatusEffectsSystem = Content.Shared.StatusEffectNew.StatusEffectsSystem;
 
 namespace Content.Shared.CMU14.ChemicalIrritants;
@@ -133,6 +132,9 @@ public abstract partial class SharedChemicalIrritantSystem : EntitySystem
     private void ApplyIrritant(EntityUid victim, ChemicalIrritantInjectorComponent injector)
     {
         if (IsImmuneToIrritants(victim))
+            return;
+
+        if (_mask.IsBreathingInternals(victim))
             return;
 
         if (TryGetFilterFromMask(victim, out var filterId, out var filter))
@@ -265,7 +267,7 @@ public abstract partial class SharedChemicalIrritantSystem : EntitySystem
     {
         return HasComp<SynthComponent>(victim)
             || HasComp<XenoComponent>(victim)
-            || HasComp<AbominationComponent>(victim);
+            || HasComp<BiomorphComponent>(victim);
     }
 
     private bool TryGetFilterFromMask(EntityUid victim, out EntityUid filterId, out GasMaskFilterComponent filter)
@@ -364,7 +366,7 @@ public abstract partial class SharedChemicalIrritantSystem : EntitySystem
         if (IsImmuneToIrritants(victim))
             return;
 
-        if (TryGetFilterFromMask(victim, out _, out _))
+        if (_mask.IsBreathingInternals(victim) || TryGetFilterFromMask(victim, out _, out _))
             return;
 
         var alreadyExposed = EnsureComp<ChemicalIrritantComponent>(victim, out var chem);

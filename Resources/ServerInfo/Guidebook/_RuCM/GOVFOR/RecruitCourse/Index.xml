@@ -1,0 +1,14 @@
+<Document>
+  <GOVFORLocalizedText Key="rucm-guide-course-purpose"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourseIntroduction"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourseMilitaryRegulations"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourseDrill"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourseCommunications"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourseFirearms"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourseTactics"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourseFirstAid"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourseTopography"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourseEngineeringBasics"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourseFieldExercise"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourseReference"/>
+</Document>

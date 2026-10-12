@@ -5,7 +5,7 @@
   name: au14-job-name-govforauxsupportsynth
   description: au14-job-description-govforauxsupportsynth
   icon: "AU14JobIconGovSynth"
-  spawnMenuRoleName: Support Synth (GOVFOR)
+  spawnMenuRoleName: cmu-spawn-role-support-synth-govfor
   startingGear: AU14GearGOVFORAuxSupportSynth
   dummyStartingGear: AU14GearGOVFORAuxSupportSynthDummy
   supervisors: au14-job-supervisors-govforplatco
@@ -14,7 +14,7 @@
   whitelisted: true
   whitelistParent: RuCMWhitelistMedium
   isSynthetic: true
-  displayWeight: -1
+  displayWeight: 1
   accessGroups:
   - AU14GovforCommand
   - CMCargoTech
@@ -106,8 +106,6 @@
         RMCSkillNavigations: 1
 
   requirements:
-  - !type:OverallPlaytimeRequirement
-    time: 18000 # 5 hours
   - !type:TraitsRequirement
     inverted: true
     traits:
@@ -167,19 +165,14 @@
   groups:
   - GOVFORSynthSpecializationAU14
   - SynthBackpackAU14
-  - SynthUniformAU14
-  - SynthUniformAccessoriesAU14
   - SynthEquipmentAU14
   - SynthAccesoriesSpecialAU14
-  - SynthSuitAU14
   - SynthSuitSpecialAU14
   - SynthBeltAU14
   - SynthPouchesLeftAU14
   - SynthPouchesRightAU14
-  - SynthHeadwearAU14
   - SynthGlassesAU14
   - SynthGlovesAU14
-  - SynthShoesRMC
   - SynthMasksAU14
   - HelmetGarbsRMC
   - SmokablesRMC
@@ -202,6 +195,7 @@
   - AU14OpforCommand
   - CMCargoTech
   - aulegacygroupcommand
+  useLoadoutOfJob: AU14JobGOVFORAuxSupportSynth
 
 - type: startingGear
   id: AU14GearOPFORAuxSupportSynth
@@ -247,8 +241,6 @@
   name: au14-job-name-govforauxsupportsynthRMC
   spawnMenuRoleName: Support Synth (TWE RMC)
   requirements:
-  - !type:OverallPlaytimeRequirement
-    time: 7200 # 2 hours
   - !type:TraitsRequirement
     inverted: true
     traits:
@@ -279,8 +271,6 @@
   roundForce: UPP
   spawnMenuRoleName: Support Synth (UPP)
   requirements:
-  - !type:OverallPlaytimeRequirement
-    time: 7200 # 2 hours
   - !type:TraitsRequirement
     inverted: true
     traits:

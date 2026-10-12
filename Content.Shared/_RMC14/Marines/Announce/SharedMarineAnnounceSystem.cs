@@ -52,6 +52,13 @@ public abstract partial class SharedMarineAnnounceSystem : EntitySystem
 
     private static readonly EntProtoId<ARESLogTypeComponent> LogCat = "ARESTabAnnouncementLogs";
 
+    // CMU14: Vehicle interiors inherit their supplying faction.
+    public void SetComputerFaction(Entity<MarineCommunicationsComputerComponent> computer, string faction)
+    {
+        computer.Comp.Faction = faction;
+        Dirty(computer);
+    }
+
     public override void Initialize()
     {
         SubscribeLocalEvent<MarineCommunicationsComputerComponent, EchoSquadReasonEvent>(OnEchoSquadReason);
@@ -113,7 +120,7 @@ public abstract partial class SharedMarineAnnounceSystem : EntitySystem
 
         if (!_skills.HasSkill(args.Actor, ent.Comp.AnnounceSkill, ent.Comp.AnnounceSkillLevel))
         {
-            _popup.PopupClient(Loc.GetString("rmc-skills-no-training", ("target", ent)), args.Actor, PopupType.MediumCaution);
+            _popup.PopupSelf(Loc.GetString("rmc-skills-no-training", ("target", ent)), args.Actor, PopupType.MediumCaution);
             return;
         }
 
@@ -121,7 +128,7 @@ public abstract partial class SharedMarineAnnounceSystem : EntitySystem
         if (_timing.CurTime < ent.Comp.LastAnnouncement + ent.Comp.Cooldown)
         {
             var cooldownMessage = Loc.GetString("rmc-announcement-cooldown", ("seconds", (int) ent.Comp.Cooldown.TotalSeconds));
-            _popup.PopupClient(cooldownMessage, args.Actor, PopupType.SmallCaution);
+            _popup.PopupSelf(cooldownMessage, args.Actor, PopupType.SmallCaution);
             return;
         }
 
@@ -130,7 +137,12 @@ public abstract partial class SharedMarineAnnounceSystem : EntitySystem
         if (text.Length > CharacterLimit)
             text = text[..CharacterLimit].Trim();
 
-        AnnounceSigned(args.Actor, text, name: ent.Comp.AnnounceName, faction: ResolveAnnouncementFaction(ent));
+        // CMU14: admin tablets announce under High Command
+        var author = ent.Comp.AnnounceAuthor is { } announceAuthor ? Loc.GetString(announceAuthor) : null;
+        AnnounceSigned(args.Actor, text,
+            author: author,
+            name: ent.Comp.AnnounceName,
+            faction: ResolveAnnouncementFaction(ent));
 
         ent.Comp.LastAnnouncement = time;
         Dirty(ent);
@@ -157,7 +169,7 @@ public abstract partial class SharedMarineAnnounceSystem : EntitySystem
     {
         if (!_skills.HasSkill(args.Actor, ent.Comp.OverwatchSkill, ent.Comp.OverwatchSkillLevel))
         {
-            _popup.PopupClient("You are not trained in overwatch!", args.Actor, PopupType.LargeCaution);
+            _popup.PopupSelf("You are not trained in overwatch!", args.Actor, PopupType.LargeCaution);
             return;
         }
 
@@ -192,9 +204,10 @@ public abstract partial class SharedMarineAnnounceSystem : EntitySystem
     public void AnnounceARES(
         EntityUid? source,
         string message,
-        SoundSpecifier? sound = null)
+        SoundSpecifier? sound = null,
+        string? faction = null) // CMU14: optional GOVFOR/OPFOR recipient filter.
     {
-        AnnounceARESStaging(source, message, sound, "rmc-announcement-ares-command");
+        AnnounceARESStaging(source, message, sound, "rmc-announcement-ares-command", faction); // CMU14
     }
 
     public virtual void AnnounceSquad(

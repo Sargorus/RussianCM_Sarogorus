@@ -1,6 +1,10 @@
 # Chat window radio wrap (prefix and postfix)
-chat-radio-message-wrap = [color={$color}][font={$fontType} size={$fontSize}]{$channel} [bold]{$name}[/bold] {$verb}, { chat-manager-speech-double-quote-begin }{$message}{ chat-manager-speech-double-quote-end }[/font][/color]
-chat-radio-message-wrap-bold = [color={$color}][font={$fontType} size={$fontSize}]{$channel} [bold]{$name}[/bold] {$verb}, [bold]{ chat-manager-speech-double-quote-begin }{$message}{ chat-manager-speech-double-quote-end }[/bold][/font][/color]
+# CMU14 Radio Begin: radio chat shows quoted speech without automatic sender identity.
+# chat-radio-message-wrap = [color={$color}][font={$fontType} size={$fontSize}]{$channel} [bold]{$name}[/bold] {$verb}, { chat-manager-speech-double-quote-begin }{$message}{ chat-manager-speech-double-quote-end }[/font][/color]
+# chat-radio-message-wrap-bold = [color={$color}][font={$fontType} size={$fontSize}]{$channel} [bold]{$name}[/bold] {$verb}, [bold]{ chat-manager-speech-double-quote-begin }{$message}{ chat-manager-speech-double-quote-end }[/bold][/font][/color]
+chat-radio-message-wrap = [color={$color}][font={$fontType} size={$fontSize}]{$channel} { chat-manager-speech-double-quote-begin }{$message}{ chat-manager-speech-double-quote-end }[/font][/color]
+chat-radio-message-wrap-bold = [color={$color}][font={$fontType} size={$fontSize}]{$channel} [bold]{ chat-manager-speech-double-quote-begin }{$message}{ chat-manager-speech-double-quote-end }[/bold][/font][/color]
+# CMU14 End
 examine-headset-default-channel = Use {$prefix} for the default channel ([color={$color}]{$channel}[/color]).
 
 chat-radio-common = Common

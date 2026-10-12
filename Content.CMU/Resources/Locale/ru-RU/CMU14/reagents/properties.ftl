@@ -205,3 +205,4 @@ cmu-reagent-property-name-duration = Продолжительность
 cmu-reagent-property-desc-duration = Неизвестным способом управляет продолжительностью пожара.
 cmu-reagent-property-name-encephaloprasive = Энцефалопразивное
 cmu-reagent-property-desc-encephaloprasive = Значительно увеличивает амплитуду гамма- и бета-волн мозга, позволяя носителю транслировать свои мысли.
+cmu-reagent-property-code-yautjahemogenic = ЯГМ

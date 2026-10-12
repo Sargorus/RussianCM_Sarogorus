@@ -1,0 +1,109 @@
+# Native CMU uniforms and empty boots. No weapon, armor or expanded access is issued.
+
+- type: startingGear
+  id: CMUGearRecruitUSCM
+  equipment:
+    jumpsuit: AU14CamoUSCMFatigues
+    shoes: CMBootsBlack
+
+- type: startingGear
+  parent: CMUGearRecruitUSCM
+  id: CMUGearInstructorUSCM
+  equipment:
+    head: CMHeadCapDrill
+
+- type: startingGear
+  id: CMUGearRecruitLACN
+  equipment:
+    jumpsuit: AU14LACNUniform
+    shoes: AU14LACNBoots
+
+- type: startingGear
+  parent: CMUGearRecruitLACN
+  id: CMUGearInstructorLACN
+  equipment:
+    head: CMULACNFieldCap
+
+- type: startingGear
+  id: CMUGearRecruitUPP
+  equipment:
+    jumpsuit: AU14FatiguesUPP
+    shoes: RMCBootsSPPBlack
+
+- type: startingGear
+  parent: CMUGearRecruitUPP
+  id: CMUGearInstructorUPP
+  equipment:
+    head: AU14UPPPatrolCap
+
+- type: startingGear
+  id: CMUGearRecruitWEYU
+  equipment:
+    jumpsuit: AU14WYPMCFatigues
+    shoes: RMCBootsCorporate
+
+- type: startingGear
+  parent: CMUGearRecruitWEYU
+  id: CMUGearInstructorWEYU
+  equipment:
+    head: AU14WYPMCBallCap
+
+- type: startingGear
+  id: CMUGearRecruitCMBCIU
+  equipment:
+    jumpsuit: AU14UniversalBlackFatigues
+    shoes: RMCBootsSPPBlack
+
+- type: startingGear
+  parent: CMUGearRecruitCMBCIU
+  id: CMUGearInstructorCMBCIU
+  equipment:
+    head: CMHeadCapDrill
+
+- type: startingGear
+  id: CMUGearRecruitHAZOPS
+  equipment:
+    jumpsuit: AU14HAZOPUrbanFatigues
+    shoes: CMBootsBlack
+
+- type: startingGear
+  parent: CMUGearRecruitHAZOPS
+  id: CMUGearInstructorHAZOPS
+  equipment:
+    head: AU14JunglePatrolCap
+
+- type: startingGear
+  id: CMUGearRecruitProdigySF
+  equipment:
+    jumpsuit: AU14ProdigyFatigues
+    shoes: RMCBootsSPPBlack
+
+- type: startingGear
+  parent: CMUGearRecruitProdigySF
+  id: CMUGearInstructorProdigySF
+  equipment:
+    head: AU14ProdigyCap
+
+- type: startingGear
+  id: CMUGearRecruitVAIPO
+  equipment:
+    jumpsuit: AU14CivilianWorkwearBlue
+    shoes: CMBootsBlack
+
+- type: startingGear
+  parent: CMUGearRecruitVAIPO
+  id: CMUGearInstructorVAIPO
+  equipment:
+    head: AU14DesertPatrolCap
+
+- type: startingGear
+  id: CMUGearRecruitRMC
+  equipment:
+    jumpsuit: CMUFatiguesRMC
+    shoes: RMCBootsRoyal
+
+- type: startingGear
+  parent: CMUGearRecruitRMC
+  id: CMUGearInstructorRMC
+  equipment:
+    head: AU14HeadBeretRMCLead

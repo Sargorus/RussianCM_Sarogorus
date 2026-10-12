@@ -1,20 +1,20 @@
 <Document>
 	# Исследования
-	
+
 	В этом разделе описано всё, что связано с исследованиями.
-	
+
 	## Руководства
 	- [textlink="Химические исследования" link="CMUResearch"]
 	- [textlink="Терминал исследовательских данных" link="CMURDT"]
 	- [textlink="XRF-сканер" link="CMUXRF"]
 	- [textlink="Симулятор синтеза" link="CMUSIM"]
 	- [textlink="Гидропоника" link="CMUBotany"]
-	
+
 	## Краткий справочник
-	- [textlink="Химические вещества" link="RMCChemicals"]
-	
+	- [textlink="Химические вещества" link="CMUChemicals"]
+
 	### Источники химических веществ в гидропонике
-	
+
 	<Table Columns="2" MinForcedColumnWidth="64">
 		<ColorBox Color="#202028">
 			<Box Margin="4">[bold]Вещество[/bold]</Box>

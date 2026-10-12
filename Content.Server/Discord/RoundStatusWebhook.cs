@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Robust.Shared.Localization;
 
 namespace Content.Server.Discord;
 
@@ -42,7 +43,7 @@ public static class RoundStatusWebhook
 {
     private const int DetailValueLength = 96;
     private const int RecentGamemodeLength = 72;
-    private const string FooterText = "CMU Status Network";
+    private static string FooterText => Loc.GetString("discord-round-status-footer");
 
     public static readonly RoundStatusWebhookColors DefaultColors = new(
         0xF0C419,
@@ -70,16 +71,16 @@ public static class RoundStatusWebhook
 
         var fields = new List<WebhookEmbedField>
         {
-            new() { Name = "Status", Value = GetState(kind), Inline = true },
-            new() { Name = "Players", Value = status.PlayerCount.ToString(CultureInfo.InvariantCulture), Inline = true },
-            new() { Name = "Round", Value = $"#{status.RoundId}", Inline = true },
+            new() { Name = Loc.GetString("discord-round-status-field-status"), Value = GetState(kind), Inline = true },
+            new() { Name = Loc.GetString("discord-round-status-field-players"), Value = status.PlayerCount.ToString(CultureInfo.InvariantCulture), Inline = true },
+            new() { Name = Loc.GetString("discord-round-status-field-round"), Value = $"#{status.RoundId}", Inline = true },
         };
 
         if (status.Duration is { } duration)
-            fields.Add(new WebhookEmbedField { Name = "Runtime", Value = FormatDuration(duration), Inline = true });
+            fields.Add(new WebhookEmbedField { Name = Loc.GetString("discord-round-status-field-runtime"), Value = FormatDuration(duration), Inline = true });
 
-        fields.Add(new WebhookEmbedField { Name = "Operation", Value = FormatOperation(status), Inline = false });
-        fields.Add(new WebhookEmbedField { Name = "Recent Rounds", Value = FormatRecentGamemodes(status.RecentGamemodes), Inline = false });
+        fields.Add(new WebhookEmbedField { Name = Loc.GetString("discord-round-status-field-operation"), Value = FormatOperation(status), Inline = false });
+        fields.Add(new WebhookEmbedField { Name = Loc.GetString("discord-round-status-field-recent-rounds"), Value = FormatRecentGamemodes(status.RecentGamemodes), Inline = false });
         fields.Add(CreateLastUpdatedField(DateTimeOffset.UtcNow));
 
         var payload = new WebhookPayload
@@ -114,12 +115,12 @@ public static class RoundStatusWebhook
                 new()
                 {
                     Title = GetTitle(RoundStatusWebhookKind.Shutdown, 0),
-                    Description = "Server offline.",
+                    Description = Loc.GetString("discord-round-status-description-offline"),
                     Color = colors.Shutdown,
                     Footer = new WebhookEmbedFooter { Text = FooterText },
                     Fields = new List<WebhookEmbedField>
                     {
-                        new() { Name = "Status", Value = "Offline", Inline = true },
+                        new() { Name = Loc.GetString("discord-round-status-field-status"), Value = Loc.GetString("discord-round-status-state-offline"), Inline = true },
                     },
                 },
             },
@@ -273,7 +274,7 @@ public static class RoundStatusWebhook
     {
         return new WebhookEmbedField
         {
-            Name = "Last Updated",
+            Name = Loc.GetString("discord-round-status-field-last-updated"),
             Value = $"<t:{updatedAt.ToUnixTimeSeconds()}:R>",
             Inline = false,
         };
@@ -281,14 +282,15 @@ public static class RoundStatusWebhook
 
     private static string GetTitle(RoundStatusWebhookKind kind, int roundId)
     {
+        var round = ("id", (object) roundId.ToString(CultureInfo.InvariantCulture));
         return kind switch
         {
-            RoundStatusWebhookKind.Starting => "CMU Round Status - Starting",
-            RoundStatusWebhookKind.Lobby => "CMU Round Status - Lobby",
-            RoundStatusWebhookKind.Running => $"CMU Round #{roundId} - Running",
-            RoundStatusWebhookKind.Ended => $"CMU Round #{roundId} - Ended",
-            RoundStatusWebhookKind.Shutdown => "CMU Round Status - Offline",
-            _ => "CMU Round Status",
+            RoundStatusWebhookKind.Starting => Loc.GetString("discord-round-status-title-starting"),
+            RoundStatusWebhookKind.Lobby => Loc.GetString("discord-round-status-title-lobby"),
+            RoundStatusWebhookKind.Running => Loc.GetString("discord-round-status-title-running", round),
+            RoundStatusWebhookKind.Ended => Loc.GetString("discord-round-status-title-ended", round),
+            RoundStatusWebhookKind.Shutdown => Loc.GetString("discord-round-status-title-offline"),
+            _ => Loc.GetString("discord-round-status-title-unknown"),
         };
     }
 
@@ -309,12 +311,12 @@ public static class RoundStatusWebhook
     {
         return kind switch
         {
-            RoundStatusWebhookKind.Starting => "Server starting. Preparing the next operation.",
-            RoundStatusWebhookKind.Lobby => "Server online in pre-round lobby.",
-            RoundStatusWebhookKind.Running => "Round in progress. Live operation status is below.",
-            RoundStatusWebhookKind.Ended => "Round ended. Final operation summary is below.",
-            RoundStatusWebhookKind.Shutdown => "Server offline.",
-            _ => "Server status.",
+            RoundStatusWebhookKind.Starting => Loc.GetString("discord-round-status-description-starting"),
+            RoundStatusWebhookKind.Lobby => Loc.GetString("discord-round-status-description-lobby"),
+            RoundStatusWebhookKind.Running => Loc.GetString("discord-round-status-description-running"),
+            RoundStatusWebhookKind.Ended => Loc.GetString("discord-round-status-description-ended"),
+            RoundStatusWebhookKind.Shutdown => Loc.GetString("discord-round-status-description-offline"),
+            _ => Loc.GetString("discord-round-status-description-unknown"),
         };
     }
 
@@ -322,12 +324,12 @@ public static class RoundStatusWebhook
     {
         return kind switch
         {
-            RoundStatusWebhookKind.Starting => "Starting",
-            RoundStatusWebhookKind.Lobby => "Lobby",
-            RoundStatusWebhookKind.Running => "Running",
-            RoundStatusWebhookKind.Ended => "Ended",
-            RoundStatusWebhookKind.Shutdown => "Offline",
-            _ => "Unknown",
+            RoundStatusWebhookKind.Starting => Loc.GetString("discord-round-status-state-starting"),
+            RoundStatusWebhookKind.Lobby => Loc.GetString("discord-round-status-state-lobby"),
+            RoundStatusWebhookKind.Running => Loc.GetString("discord-round-status-state-running"),
+            RoundStatusWebhookKind.Ended => Loc.GetString("discord-round-status-state-ended"),
+            RoundStatusWebhookKind.Shutdown => Loc.GetString("discord-round-status-state-offline"),
+            _ => Loc.GetString("discord-round-status-state-unknown"),
         };
     }
 
@@ -335,15 +337,21 @@ public static class RoundStatusWebhook
     {
         return string.Join(
             "\n",
-            $"**Map:** {Shorten(status.MapName, DetailValueLength)}",
-            $"**GOVFOR:** {Shorten(status.Govfor, DetailValueLength)}",
-            $"**Mode:** {Shorten(status.Gamemode, DetailValueLength)}");
+            FormatOperationLine("discord-round-status-operation-map", status.MapName),
+            FormatOperationLine("discord-round-status-operation-govfor", status.Govfor),
+            FormatOperationLine("discord-round-status-operation-mode", status.Gamemode));
+    }
+
+    private static string FormatOperationLine(string id, string value)
+    {
+        var shortened = Shorten(value, DetailValueLength);
+        return Loc.GetString(id, ("value", (object) shortened));
     }
 
     private static string FormatRecentGamemodes(IReadOnlyList<RoundStatusRecentGamemode> recentGamemodes)
     {
         if (recentGamemodes.Count == 0)
-            return "No completed rounds yet.";
+            return Loc.GetString("discord-round-status-no-recent-rounds");
 
         return string.Join(
             "\n",
@@ -355,7 +363,7 @@ public static class RoundStatusWebhook
     private static string UnknownIfEmpty(string value)
     {
         return string.IsNullOrWhiteSpace(value)
-            ? "Unknown"
+            ? Loc.GetString("discord-round-status-unknown-value")
             : value.Trim();
     }
 
@@ -388,13 +396,25 @@ public static class RoundStatusWebhook
 
     private static string FormatDuration(TimeSpan duration)
     {
-        return $"{(int) duration.TotalHours}h {duration.Minutes}m {duration.Seconds}s";
+        var hours = (int) duration.TotalHours;
+        return Loc.GetString(
+            "discord-round-status-duration-long",
+            ("hours", (object) hours.ToString(CultureInfo.InvariantCulture)),
+            ("minutes", (object) duration.Minutes.ToString(CultureInfo.InvariantCulture)),
+            ("seconds", (object) duration.Seconds.ToString(CultureInfo.InvariantCulture)));
     }
 
     private static string FormatShortDuration(TimeSpan duration)
     {
+        var hours = (int) duration.TotalHours;
         return duration.TotalHours >= 1
-            ? $"{(int) duration.TotalHours}h{duration.Minutes:D2}m"
-            : $"{duration.Minutes}m{duration.Seconds:D2}s";
+            ? Loc.GetString(
+                "discord-round-status-duration-short-hours",
+                ("hours", (object) hours.ToString(CultureInfo.InvariantCulture)),
+                ("minutes", (object) duration.Minutes.ToString("D2", CultureInfo.InvariantCulture)))
+            : Loc.GetString(
+                "discord-round-status-duration-short-minutes",
+                ("minutes", (object) duration.Minutes.ToString(CultureInfo.InvariantCulture)),
+                ("seconds", (object) duration.Seconds.ToString("D2", CultureInfo.InvariantCulture)));
     }
 }

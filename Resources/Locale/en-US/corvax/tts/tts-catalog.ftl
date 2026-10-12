@@ -1,6 +1,10 @@
 humanoid-profile-editor-voice-tab = Voice
 humanoid-profile-editor-voice-placeholder = Search voices...
 humanoid-profile-editor-voice-categories = Categories
+# CMU14: TTS category reset and random voice selection.
+cmu-humanoid-profile-editor-voice-all = All categories
+cmu-humanoid-profile-editor-voice-random = Random voice
+cmu-humanoid-profile-editor-voice-random-tooltip = Choose a random voice matching the character's sex when they spawn.
 humanoid-profile-editor-voice-other = Other
 humanoid-profile-editor-voice-play = ▶
 humanoid-profile-editor-voice-tooltip-play = Preview

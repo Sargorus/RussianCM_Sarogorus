@@ -1,5 +1,5 @@
 - type: job
-  parent: CMJobBase
+  parent: RMCJobRibbonBase
   id: AU14JobCivilianColonist
   roundSide: Civilian
   roundForce: COLONY
@@ -8,9 +8,7 @@
   - type: Skills
     skills:
       RMCSkillFireman: 1
-      RMCSkillVehicles: 1
       RMCSkillDomestics: 1
-      RMCSkillFirearms: 2
   - type: JobPrefix
     prefix: au14-job-prefix-civiliancolonist
   - type: TacticalMapIcon
@@ -30,7 +28,7 @@
   requireAdminNotify: false
   joinNotifyCrew: false
   supervisors: au14-job-supervisors-colonycivilian
-  spawnMenuRoleName: Colonist (CMU)
+  spawnMenuRoleName: cmu-spawn-role-colonist-cmu
   accessGroups:
   - Colonist
   roleWeight: 0.25
@@ -38,6 +36,8 @@
 - type: startingGear
   id: AU14GearCivilianColonist
   equipment:
+    jumpsuit: CMJumpsuitColonist
+    shoes: RMCShoesBlack
     id: AU14IDCardColonyColonist
 
 - type: entity
@@ -57,18 +57,16 @@
 # ├──[ colony ]──────────────────────────────────────────────────────┤
 - type: roleLoadout
   id: JobAU14JobCivilianColonist
-  points: 7
+  points: 20
   groups:
   - CivSatchelAU14
-  - CivFootwearAU14
-  - CivHatsAU14
-  - CivGlassesAU14
-  - CivJumpsuitAU14
-  - CivJacketAU14
   - PaperworkRMC
   - RecreationalRMC
   - CannedDrinksAU14
   - SmokablesRMC
-  - EyewearRMC
-  - MasksRMC
-  - HeadwearCLFAU14
+  - AU14ColonistPerkGroupFirearms
+  - AU14ColonistPerkGroupMelee
+  - AU14ColonistPerkGroupEngineering
+  - AU14ColonistPerkGroupMedical
+  - AU14ColonistPerkGroupDriving
+  - AU14ColonistPerkGroupCooking

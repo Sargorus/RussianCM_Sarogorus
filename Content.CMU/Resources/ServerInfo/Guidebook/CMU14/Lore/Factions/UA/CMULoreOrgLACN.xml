@@ -1,0 +1,16 @@
+<Document>
+  # Латиноамериканский колониальный флот
+
+  <Box>
+    <CMUGuideOutfitEmbed Gear="AU14GearLACNCommandoSniperTeamSniper" Caption="Снайпер коммандос"/>
+    <CMUGuideOutfitEmbed Gear="AU14GearLACNCommandoSniperTeamSpotter" Caption="Наблюдатель коммандос"/>
+  </Box>
+
+  [bold]Латиноамериканский колониальный флот[/bold] (LACN) — род войск космических сил [textlink="Объединённых Америк" link="CMUGuideLoreUA"]. [bold]Десантные силы[/bold] специализируются на быстром развёртывании и ударной тактике планетарного штурма и оккупации.
+
+  ## В разработке
+  Эта страница ещё пишется.
+
+  ## Доступные подразделения
+  - [textlink="Десантные силы LACN" link="CMUGuideLorePlatoonLACN"]
+</Document>

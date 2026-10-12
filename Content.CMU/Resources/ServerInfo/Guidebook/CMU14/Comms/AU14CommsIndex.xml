@@ -1,59 +1,83 @@
 <Document>
-  # Справочник по связи
+  # Руководство по связи
 
-В этом разделе описаны системы радиосвязи, используемые наземными подразделениями.
+  Этот раздел описывает радиооборудование и системы связи наземных сил.
+
+  Впервые пользуетесь системой? Начните с [textlink="Выход в радиосеть" link="AU14CommsGettingOnTheNet"] — пошагового вводного руководства.
 
   <Box>
     <GuideEntityEmbed Entity="ANPRC117GRadio" Caption="AN/PRC-117G"/>
-    <GuideEntityEmbed Entity="AU14HeadsetGovforMarineFTL" Caption="Полевая гарнитура"/>
+    <GuideEntityEmbed Entity="AU14HeadsetGovforMarineFTL" Caption="Field Headset"/>
   </Box>
 
-## Руководства
+  ## Руководства
 
-- [textlink="Радиостанция AN/PRC-117G" link="AU14CommsANPRC"] — инструкция по эксплуатации ранцевой радиостанции: настройка радиосетей, режимы работы, загрузка ключей COMSEC, развёртывание ретрансляционных станций, перехват сообщений и журнал радиосети.
-- [textlink="Полевые гарнитуры" link="AU14CommsHeadsets"] — штатные гарнитуры: именованные радиосети, зона покрытия ретрансляторов, радиоэлектронное подавление и настройка прямой частоты.
-- [textlink="Правила радиообмена" link="AU14CommsVoiceProcedure"] — стандартный формат радиосообщений, процедурные слова и примеры передачи докладов о контакте, вызова огневой поддержки и запросов на эвакуацию раненых.
-- [textlink="Краткий справочник по связи" link="AU14CommsQuickRef"] — префиксы чата, дальность сигнала, типы антенн, режимы работы, мощность передатчика, шумоподавление и элементы управления COMSEC.
+  - [textlink="Выход в радиосеть" link="AU14CommsGettingOnTheNet"] — руководство для новичков: гарнитуры, ретрансляция, настройка AN/PRC и первая передача.
+  - [textlink="Радиостанция AN/PRC-117G" link="AU14CommsANPRC"] — полное руководство по носимой радиостанции: сети, ретрансляция, трубка, полевой телефон, аккумулятор, COMSEC, развёрнутые радиостанции и антенные мачты.
+  - [textlink="AN/PRC-117G: упрощённая панель" link="AU14CommsANPRCGuided"] — стандартный интерфейс: СЕТИ, ЖУРНАЛ, БЕЗОПАСНОСТЬ и НАСТРОЙКИ.
+  - [textlink="AN/PRC-117G: расширенная панель" link="AU14CommsANPRCExpert"] — расширенное управление, прямые частоты, поиск и пеленгация, мощность, EMCON, ретрансляция и другие функции оператора.
+  - [textlink="Полевые гарнитуры" link="AU14CommsHeadsets"] — выдаваемые гарнитуры и наушники, доступные сети, ретрансляция, помехи и настройка.
+  - [textlink="Порядок радиообмена" link="AU14CommsVoiceProcedure"] — структура радиосообщений, стандартные служебные слова и примеры докладов о контакте, огневых задач и запросов эвакуации раненых.
+  - [textlink="Краткий справочник связи" link="AU14CommsQuickRef"] — часто нужные префиксы, дальности, параметры антенн, настройки радио и управление COMSEC в одном месте.
+  - [textlink="Башни связи и сенсоров" link="CMUGuideTowers"] — ремонт, настройка и питание башен связи и сенсоров колонии.
 
-## Поиск по теме
+  ## Найдите тему
 
   <Table Columns="2" MinForcedColumnWidth="120">
     <ColorBox Color="#263238">
-      <Box Margin="4">[bold]Тема[/bold]</Box>
+      <Box Margin="4">[bold]Я хочу...[/bold]</Box>
     </ColorBox>
     <ColorBox Color="#263238">
-      <Box Margin="4">[bold]Руководство[/bold]</Box>
+      <Box Margin="4">[bold]Читать[/bold]</Box>
     </ColorBox>
 
+    <ColorBox>
+      <Box Margin="4">Изучить систему радиосвязи с начала</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">[textlink="Выход в радиосеть" link="AU14CommsGettingOnTheNet"]</Box>
+    </ColorBox>
 
-<ColorBox>
-  <Box Margin="4">Настройка или эксплуатация AN/PRC</Box>
-</ColorBox>
-<ColorBox>
-  <Box Margin="4">[textlink="Радиостанция AN/PRC-117G" link="AU14CommsANPRC"]</Box>
-</ColorBox>
+    <ColorBox>
+      <Box Margin="4">Настроить или использовать AN/PRC</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">[textlink="Радиостанция AN/PRC-117G" link="AU14CommsANPRC"]</Box>
+    </ColorBox>
 
-<ColorBox>
-  <Box Margin="4">Использование штатной гарнитуры</Box>
-</ColorBox>
-<ColorBox>
-  <Box Margin="4">[textlink="Полевые гарнитуры" link="AU14CommsHeadsets"]</Box>
-</ColorBox>
+    <ColorBox>
+      <Box Margin="4">Использовать выданную гарнитуру или наушник</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">[textlink="Полевые гарнитуры" link="AU14CommsHeadsets"]</Box>
+    </ColorBox>
 
-<ColorBox>
-  <Box Margin="4">Изучение правил радиообмена и процедурных слов</Box>
-</ColorBox>
-<ColorBox>
-  <Box Margin="4">[textlink="Правила радиообмена" link="AU14CommsVoiceProcedure"]</Box>
-</ColorBox>
+    <ColorBox>
+      <Box Margin="4">Научиться составлять радиосообщения</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">[textlink="Порядок радиообмена" link="AU14CommsVoiceProcedure"]</Box>
+    </ColorBox>
 
-<ColorBox>
-  <Box Margin="4">Проверка элемента управления, дальности или префикса</Box>
-</ColorBox>
-<ColorBox>
-  <Box Margin="4">[textlink="Краткий справочник по связи" link="AU14CommsQuickRef"]</Box>
-</ColorBox>
+    <ColorBox>
+      <Box Margin="4">Найти префикс, дальность или настройку</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">[textlink="Краткий справочник связи" link="AU14CommsQuickRef"]</Box>
+    </ColorBox>
 
+    <ColorBox>
+      <Box Margin="4">Использовать расширенное управление AN/PRC</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">[textlink="AN/PRC-117G: расширенная панель" link="AU14CommsANPRCExpert"]</Box>
+    </ColorBox>
 
+    <ColorBox>
+      <Box Margin="4">Запустить башню связи или сенсоров</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">[textlink="Башни связи и сенсоров" link="CMUGuideTowers"]</Box>
+    </ColorBox>
   </Table>
 </Document>

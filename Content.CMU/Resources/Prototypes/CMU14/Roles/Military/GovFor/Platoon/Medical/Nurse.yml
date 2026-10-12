@@ -1,11 +1,12 @@
 - type: job
   abstract: true
   parent: AU14JobMilitaryBase
+  displayWeight: -2
   id: AU14JobNurseBaseAbstract
   name: au14-job-name-govfornurse
   description: au14-job-description-govfornurse
   icon: "AU14JobIconCorpsman"
-  spawnMenuRoleName: Nurse (GOVFOR)
+  spawnMenuRoleName: cmu-spawn-role-nurse-govfor
   startingGear: AU14GearGOVFORNurse
   dummyStartingGear: AU14GearGOVFORNurseDummy
   playTimeTracker: AU14JobGOVFORNurse
@@ -45,6 +46,8 @@
     - NoEnglish
     - SlowRunner
     - Anemic
+    - CMUAlcoholic
+    - CMUDrugAddict
   ranks:
     RMCRankCivilian: []
   chevrons:
@@ -138,6 +141,7 @@
   accessGroups:
   - AU14OpforCorpsman
   - AU14OpforSquad
+  useLoadoutOfJob: AU14JobGOVFORNurse
 
 - type: startingGear
   id: AU14GearOPFORNurse

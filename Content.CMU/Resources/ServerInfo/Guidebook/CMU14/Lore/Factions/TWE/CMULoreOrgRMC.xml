@@ -1,0 +1,17 @@
+<Document>
+  # Королевские морские коммандос
+
+  <Box>
+    <CMUGuideOutfitEmbed Gear="AU14GearRMCRRTRifleman" Caption="Стрелок"/>
+    <CMUGuideOutfitEmbed Gear="AU14GearRMCRRTMarksman" Caption="Марксман"/>
+    <CMUGuideOutfitEmbed Gear="AU14GearRMCRRTCommander" Caption="Командир"/>
+  </Box>
+
+  [bold]Королевские морские коммандос[/bold] (RMC) — элита [textlink="Империи трёх миров" link="CMUGuideLoreTWE"]. Дисциплинированы, хорошо оснащены и обучены быстрому развёртыванию, абордажу, разведке, диверсиям и точечным ударам далеко в тылу, но значительно малочисленнее других армий.
+
+  ## В разработке
+  Эта страница ещё пишется.
+
+  ## Доступные подразделения
+  - [textlink="Королевская морская пехота TWE" link="CMUGuideLorePlatoonRMC"]
+</Document>

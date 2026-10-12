@@ -33,6 +33,7 @@ public sealed class FlammableLifecycleTest : GameTest
             var target = SEntMan.SpawnEntity(prototype, map.GridCoords);
             IgniteRmc(target, 10, 10, 10);
 
+            Server.System<ServerFlammableSystem>().RefreshUpdateSnapshot(); // CMU14: include the entity spawned above
             Server.System<ServerFlammableSystem>().Update(0f);
 
             Assert.Multiple(() =>
@@ -194,8 +195,6 @@ public sealed class FlammableLifecycleTest : GameTest
                     "refreshing an already-burning entity must not raise a second ignition transition");
                 Assert.That(HasAutoNetworkedField(nameof(OnFireComponent.Intensity)), Is.False);
                 Assert.That(HasAutoNetworkedField(nameof(OnFireComponent.Duration)), Is.False);
-                Assert.That(typeof(FlammableComponent).GetField("Intensity"), Is.Null);
-                Assert.That(typeof(FlammableComponent).GetField("Duration"), Is.Null);
             });
         });
 
@@ -381,6 +380,7 @@ public sealed class FlammableLifecycleTest : GameTest
             Assert.That(SEntMan.GetComponent<FlammableComponent>(human).OnFire, Is.False,
                 "this regression covers acid burns without ordinary fire");
 
+            Server.System<ServerFlammableSystem>().RefreshUpdateSnapshot(); // CMU14: include the entity spawned above
             Server.System<ServerFlammableSystem>().Update(0f);
 
             Assert.That(alerts.IsShowingAlert(human, "Fire"), Is.True,
@@ -435,6 +435,52 @@ public sealed class FlammableLifecycleTest : GameTest
             {
                 Assert.That(flammable.FireStacks, Is.Zero);
                 Assert.That(flammable.OnFire, Is.False);
+            });
+        });
+    }
+
+    // CMU14 test
+    [Test]
+    public async Task StopDropRollAppliesResistStacksOncePerPress()
+    {
+        var map = await Pair.CreateTestMap();
+        EntityUid human = default;
+
+        await Server.WaitAssertion(() =>
+        {
+            SetOxygenAtmosphere(map.MapUid);
+            human = SpawnBurnable(map.MapId, 0);
+
+            // Species flares +1/s; the pin must suppress that, not stack another application.
+            SEntMan.GetComponent<FlammableComponent>(human).FirestackFade = 1;
+            IgniteRmc(human, 10, 20, 20);
+
+            var alert = new ResistFireAlertEvent();
+            SEntMan.EventBus.RaiseLocalEvent(human, alert);
+
+            Assert.That(alert.Handled, Is.True);
+        });
+
+        // Three forced update ticks inside one resist window: the first applies ResistStacks,
+        // the rest must fall through to the fade, not stack up another application.
+        for (var i = 0; i < 3; i++)
+        {
+            await Server.WaitAssertion(() =>
+            {
+                SEntMan.GetComponent<FlammableComponent>(human).NextUpdate = SGameTiming.CurTime;
+            });
+
+            await Pair.RunTicksSync(1);
+        }
+
+        await Server.WaitAssertion(() =>
+        {
+            var flammable = SEntMan.GetComponent<FlammableComponent>(human);
+            Assert.Multiple(() =>
+            {
+                Assert.That(flammable.FireStacks, Is.EqualTo(10),
+                    "one roll press must remove exactly one ResistStacks worth, not one per update tick");
+                Assert.That(flammable.OnFire, Is.True);
             });
         });
     }

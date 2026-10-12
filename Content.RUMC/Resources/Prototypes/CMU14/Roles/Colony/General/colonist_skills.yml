@@ -1,0 +1,200 @@
+# Colonist skills: each category is a group, each option is a loadout that sets skills; only one option per category.
+
+- type: loadoutGroup
+  id: AU14ColonistPerkGroupFirearms
+  name: loadout-group-au14-colonist-perk-firearms
+  hidden: true
+  minLimit: 0
+  maxLimit: 1
+  loadouts: [ AU14ColonistPerkFirearmsCourse, AU14ColonistPerkHunter, AU14ColonistPerkMarksman ]
+
+- type: loadout
+  id: AU14ColonistPerkFirearmsCourse
+  cost: 4
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillFirearms
+    level: 1
+
+- type: loadout
+  id: AU14ColonistPerkHunter
+  cost: 10
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillFirearms
+    level: 2
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillEndurance
+    level: 1
+
+- type: loadout
+  id: AU14ColonistPerkMarksman
+  cost: 14
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillEndurance
+    level: 2
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillFirearms
+    level: 2
+
+- type: loadoutGroup
+  id: AU14ColonistPerkGroupMelee
+  name: loadout-group-au14-colonist-perk-melee
+  hidden: true
+  minLimit: 0
+  maxLimit: 1
+  loadouts: [ AU14ColonistPerkMeleeLessons, AU14ColonistPerkMartialArts ]
+
+- type: loadout
+  id: AU14ColonistPerkMeleeLessons
+  cost: 6
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillCqc
+    level: 1
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillMeleeWeapons
+    level: 1
+
+- type: loadout
+  id: AU14ColonistPerkMartialArts
+  cost: 12
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillMeleeWeapons
+    level: 2
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillCqc
+    level: 2
+
+- type: loadoutGroup
+  id: AU14ColonistPerkGroupEngineering
+  name: loadout-group-au14-colonist-perk-engineering
+  hidden: true
+  minLimit: 0
+  maxLimit: 1
+  loadouts: [ AU14ColonistPerkConstructionExperience, AU14ColonistPerkEnthusiast ]
+
+- type: loadout
+  id: AU14ColonistPerkConstructionExperience
+  cost: 4
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillConstruction
+    level: 1
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillEngineer
+    level: 1
+
+- type: loadout
+  id: AU14ColonistPerkEnthusiast
+  cost: 6
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillEngineer
+    level: 2
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillConstruction
+    level: 2
+
+- type: loadoutGroup
+  id: AU14ColonistPerkGroupMedical
+  name: loadout-group-au14-colonist-perk-medical
+  hidden: true
+  minLimit: 0
+  maxLimit: 1
+  loadouts: [ AU14ColonistPerkFirstAid, AU14ColonistPerkOrderly, AU14ColonistPerkDoctor ]
+
+- type: loadout
+  id: AU14ColonistPerkFirstAid
+  cost: 4
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillMedical
+    level: 1
+
+- type: loadout
+  id: AU14ColonistPerkOrderly
+  cost: 6
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillMedical
+    level: 2
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillSurgery
+    level: 1
+
+- type: loadout
+  id: AU14ColonistPerkDoctor
+  cost: 15
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillMedical
+    level: 2
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillSurgery
+    level: 2
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillResearch
+    level: 1
+
+- type: loadoutGroup
+  id: AU14ColonistPerkGroupDriving
+  name: loadout-group-au14-colonist-perk-driving
+  hidden: true
+  minLimit: 0
+  maxLimit: 1
+  loadouts: [ AU14ColonistPerkDrivingLessons ]
+
+- type: loadout
+  id: AU14ColonistPerkDrivingLessons
+  cost: 4
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillVehicles
+    level: 1
+
+- type: loadoutGroup
+  id: AU14ColonistPerkGroupCooking
+  name: loadout-group-au14-colonist-perk-cooking
+  hidden: true
+  minLimit: 0
+  maxLimit: 1
+  loadouts: [ AU14ColonistPerkCookingLessons ]
+
+- type: loadout
+  id: AU14ColonistPerkCookingLessons
+  cost: 2
+  effects:
+  - !type:SetSkillLoadoutEffect
+    skill: RMCSkillDomestics
+    level: 2
+
+# Special loadout: its own points pool for gear, boxes and clothing.
+- type: roleLoadout
+  id: AU14ColonistSpecialLoadout
+  points: 20
+  groups:
+  - AU14ColonistSpecialLoadoutGroup
+  - AU14ColonistSpecialGroupCqc
+  - AU14ColonistSpecialGroupMelee
+  - AU14ColonistSpecialGroupMedical
+  - AU14ColonistSpecialGroupSurgery
+  - AU14ColonistSpecialGroupEngineer
+  - AU14ColonistSpecialGroupConstruction
+  - AU14ColonistSpecialGroupEngConstruction
+  - AU14ColonistSpecialGroupResearch
+  - AU14ColonistSpecialGroupDomestics
+  - AU14ColonistSpecialGroupEndurance
+  - AU14ColonistSpecialGroupEnduranceMelee
+  - AU14ColonistSpecialGroupVehicles
+  - AU14ColonistClothingGroup
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialLoadoutGroup
+  name: loadout-group-au14-colonist-special-loadout
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutGlock77Rubber ]

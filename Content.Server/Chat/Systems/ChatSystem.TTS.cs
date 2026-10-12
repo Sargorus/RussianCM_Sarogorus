@@ -1,3 +1,4 @@
+using Content.Server._RMC14.Chat.Chat;
 using Content.Shared._RMC14.Language.Prototypes;
 using Content.Shared.Chat;
 using Robust.Shared.Enums;
@@ -25,7 +26,11 @@ public sealed partial class ChatSystem
             return result;
 
         var maxRange = whisper ? WhisperMuffledRange : VoiceRange;
-        foreach (var (session, data) in GetRecipients(source, maxRange, ignoreXenos))
+        foreach (var (session, data) in GetRecipients(
+                     source,
+                     maxRange,
+                     ChatRecipientPurpose.Speech,
+                     ignoreXenos))
         {
             if (session.Status != SessionStatus.InGame ||
                 session.AttachedEntity is not { Valid: true } listener ||

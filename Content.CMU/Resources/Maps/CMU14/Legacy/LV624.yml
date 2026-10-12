@@ -5,7 +5,7 @@ meta:
   forkId: ""
   forkVersion: ""
   time: 03/29/2026 11:27:10
-  entityCount: 33617
+  entityCount: 33622
 maps:
 - 1
 grids:
@@ -80781,19 +80781,19 @@ entities:
           cost: 4000
           name: null
         - entities: []
-          crate: RMCCrateGrenadesHighExplosiveBox
+          crate: CMUCrateGrenadeBoxHEDP
           cost: 10000
           name: null
         - entities: []
-          crate: RMCCrateGrenadesBoxHEFA
+          crate: CMUCrateGrenadeBoxHEFA
           cost: 10000
           name: null
         - entities: []
-          crate: RMCCrateGrenadesAirburstFragBox
+          crate: CMUCrateGrenadeBoxAGMF
           cost: 10000
           name: null
         - entities: []
-          crate: RMCCrateBoxAGMI
+          crate: CMUCrateGrenadeBoxAGMI
           cost: 10000
           name: null
         - entities: []
@@ -83362,6 +83362,8 @@ entities:
   entities:
   - uid: 894
     components:
+    - type: DropshipDestination
+      forceOnForceFaction: opfor
     - type: MetaData
       name: 'LZ2: Robotics Landing Zone'
     - type: Transform
@@ -83369,6 +83371,8 @@ entities:
       parent: 1
   - uid: 895
     components:
+    - type: DropshipDestination
+      forceOnForceFaction: thirdparty
     - type: MetaData
       name: 'LZ1: Nexus Landing Zone'
     - type: Transform
@@ -83376,6 +83380,8 @@ entities:
       parent: 1
   - uid: 896
     components:
+    - type: DropshipDestination
+      forceOnForceFaction: govfor
     - type: MetaData
       name: LACN Armory LZ "Rogain"
     - type: Transform
@@ -83384,6 +83390,8 @@ entities:
       parent: 1
   - uid: 897
     components:
+    - type: DropshipDestination
+      forceOnForceFaction: thirdparty
     - type: Transform
       rot: 1.5707963267948966 rad
       pos: -139.5,-0.5
@@ -217872,7 +217880,7 @@ entities:
     - type: Transform
       pos: 22.959236,-81.51034
       parent: 1
-- proto: GasVentPump
+- proto: CMVentPump
   entities:
   - uid: 26157
     components:
@@ -242355,7 +242363,7 @@ entities:
     - type: Transform
       pos: -181.18642,-97.40619
       parent: 1
-- proto: RMCGeneratorFusion
+- proto: CMUGeneratorFusion
   entities:
   - uid: 30043
     components:
@@ -242517,7 +242525,7 @@ entities:
     - type: Transform
       pos: 2.741615,-97.40286
       parent: 1
-- proto: RMCGeneratorFusionColony
+- proto: CMUGeneratorThermo
   entities:
   - uid: 30047
     components:
@@ -263684,4 +263692,17 @@ entities:
     - type: Transform
       pos: -7.5,-33.5
       parent: 1
+- proto: CMUYautjaGroundRelayDestination
+  entities:
+  - uid: 1000000008
+    components:
+    - type: MetaData
+      name: LV624 ground relay
+    - type: Transform
+      pos: 39.5,-109.5
+      parent: 1
+    - type: YautjaRelayDestination
+      kind: Ground
+      id: lv624.ground.relay
+      displayName: LV624 Ground Relay
 ...

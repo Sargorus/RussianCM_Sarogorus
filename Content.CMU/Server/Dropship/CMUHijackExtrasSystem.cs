@@ -1,17 +1,22 @@
+using Content.Server.GameTicking;
 using Content.Server.Ghost;
 using Content.Server.Mind;
 using Content.Server.Popups;
 using Content.Server.Stunnable;
+using Content.Server.Destructible;
 using Content.Server._RMC14.Xenonids.JoinXeno;
 using Content.Shared.CMU14.ZLevels.Core.EntitySystems;
 using Content.Shared._RMC14.CameraShake;
 using Content.Shared._RMC14.CCVar;
 using Content.Shared._RMC14.Dropship;
 using Content.Shared._RMC14.Marines;
+using Content.Shared.CMU14.Marines;
 using Content.Shared._RMC14.Rules;
 using Content.Shared._RMC14.Xenonids;
+using Content.Shared._RMC14.Xenonids.Construction;
 using Content.Shared._RMC14.Xenonids.Hive;
 using Content.Shared._RMC14.Xenonids.JoinXeno;
+using Content.Shared._RMC14.Xenonids.Maturing;
 using Content.Shared._RMC14.Xenonids.Parasite;
 using Content.Shared.CMU14;
 using Content.Shared.Coordinates;
@@ -33,6 +38,7 @@ using Robust.Shared.Collections;
 using Robust.Shared.Configuration;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
+using Content.Shared.CMU14.Threats.Mobs.Wendigo.Lab;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
@@ -44,14 +50,17 @@ namespace Content.Server.CMU14.Dropship;
 ///     presets that don't run the classic <see cref="CMDistressSignalRuleComponent"/> rule.
 ///     That rule provides these itself, so this system must stay off while it is active.
 /// </summary>
-public sealed class CMUHijackExtrasSystem : EntitySystem
+public sealed partial class CMUHijackExtrasSystem : EntitySystem
 {
     [Dependency] private AudioSystem _audio = default!;
     [Dependency] private IConfigurationManager _config = default!;
+    [Dependency] private GameTicker _gameTicker = default!;
     [Dependency] private GhostSystem _ghost = default!;
+    [Dependency] private DestructibleSystem _destruction = default!;
     [Dependency] private LarvaQueueSystem _larvaQueue = default!;
     [Dependency] private MindSystem _mind = default!;
     [Dependency] private MobStateSystem _mobState = default!;
+    [Dependency] private XenoMaturingSystem _maturing = default!;
     [Dependency] private IPrototypeManager _prototypes = default!;
     [Dependency] private PopupSystem _popup = default!;
     [Dependency] private RMCCameraShakeSystem _rmcCameraShake = default!;
@@ -68,6 +77,7 @@ public sealed class CMUHijackExtrasSystem : EntitySystem
         new SoundCollectionSpecifier("RMCHijack", AudioParams.Default.WithVolume(-8));
 
     private bool _hijackSongPlayed;
+    private bool _surgeFired;
     private float _hijackShipWeight;
     private int _hijackMinBurrowed;
 
@@ -75,6 +85,7 @@ public sealed class CMUHijackExtrasSystem : EntitySystem
     {
         SubscribeLocalEvent<DropshipHijackStartEvent>(OnDropshipHijackStart);
         SubscribeLocalEvent<DropshipHijackLandedEvent>(OnDropshipHijackLanded);
+        SubscribeLocalEvent<DropshipHijackDeclinedEvent>(OnDropshipHijackDeclined);
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
 
         Subs.CVar(_config, RMCCVars.RMCHijackShipWeight, v => _hijackShipWeight = v, true);
@@ -87,30 +98,49 @@ public sealed class CMUHijackExtrasSystem : EntitySystem
             || HasActiveDistressRule())
             return;
 
-        // Classic rule deletes planet-bound xenos here; mirror it so stranded neomorphs can't
-        // linger on the planet after the hijack endgame moves to the ship
-        var xenoAmount = 0;
-        var xenos = EntityQueryEnumerator<XenoComponent, MobStateComponent, TransformComponent>();
-        while (xenos.MoveNext(out var xeno, out var comp, out _, out var xform))
+        // Remove limited structures across every planet level, regardless of the departure grid.
+        var hiveStructures = EntityQueryEnumerator<HiveConstructionLimitedComponent, TransformComponent>();
+        while (hiveStructures.MoveNext(out var structure, out _, out var xform))
         {
-            if (_mobState.IsDead(xeno))
+            if ((ev.Dropship != null && xform.GridUid == ev.Dropship) || !_rmcPlanet.IsOnPlanetLevel(xform))
                 continue;
 
-            if (xform.ParentUid != ev.Dropship && _rmcPlanet.IsOnPlanet(xeno.ToCoordinates()))
+            EnsureComp<HiveConstructionSuppressAnnouncementsComponent>(structure);
+            _destruction.DestroyEntity(structure);
+        }
+
+        var secretions = EntityQueryEnumerator<XenoSecretionLimitedComponent, TransformComponent>();
+        while (secretions.MoveNext(out var structure, out _, out var xform))
+        {
+            if ((ev.Dropship != null && xform.GridUid == ev.Dropship) || !_rmcPlanet.IsOnPlanetLevel(xform))
+                continue;
+
+            EnsureComp<HiveConstructionSuppressAnnouncementsComponent>(structure);
+            _destruction.DestroyEntity(structure);
+        }
+
+        // Return stranded xenos to the burrowed queue before removing their bodies.
+        var xenoAmount = 0;
+        var originalXenos = new List<(EntityUid Uid, XenoComponent Xeno, TransformComponent Transform)>();
+        var xenos = EntityQueryEnumerator<XenoComponent, MobStateComponent, TransformComponent>();
+        while (xenos.MoveNext(out var xeno, out var comp, out _, out var xform))
+            originalXenos.Add((xeno, comp, xform));
+
+        // Rejoining can spawn a burrowed larva immediately. Only process the original bodies.
+        foreach (var (xeno, comp, xform) in originalXenos)
+        {
+            if (TerminatingOrDeleted(xeno) || _mobState.IsDead(xeno))
+                continue;
+
+            // Lab-made Wendigos are not hive xenos and never feed the burrowed larva queue.
+            if (HasComp<CMUWendigoLabMadeComponent>(xeno))
+                continue;
+
+            if ((ev.Dropship == null || xform.GridUid != ev.Dropship) && _rmcPlanet.IsOnPlanetLevel(xform))
             {
                 if (TryComp(xeno, out ActorComponent? actor))
                 {
                     var session = actor.PlayerSession;
-                    Entity<MindComponent> mind;
-
-                    if (_mind.TryGetMind(session, out var mindId, out var mindComp))
-                        mind = (mindId, mindComp);
-                    else
-                        mind = _mind.CreateMind(session.UserId);
-
-                    var ghost = _ghost.SpawnGhost((mind.Owner, mind.Comp), xeno);
-                    if (ghost != null)
-                        EnsureComp<JoinXenoCooldownIgnoreComponent>(ghost.Value);
 
                     var origin = _transform.GetMoverCoordinates(xeno);
                     _popup.PopupCoordinates(
@@ -120,8 +150,30 @@ public sealed class CMUHijackExtrasSystem : EntitySystem
                         true,
                         PopupType.MediumXeno);
 
+                    var rejoined = false;
                     if (comp.CountedInSlots && _hive.GetHive(xeno) is { } hive)
-                        _larvaQueue.AddToLarvaQueueFront(hive, session.UserId);
+                    {
+                        if (_hive.JoinBurrowedLarva(hive, session, ignorePoolGate: true))
+                            rejoined = true;
+                        else
+                            _larvaQueue.AddToLarvaQueueFront(hive, session.UserId);
+
+                        _hive.ChangeBurrowedLarva(hive, 1);
+                    }
+
+                    if (!rejoined)
+                    {
+                        Entity<MindComponent> mind;
+
+                        if (_mind.TryGetMind(session, out var mindId, out var mindComp))
+                            mind = (mindId, mindComp);
+                        else
+                            mind = _mind.CreateMind(session.UserId);
+
+                        var ghost = _ghost.SpawnGhost((mind.Owner, mind.Comp), xeno);
+                        if (ghost != null)
+                            EnsureComp<JoinXenoCooldownIgnoreComponent>(ghost.Value);
+                    }
                 }
 
                 QueueDel(xeno);
@@ -131,11 +183,25 @@ public sealed class CMUHijackExtrasSystem : EntitySystem
             xenoAmount++;
         }
 
+        // Preserve the queen maturation previously handled by the global distress-rule listener.
+        var queens = EntityQueryEnumerator<XenoMaturingComponent, MobStateComponent>();
+        while (queens.MoveNext(out var queen, out var maturing, out _))
+        {
+            if (!_mobState.IsDead(queen))
+                _maturing.Mature((queen, maturing));
+        }
+
         if (ev.HijackerType == DropshipHijackerType.Pathogen)
             return;
 
+        // Planet xeno cleanup above still runs on repeat hijacks. The surge pool itself is once per round.
+        if (_surgeFired)
+            return;
+
+        _surgeFired = true;
+
         var shipMapIds = new HashSet<MapId>();
-        var almayerQuery = EntityQueryEnumerator<AlmayerComponent, TransformComponent>();
+        var almayerQuery = EntityQueryEnumerator<WarshipComponent, TransformComponent>();
         while (almayerQuery.MoveNext(out _, out var xform))
             AddShipMapAndConnectedZLevelMapIds(shipMapIds, xform.MapUid);
 
@@ -221,9 +287,21 @@ public sealed class CMUHijackExtrasSystem : EntitySystem
         }
     }
 
+    // only the classic distress rule listened for this, so on our presets the queen's
+    // "do not hijack" button always bounced with the unavailable popup
+    private void OnDropshipHijackDeclined(ref DropshipHijackDeclinedEvent ev)
+    {
+        if (ev.Handled || HasActiveDistressRule() || _gameTicker.RunLevel != GameRunLevel.InRound)
+            return;
+
+        _gameTicker.EndRound(Loc.GetString("cmu-distress-signal-minorxenovictory-no-hijack"));
+        ev.Handled = true;
+    }
+
     private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
     {
         _hijackSongPlayed = false;
+        _surgeFired = false;
     }
 
     private bool HasActiveDistressRule()

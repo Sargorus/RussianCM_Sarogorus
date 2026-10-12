@@ -85,7 +85,7 @@ anprc-battery-insufficient = Недостаточно заряда батаре�
 
 anprc-unknown-station = НЕИЗВЕСТНАЯ СТАНЦИЯ
 anprc-radio-check-call = ВСЕМ СТАНЦИЯМ, Я { $station }, ПРОВЕРКА СВЯЗИ, ПРИЁМ.
-anprc-radio-check-report = ОТВЕТЫ НА ПРОВЕРКУ СВЯЗИ — LIMA CHARLIE: { $clear } | СЛАБО, НО РАЗБОРЧИВО: { $degraded }
+anprc-radio-check-report = ОТВЕТЫ НА ПРОВЕРКУ СВЯЗИ — ПРИЁМ РАЗБОРЧИВЫЙ: { $clear } | ПРИЁМ С ПОМЕХАМИ: { $degraded }
 anprc-radio-check-nothing-heard = ОТВЕТА НЕТ
 anprc-radio-check-interference = ПОМЕХИ В РАДИОСЕТИ — азимут сильнейшего источника { $bearing }.
 
@@ -123,3 +123,5 @@ anprc-log-frequency-unknown = ЧАСТОТА НЕИЗВ.
 
 # Языки, которые невозможно передавать по радио
 anprc-language-no-radio = { $language } невозможно передать по радиосети.
+
+anprc-chat-intercept-line = [color={ $color }]\[INT\] "{ $message }"[/color]

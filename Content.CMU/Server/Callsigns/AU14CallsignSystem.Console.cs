@@ -97,8 +97,16 @@ public sealed partial class AU14CallsignSystem
 
         if (args.Squad is { } netSquad)
         {
-            if (!TryGetEntity(netSquad, out var squad) || !HasComp<SquadTeamComponent>(squad))
+            if (!TryGetEntity(netSquad, out var squad)
+                || !TryComp(squad, out SquadTeamComponent? team)
+                || !string.Equals(team.Group, ent.Comp.Faction, StringComparison.OrdinalIgnoreCase))
                 return;
+
+            if (WordInUse(ent.Comp.Faction, word, exceptSquad: squad))
+            {
+                _popup.PopupEntity(Loc.GetString("au14-callsign-console-group-taken", ("word", word)), ent.Owner, args.Actor);
+                return;
+            }
 
             _squadWords[squad.Value] = word;
         }
@@ -107,10 +115,22 @@ public sealed partial class AU14CallsignSystem
             if (!ConsoleCategories.Contains(category, StringComparer.OrdinalIgnoreCase))
                 return;
 
+            if (WordInUse(ent.Comp.Faction, word, exceptCategory: category))
+            {
+                _popup.PopupEntity(Loc.GetString("au14-callsign-console-group-taken", ("word", word)), ent.Owner, args.Actor);
+                return;
+            }
+
             _categoryWords[(ent.Comp.Faction, category.ToUpperInvariant())] = word;
         }
         else
         {
+            if (WordInUse(ent.Comp.Faction, word, exceptCommand: true))
+            {
+                _popup.PopupEntity(Loc.GetString("au14-callsign-console-group-taken", ("word", word)), ent.Owner, args.Actor);
+                return;
+            }
+
             _commandWords[ent.Comp.Faction] = word;
         }
 
@@ -129,10 +149,11 @@ public sealed partial class AU14CallsignSystem
             return;
         }
 
-        var suffix = SanitizeCallsignPart(args.Suffix, AU14Callsigns.MaxSuffixLength);
-
-        if (string.IsNullOrWhiteSpace(suffix))
+        if (!AU14Callsigns.TryNormalizeNumber(args.Suffix, out var suffix))
+        {
+            _popup.PopupEntity(Loc.GetString("cmu-callsign-console-invalid-number"), ent.Owner, args.Actor);
             return;
+        }
 
         if (SuffixTaken(callsign.Faction, callsign.Squad, callsign.Group, callsign.Category, suffix, member.Value))
         {
@@ -220,7 +241,7 @@ public sealed partial class AU14CallsignSystem
         Assign(member.Value, callsign);
     }
 
-    private bool WordInUse(string faction, string word)
+    private bool WordInUse(string faction, string word, EntityUid? exceptSquad = null, string? exceptCategory = null, bool exceptCommand = false)
     {
         if (_groups.TryGetValue(faction, out var groups) &&
             groups.Contains(word, StringComparer.OrdinalIgnoreCase))
@@ -228,11 +249,14 @@ public sealed partial class AU14CallsignSystem
             return true;
         }
 
-        if (string.Equals(GetCommandWord(faction), word, StringComparison.OrdinalIgnoreCase))
+        if (!exceptCommand && string.Equals(GetCommandWord(faction), word, StringComparison.OrdinalIgnoreCase))
             return true;
 
         foreach (var category in ConsoleCategories)
         {
+            if (string.Equals(category, exceptCategory, StringComparison.OrdinalIgnoreCase))
+                continue;
+
             if (string.Equals(GetCategoryWord(faction, category), word, StringComparison.OrdinalIgnoreCase))
                 return true;
         }
@@ -242,7 +266,7 @@ public sealed partial class AU14CallsignSystem
 
         while (squads.MoveNext(out var squadUid, out var team))
         {
-            if (team.Group == group &&
+            if (squadUid != exceptSquad && team.Group == group &&
                 string.Equals(GetSquadWord(squadUid), word, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
@@ -417,36 +441,12 @@ public sealed partial class AU14CallsignSystem
             .ToList();
     }
 
-    // roster order the way a net is read: 6, 5, 7, ROMEO, air crew, OPS, then the
-    // fireteam-numbered blocks (1-N, 2-N, ...)
+    // Sort station numbers numerically, including numbers above 99.
     private static string SuffixSortKey(string suffix)
     {
-        var rank = suffix.ToUpperInvariant() switch
-        {
-            "6" => 0,
-            "ACTUAL" => 0,
-            "5" => 1,
-            "7" => 2,
-            "ROMEO" => 3,
-            _ when suffix.StartsWith("PAPA", StringComparison.OrdinalIgnoreCase) => 4,
-            _ when suffix.StartsWith("CHIEF", StringComparison.OrdinalIgnoreCase) => 4,
-            _ when suffix.StartsWith("OPS", StringComparison.OrdinalIgnoreCase) => 5,
-            _ when suffix.Length > 1 && char.IsAsciiDigit(suffix[0]) && suffix.Contains('-') => 6,
-            _ => 7,
-        };
-
-        // zero-pad both halves so 2-1 sorts after 1-10 and 1-10 after 1-9
-        var fireteam = 0;
-        var numeric = 0;
-        var dash = suffix.LastIndexOf('-');
-
-        if (dash >= 0 && int.TryParse(suffix[(dash + 1)..], out var parsed))
-            numeric = parsed;
-
-        if (dash > 0 && int.TryParse(suffix[..dash], out var parsedTeam))
-            fireteam = parsedTeam;
-
-        return $"{rank}-{fireteam:D2}-{numeric:D4}-{suffix}";
+        return int.TryParse(suffix, out var number)
+            ? number.ToString("D8", System.Globalization.CultureInfo.InvariantCulture)
+            : suffix;
     }
 
     private static string SanitizeCallsignPart(string input, int maxLength)

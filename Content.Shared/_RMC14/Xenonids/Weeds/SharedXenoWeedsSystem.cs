@@ -74,6 +74,7 @@ public abstract partial class SharedXenoWeedsSystem : EntitySystem
 
     private readonly HashSet<EntityUid> _toUpdate = new();
     private readonly HashSet<EntityUid> _intersecting = new();
+    private readonly List<Entity<MapGridComponent>> _weedBlockingGrids = new();
 
     private EntityQuery<AffectableByWeedsComponent> _affectedQuery;
     private EntityQuery<XenoWeedsComponent> _weedsQuery;
@@ -433,7 +434,7 @@ public abstract partial class SharedXenoWeedsSystem : EntitySystem
         // Some structures produce hive weed and act like a hive weed source, but they themselves are not hiveweeds.
         // For the purposes of this function, those structures are hive weed sources.
         return _prototype.TryIndex(weedComp.Spawns, out var spawns) &&
-               spawns.HasComponent<HiveWeedsComponent>();
+               spawns.HasComp<HiveWeedsComponent>(Factory);
     }
 
     public bool IsOnWeeds(Entity<MapGridComponent> grid, EntityCoordinates coordinates, bool sourceOnly = false)
@@ -444,7 +445,7 @@ public abstract partial class SharedXenoWeedsSystem : EntitySystem
     public Entity<XenoWeedsComponent>? GetWeedsOnFloor(Entity<MapGridComponent> grid, EntityCoordinates coordinates, bool sourceOnly = false)
     {
         var position = _mapSystem.LocalToTile(grid, grid, coordinates);
-        var enumerator = _mapSystem.GetAnchoredEntitiesEnumerator(grid, grid, position);
+        var enumerator = _mapSystem.GetAnchoredEntities(grid, grid, position);
 
         while (enumerator.MoveNext(out var anchored))
         {
@@ -570,14 +571,20 @@ public abstract partial class SharedXenoWeedsSystem : EntitySystem
                 return false;
         }
 
-        var targetTileAnchored = _mapSystem.GetAnchoredEntitiesEnumerator(grid, grid, tileIndex);
-        while (targetTileAnchored.MoveNext(out var uid))
+        if (HasWeedBlocker(grid, tileIndex))
         {
-            if (_blockWeedsQuery.HasComp(uid))
-                return false;
+            GenericPopup();
+            return false;
+        }
 
-            if (source && HasComp<XenoResinHoleComponent>(uid))
-                return false;
+        if (source)
+        {
+            var targetTileAnchored = _mapSystem.GetAnchoredEntities(grid, grid, tileIndex);
+            while (targetTileAnchored.MoveNext(out var uid))
+            {
+                if (HasComp<XenoResinHoleComponent>(uid))
+                    return false;
+            }
         }
 
         return true;
@@ -588,7 +595,7 @@ public abstract partial class SharedXenoWeedsSystem : EntitySystem
                 return;
 
             var msg = Loc.GetString("cm-xeno-construction-failed-weeds");
-            _popup.PopupClient(msg, user.Value, user.Value, PopupType.SmallCaution);
+            _popup.PopupEntity(msg, user.Value, user.Value, PopupType.SmallCaution);
         }
     }
 
@@ -598,17 +605,24 @@ public abstract partial class SharedXenoWeedsSystem : EntitySystem
         bool limitDistance,
         EntityCoordinates? popupAt = null)
     {
+        if (HasWeedBlocker(grid, _mapSystem.LocalToTile(grid, grid, coordinates)))
+        {
+            _popup.PopupCoordinates(Loc.GetString("rmc-xeno-weeds-blocked"),
+                popupAt ?? xeno.ToCoordinates(), xeno, PopupType.SmallCaution);
+            return false;
+        }
+
         if (_rmcMap.HasAnchoredEntityEnumerator<XenoWeedsComponent>(coordinates, out var oldWeeds))
         {
             if (oldWeeds.Comp.IsSource)
             {
-                _popup.PopupClient("There's a pod here already!", oldWeeds, xeno, PopupType.SmallCaution);
+                _popup.PopupEntity("There's a pod here already!", oldWeeds, xeno, PopupType.SmallCaution);
                 return false;
             }
 
             if (oldWeeds.Comp.BlockOtherWeeds)
             {
-                _popup.PopupClient("These weeds are too strong to plant a node on!",
+                _popup.PopupEntity("These weeds are too strong to plant a node on!",
                     oldWeeds,
                     xeno,
                     PopupType.SmallCaution);
@@ -618,7 +632,7 @@ public abstract partial class SharedXenoWeedsSystem : EntitySystem
 
         if (limitDistance && !HasWeedsNearby(grid, coordinates))
         {
-            _popup.PopupClient("We can only plant weed nodes near other weed nodes our hive owns!",
+            _popup.PopupCoordinates("We can only plant weed nodes near other weed nodes our hive owns!",
                 popupAt ?? xeno.ToCoordinates(),
                 xeno,
                 PopupType.SmallCaution);
@@ -634,7 +648,7 @@ public abstract partial class SharedXenoWeedsSystem : EntitySystem
                     _tags.HasTag(entity, PlatformTag))
                     continue;
 
-                _popup.PopupClient(Loc.GetString("rmc-xeno-weeds-blocked"),
+                _popup.PopupCoordinates(Loc.GetString("rmc-xeno-weeds-blocked"),
                     popupAt ?? xeno.ToCoordinates(),
                     xeno,
                     PopupType.SmallCaution);
@@ -643,6 +657,40 @@ public abstract partial class SharedXenoWeedsSystem : EntitySystem
         }
 
         return true;
+    }
+
+    private bool HasWeedBlocker(Entity<MapGridComponent> grid, Vector2i tile)
+    {
+        if (HasBlocker(grid, tile))
+            return true;
+
+        // CMU: boarding ramps overlap the landing site's grid. Check the same
+        // world position on every grid so ground weeds cannot grow through them.
+        var coordinates = _transform.ToMapCoordinates(_mapSystem.GridTileToLocal(grid, grid, tile));
+        _weedBlockingGrids.Clear();
+        var grids = _weedBlockingGrids;
+        _mapSystem.FindGridsIntersecting(coordinates.MapId,
+            Box2.CenteredAround(coordinates.Position, new Vector2(0.01f)), ref grids, approx: true, includeMap: true);
+        foreach (var other in grids)
+        {
+            if (other.Owner != grid.Owner &&
+                HasBlocker(other, _mapSystem.WorldToTile(other, other, coordinates.Position)))
+                return true;
+        }
+
+        return false;
+
+        bool HasBlocker(Entity<MapGridComponent> owner, Vector2i indices)
+        {
+            var anchored = _mapSystem.GetAnchoredEntities(owner, owner, indices);
+            while (anchored.MoveNext(out var uid))
+            {
+                if (_blockWeedsQuery.HasComp(uid))
+                    return true;
+            }
+
+            return false;
+        }
     }
 
     public void UpdateQueued(EntityUid update)

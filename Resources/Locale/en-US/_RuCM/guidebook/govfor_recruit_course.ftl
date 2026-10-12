@@ -1,0 +1,14 @@
+rucm-guide-course-title = GOVFOR Recruit Training Course
+rucm-guide-course-purpose = A practical handbook for recruits completing Enlisted training. It explains existing rules and does not replace SOP, the military code or service regulations. Choose the introduction or a training chapter. Reading alone does not complete training.
+rucm-guide-course-references = Related regulations
+rucm-guide-course-introduction = Introduction
+rucm-guide-course-militaryregulations = General military training
+rucm-guide-course-drill = Drill training
+rucm-guide-course-communications = Communications
+rucm-guide-course-firearms = Weapons safety and training
+rucm-guide-course-tactics = Basic tactics
+rucm-guide-course-firstaid = Military first aid
+rucm-guide-course-topography = Military topography
+rucm-guide-course-engineeringbasics = Engineering basics
+rucm-guide-course-fieldexercise = Field training exercise
+rucm-guide-course-reference = Common mistakes and reference

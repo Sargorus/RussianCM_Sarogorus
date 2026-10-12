@@ -45,7 +45,7 @@ public sealed partial class PlatoonPrototype : IPrototype
     public List<ProtoId<LanguagePrototype>> LearnableLanguages { get; private set; } = new();
 
     [DataField("name", required: true)]
-    public string Name { get; private set; } = string.Empty;
+    public LocId Name { get; private set; } = string.Empty;
 
     [DataField("lorePrimer")]
     public ProtoId<LorePrimerPrototype>? LorePrimer { get; private set; }
@@ -54,7 +54,30 @@ public sealed partial class PlatoonPrototype : IPrototype
     public string Reqlist { get; private set; } = string.Empty;
 
     [DataField]
+    public HashSet<EntProtoId> VehicleSupplyCatalog = new();
+
+    [DataField]
+    public int MaxSuppliedVehicles = 2;
+
+    [DataField]
+    public int MaxSuppliedTanks = 1;
+
+    [DataField]
+    public int MaxSuppliedVtols = 1;
+
+    [DataField]
+    public int MaxSuppliedFighters = 1;
+
+    [DataField]
     public ProtoId<PlatoonVendorSetPrototype>? VendorSet { get; private set; }
+
+    /// <summary>Unarmed training uniform for this platoon's recruits.</summary>
+    [DataField]
+    public ProtoId<StartingGearPrototype>? RecruitGear { get; private set; }
+
+    /// <summary>Duty uniform for instructors, applied before their native platoon chevron.</summary>
+    [DataField]
+    public ProtoId<StartingGearPrototype>? InstructorGear { get; private set; }
 
     [DataField]
     public Dictionary<PlatoonMarkerClass, EntProtoId> VendorOverrides { get; private set; } = new();

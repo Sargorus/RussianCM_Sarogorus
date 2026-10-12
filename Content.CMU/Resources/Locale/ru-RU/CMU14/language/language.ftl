@@ -140,7 +140,7 @@ language-Yautja-description = Древний инопланетный язык �
 language-Arcturian-name = Арктурианский
 language-Arcturian-description = Инопланетный язык с Арктура, отличающийся гармоничными тонами и необычными речевыми структурами.
 
-language-Pathogen-name= = Патогенный
+language-Pathogen-name = Патогенный
 language-Pathogen-description = Общий язык Мицелиального Слияния — влажная, щёлкающая речь, распространяемая через споры.
 
 # Описания первого контакта

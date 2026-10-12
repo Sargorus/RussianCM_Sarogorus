@@ -1,0 +1,127 @@
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbook
+  name: rucm-guide-instructor-title
+  priority: 1
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Index.xml"
+  children:
+  - RuCMGOVFORInstructorHandbookWork
+  - RuCMGOVFORInstructorHandbookLesson
+  - RuCMGOVFORInstructorHandbookAssessment
+  - RuCMGOVFORInstructorHandbookMilitaryRegulations
+  - RuCMGOVFORInstructorHandbookDrill
+  - RuCMGOVFORInstructorHandbookCommunications
+  - RuCMGOVFORInstructorHandbookFirearms
+  - RuCMGOVFORInstructorHandbookTactics
+  - RuCMGOVFORInstructorHandbookFirstAid
+  - RuCMGOVFORInstructorHandbookTopography
+  - RuCMGOVFORInstructorHandbookEngineeringBasics
+  - RuCMGOVFORInstructorHandbookFieldExercise
+  - RuCMGOVFORInstructorHandbookGroup
+  - RuCMGOVFORInstructorHandbookCertification
+  - RuCMGOVFORInstructorHandbookReference
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookWork
+  name: rucm-guide-instructor-work
+  priority: 0
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Work.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookLesson
+  name: rucm-guide-instructor-lesson
+  priority: 1
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Lesson.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookAssessment
+  name: rucm-guide-instructor-assessment
+  priority: 2
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Assessment.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookMilitaryRegulations
+  name: rucm-guide-instructor-militaryregulations
+  priority: 3
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/MilitaryRegulations.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookDrill
+  name: rucm-guide-instructor-drill
+  priority: 4
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Drill.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookCommunications
+  name: rucm-guide-instructor-communications
+  priority: 5
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Communications.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookFirearms
+  name: rucm-guide-instructor-firearms
+  priority: 6
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Firearms.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookTactics
+  name: rucm-guide-instructor-tactics
+  priority: 7
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Tactics.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookFirstAid
+  name: rucm-guide-instructor-firstaid
+  priority: 8
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/FirstAid.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookTopography
+  name: rucm-guide-instructor-topography
+  priority: 9
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Topography.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookEngineeringBasics
+  name: rucm-guide-instructor-engineeringbasics
+  priority: 10
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/EngineeringBasics.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookFieldExercise
+  name: rucm-guide-instructor-fieldexercise
+  priority: 11
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/FieldExercise.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookGroup
+  name: rucm-guide-instructor-group
+  priority: 12
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Group.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookCertification
+  name: rucm-guide-instructor-certification
+  priority: 13
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Certification.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORInstructorHandbookReference
+  name: rucm-guide-instructor-reference
+  priority: 14
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/InstructorHandbook/Reference.xml"

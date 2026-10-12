@@ -1,0 +1,30 @@
+[
+  {
+    "id": "RuCMGOVFORDrillRegulations",
+    "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/DrillRegulations.xml",
+    "source": "Resources/RuCM/GOVFOR/Regulations/DrillRegulations.md",
+    "source_sha256": "bea54a93dd86c1b6e8ee3d1c1f9ea3bae52a02522da6901f9ceb397e4857bfae",
+    "prose_sha256": "00b5fd990ccf839a001654967bae291599647475aee5378d3fcd82e3e79eeced"
+  },
+  {
+    "id": "RuCMGOVFORCommunications",
+    "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/Communications.xml",
+    "source": "Resources/RuCM/GOVFOR/Regulations/Communications.md",
+    "source_sha256": "cf9659f89a78bcdd3e79f724ec16638755493be1e5b4f4d3760a8cba12ad673e",
+    "prose_sha256": "a1a5f97805bfc94642e112f3d942e9a5178fa492f1000579ba11c96f4e23628c"
+  },
+  {
+    "id": "RuCMGOVFORUnitCommand",
+    "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/UnitCommand.xml",
+    "source": "Resources/RuCM/GOVFOR/Regulations/UnitCommand.md",
+    "source_sha256": "39ed7889c3497845e1ee9755b49c7377efcb9e301f0ebca59be6544bff581fc6",
+    "prose_sha256": "694ce7acb6e1433c32769b1f2224e7f0a67dc92b03c01faadd922896dc88ffca"
+  },
+  {
+    "id": "RuCMGOVFORTrainingQualifications",
+    "xml": "Resources/ServerInfo/Guidebook/_RuCM/GOVFOR/TrainingQualifications.xml",
+    "source": "Resources/RuCM/GOVFOR/Regulations/TrainingQualifications.md",
+    "source_sha256": "5e1b3c166e404e633b2c95f19c6f1320717f9ff7d761a10c789d99f115764a78",
+    "prose_sha256": "4a7c318a2cbfa5107da33fd2f73d5d34e87add017ea3825ff85e51a78fe4fadd"
+  }
+]

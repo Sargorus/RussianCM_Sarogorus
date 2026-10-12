@@ -1,6 +1,6 @@
 - type: job
   abstract: true
-  parent: CMJobBase
+  parent: RMCJobRibbonBase
   id: AU14JobWorkingJoeBase
   name: au14-job-name-workingjoe
   description: au14-job-description-workingjoe
@@ -74,6 +74,7 @@
     back: AU14IMPBackpackWorkingJoe
     pocket1: RMCPouchElectronicsFill
     pocket2: RMCPouchConstructionFillFull
+    head: RuMCSeegsonCap # RuMC edit
   storage:
       belt:
       - AU14MaintenanceJackSpecial
@@ -91,6 +92,7 @@
 
 - type: job
   parent: AU14JobWorkingJoeBase
+  displayWeight: 4
   id: AU14JobColonyWorkingJoe
   roundSide: Civilian
   roundForce: WORKING_JOE
@@ -134,6 +136,7 @@
 
 - type: job
   parent: AU14JobColonyWorkingJoe
+  displayWeight: 4
   id: AU14JobColonyWorkingJoeHazmat
   roundSide: Civilian
   roundForce: WORKING_JOE
@@ -144,7 +147,7 @@
   - type: Loadout
     prototypes: [ AU14GearColonyWorkingJoeHazmat ]
 
-  spawnMenuRoleName: Working Joe (Hazmat)
+  spawnMenuRoleName: cmu-spawn-role-working-joe-hazmat
   dummyStartingGear: AU14GearColonyWorkingJoeHazmat
 
 - type: startingGear

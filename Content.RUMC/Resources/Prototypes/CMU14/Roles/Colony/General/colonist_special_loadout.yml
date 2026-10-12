@@ -1,0 +1,604 @@
+# Special loadout entries: gear, boxed machines and vehicles. Each one needs skill levels.
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupCqc
+  name: loadout-group-au14-colonist-special-cqc
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutKnuckles ]
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupMelee
+  name: loadout-group-au14-colonist-special-melee
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutBayonetM5, AU14ColonistLoadoutKnifeDruzhina, AU14ColonistLoadoutKnifeTanto, AU14ColonistLoadoutKnifeTrench, AU14ColonistLoadoutMachete ]
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupMedical
+  name: loadout-group-au14-colonist-special-medical
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutMedBelt, AU14ColonistLoadoutMedPouch, AU14ColonistLoadoutMedHud, AU14ColonistLoadoutDefib, AU14ColonistLoadoutMedBagBelt ]
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupSurgery
+  name: loadout-group-au14-colonist-special-surgery
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutSurgeryCase ]
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupEngineer
+  name: loadout-group-au14-colonist-special-engineer
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutToolBelt, AU14ColonistLoadoutEngBag, AU14ColonistLoadoutRmcFrameBackpack ]
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupConstruction
+  name: loadout-group-au14-colonist-special-construction
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutConstructionPouch ]
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupEngConstruction
+  name: loadout-group-au14-colonist-special-engconstruction
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutTacticalEngPouch ]
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupResearch
+  name: loadout-group-au14-colonist-special-research
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutLabCoat, AU14ColonistLoadoutVialPouch ]
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupDomestics
+  name: loadout-group-au14-colonist-special-domestics
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutMicrowaveBox, AU14ColonistLoadoutDinnerwareBox, AU14ColonistLoadoutIngredientsBox ]
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupEndurance
+  name: loadout-group-au14-colonist-special-endurance
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutSandals ]
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupEnduranceMelee
+  name: loadout-group-au14-colonist-special-endurancemelee
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutKatana ]
+
+- type: loadoutGroup
+  id: AU14ColonistSpecialGroupVehicles
+  name: loadout-group-au14-colonist-special-vehicles
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistLoadoutMaintenanceJack, AU14ColonistLoadoutBlueVanBox, AU14ColonistLoadoutTruckBox, AU14ColonistLoadoutCarBox, AU14ColonistLoadoutHippieVanBox ]
+
+- type: loadout
+  id: AU14ColonistLoadoutKnuckles
+  cost: 4
+  equipment:
+    gloves: ClothingHandsKnuckleDusters
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkMeleeLessons
+    - AU14ColonistPerkMartialArts
+
+- type: loadout
+  id: AU14ColonistLoadoutBayonetM5
+  cost: 2
+  inhand:
+  - RMCM5Bayonet
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkMeleeLessons
+    - AU14ColonistPerkMartialArts
+
+- type: loadout
+  id: AU14ColonistLoadoutKnifeDruzhina
+  cost: 2
+  inhand:
+  - RMCCombatUtilityKnifeA
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkMeleeLessons
+    - AU14ColonistPerkMartialArts
+
+- type: loadout
+  id: AU14ColonistLoadoutKnifeTanto
+  cost: 2
+  inhand:
+  - RMCTantoA
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkMeleeLessons
+    - AU14ColonistPerkMartialArts
+
+- type: loadout
+  id: AU14ColonistLoadoutKnifeTrench
+  cost: 2
+  inhand:
+  - RMCSawtoothDaggerA
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkMeleeLessons
+    - AU14ColonistPerkMartialArts
+
+- type: loadout
+  id: AU14ColonistLoadoutMachete
+  cost: 6
+  inhand:
+  - AU14ToolMachete
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkMartialArts
+
+- type: loadout
+  id: AU14ColonistLoadoutMedBelt
+  cost: 4
+  equipment:
+    belt: AU14BeltMedical
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkFirstAid
+    - AU14ColonistPerkOrderly
+    - AU14ColonistPerkDoctor
+
+- type: loadout
+  id: AU14ColonistLoadoutMedPouch
+  cost: 3
+  equipment:
+    pocket1: RMCPouchMedical
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkFirstAid
+    - AU14ColonistPerkOrderly
+    - AU14ColonistPerkDoctor
+
+- type: loadout
+  id: AU14ColonistLoadoutMedHud
+  cost: 3
+  equipment:
+    eyes: RMCGlassesMedicalHUDGlasses
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkFirstAid
+    - AU14ColonistPerkOrderly
+    - AU14ColonistPerkDoctor
+
+- type: loadout
+  id: AU14ColonistLoadoutDefib
+  cost: 5
+  inhand:
+  - CMDefibrillator
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkOrderly
+    - AU14ColonistPerkDoctor
+
+- type: loadout
+  id: AU14ColonistLoadoutSurgeryCase
+  cost: 6
+  inhand:
+  - CMSurgicalCaseFilled
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkOrderly
+    - AU14ColonistPerkDoctor
+
+- type: loadout
+  id: AU14ColonistLoadoutToolBelt
+  cost: 3
+  equipment:
+    belt: AU14BeltUtilityFilled
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkConstructionExperience
+    - AU14ColonistPerkEnthusiast
+
+- type: loadout
+  id: AU14ColonistLoadoutEngBag
+  cost: 4
+  equipment:
+    back: CMSatchelEngineer
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkEnthusiast
+
+- type: loadout
+  id: AU14ColonistLoadoutConstructionPouch
+  cost: 8
+  equipment:
+    pocket1: AU14PouchConstructionFilled
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkEnthusiast
+
+- type: loadout
+  id: AU14ColonistLoadoutTacticalEngPouch
+  cost: 4
+  equipment:
+    pocket1: RMCPouchToolsSocFill
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkEnthusiast
+
+- type: loadout
+  id: AU14ColonistLoadoutLabCoat
+  cost: 1
+  equipment:
+    outerClothing: RMCLabcoat
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkDoctor
+
+- type: loadout
+  id: AU14ColonistLoadoutVialPouch
+  cost: 3
+  equipment:
+    pocket2: RMCPouchVialFill
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkDoctor
+
+- type: loadout
+  id: AU14ColonistLoadoutMicrowaveBox
+  cost: 3
+  dummyEntity: CMMicrowave
+  inhand:
+  - AU14BoxMicrowave
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkCookingLessons
+
+- type: loadout
+  id: AU14ColonistLoadoutDinnerwareBox
+  cost: 4
+  dummyEntity: CMVendorDinnerware
+  inhand:
+  - AU14BoxVendorDinnerware
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkCookingLessons
+
+- type: loadout
+  id: AU14ColonistLoadoutIngredientsBox
+  cost: 3
+  dummyEntity: CMVendorIngredients
+  inhand:
+  - AU14BoxVendorIngredients
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkCookingLessons
+
+- type: loadout
+  id: AU14ColonistLoadoutSandals
+  cost: 1
+  equipment:
+    shoes: RMCShoesSandals
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkHunter
+    - AU14ColonistPerkMarksman
+
+- type: loadout
+  id: AU14ColonistLoadoutKatana
+  cost: 8
+  inhand:
+  - RMCKatana
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkMarksman
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkMartialArts
+
+- type: loadout
+  id: AU14ColonistLoadoutMaintenanceJack
+  cost: 4
+  inhand:
+  - AU14MaintenanceJack
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkDrivingLessons
+
+- type: loadout
+  id: AU14ColonistLoadoutBlueVanBox
+  cost: 8
+  dummyEntity: AU14VehicleCivBlueTruck
+  inhand:
+  - AU14BoxVehicleBlueTruck
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkDrivingLessons
+
+- type: loadout
+  id: AU14ColonistLoadoutTruckBox
+  cost: 11
+  dummyEntity: AU14VehicleCivTruck
+  inhand:
+  - AU14BoxVehicleTruck
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkDrivingLessons
+
+- type: loadout
+  id: AU14ColonistLoadoutCarBox
+  cost: 10
+  dummyEntity: AU14VehicleCivCar
+  inhand:
+  - AU14BoxVehicleCar
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkDrivingLessons
+  - !type:PaintableLoadoutEffect
+
+- type: loadout
+  id: AU14ColonistLoadoutHippieVanBox
+  cost: 15
+  dummyEntity: AU14VehicleCivHippieVan
+  inhand:
+  - AU14BoxVehicleHippieVan
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkDrivingLessons
+
+# Base for boxes that unpack a machine or vehicle when used in hand.
+- type: entity
+  abstract: true
+  parent: BaseItem
+  id: AU14DeployBoxBase
+  name: supply box
+  description: Packed for transport - use it in your hand to unpack what's inside.
+  components:
+  - type: Sprite
+    sprite: Objects/Storage/boxes.rsi
+    state: box
+  - type: AU14DeployBox
+    sound: !type:SoundPathSpecifier
+      path: /Audio/Effects/unwrap.ogg
+
+- type: entity
+  parent: AU14DeployBoxBase
+  id: AU14BoxMicrowave
+  name: microwave crate
+  description: A microwave oven, packed for transport.
+  components:
+  - type: Item
+    size: Large
+  - type: AU14DeployBox
+    anchor: true
+    distance: 2
+    entries:
+    - prototype: CMMicrowave
+
+- type: entity
+  parent: AU14DeployBoxBase
+  id: AU14BoxVendorDinnerware
+  name: dinnerware vendor crate
+  description: A dinnerware vending machine, packed for transport.
+  components:
+  - type: Item
+    size: Large
+  - type: AU14DeployBox
+    anchor: true
+    distance: 2
+    entries:
+    - prototype: CMVendorDinnerware
+
+- type: entity
+  parent: AU14DeployBoxBase
+  id: AU14BoxVendorIngredients
+  name: galley vendor crate
+  description: A galley ingredients vending machine, packed for transport.
+  components:
+  - type: Item
+    size: Large
+  - type: AU14DeployBox
+    anchor: true
+    distance: 2
+    entries:
+    - prototype: CMVendorIngredients
+
+- type: entity
+  parent: AU14DeployBoxBase
+  id: AU14BoxVehicleBlueTruck
+  name: blue van crate
+  description: A blue van, packed for transport. Wheels included.
+  components:
+  - type: Item
+    size: Huge
+  - type: AU14DeployBox
+    anchor: false
+    distance: 3
+    entries:
+    - prototype: AU14VehicleCivBlueTruck
+      install:
+        wheel-1: RMCVanWheel
+
+- type: entity
+  parent: AU14DeployBoxBase
+  id: AU14BoxVehicleTruck
+  name: truck crate
+  description: A civilian truck, packed for transport. Wheels included.
+  components:
+  - type: Item
+    size: Huge
+  - type: AU14DeployBox
+    anchor: false
+    distance: 3
+    entries:
+    - prototype: AU14VehicleCivTruck
+      install:
+        wheel-1: RMCVanWheel
+
+- type: entity
+  parent: AU14DeployBoxBase
+  id: AU14BoxVehicleCar
+  name: car crate
+  description: A passenger car, packed for transport. Wheels included.
+  components:
+  - type: Item
+    size: Huge
+  - type: AU14DeployBox
+    anchor: false
+    distance: 3.3
+    entries:
+    - prototype: AU14VehicleCivCar
+      install:
+        wheel-1: RMCVanWheel
+
+- type: entity
+  parent: AU14DeployBoxBase
+  id: AU14BoxVehicleHippieVan
+  name: hippie van crate
+  description: A hippie van, packed for transport. Wheels included.
+  components:
+  - type: Item
+    size: Huge
+  - type: AU14DeployBox
+    anchor: false
+    distance: 3.3
+    entries:
+    - prototype: AU14VehicleCivHippieVan
+      install:
+        wheel-1: RMCVanWheel
+
+- type: loadout
+  id: AU14ColonistLoadoutMedBagBelt
+  cost: 5
+  equipment:
+    belt: CMBeltMedicBagFilled
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkOrderly
+    - AU14ColonistPerkDoctor
+
+- type: loadout
+  id: AU14ColonistLoadoutGlock77Rubber
+  cost: 10
+  inhand:
+  - CMU14KitWeaponGlock77Rubber
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkFirearmsCourse
+    - AU14ColonistPerkHunter
+    - AU14ColonistPerkMarksman
+
+- type: loadout
+  id: AU14ColonistLoadoutRmcFrameBackpack
+  cost: 15
+  equipment:
+    back: AU14FrameBackpackRMC
+  effects:
+  - !type:PerkRequirementLoadoutEffect
+    anyOf:
+    - AU14ColonistPerkEnthusiast
+
+# Free clothing choice: one loadout per inventory slot.
+- type: loadoutGroup
+  id: AU14ColonistClothingGroup
+  name: loadout-group-au14-colonist-clothing
+  hidden: true
+  minLimit: 0
+  maxLimit: 20
+  loadouts: [ AU14ColonistClothingHead, AU14ColonistClothingEyes, AU14ColonistClothingMask, AU14ColonistClothingNeck, AU14ColonistClothingJumpsuit, AU14ColonistClothingOuterClothing, AU14ColonistClothingGloves, AU14ColonistClothingShoes ]
+
+- type: loadout
+  id: AU14ColonistClothingHead
+  effects:
+  - !type:CustomClothingLoadoutEffect
+    slot: head
+
+- type: loadout
+  id: AU14ColonistClothingEyes
+  effects:
+  - !type:CustomClothingLoadoutEffect
+    slot: eyes
+
+- type: loadout
+  id: AU14ColonistClothingMask
+  effects:
+  - !type:CustomClothingLoadoutEffect
+    slot: mask
+
+- type: loadout
+  id: AU14ColonistClothingNeck
+  effects:
+  - !type:CustomClothingLoadoutEffect
+    slot: neck
+
+- type: loadout
+  id: AU14ColonistClothingJumpsuit
+  effects:
+  - !type:CustomClothingLoadoutEffect
+    slot: jumpsuit
+
+- type: loadout
+  id: AU14ColonistClothingOuterClothing
+  effects:
+  - !type:CustomClothingLoadoutEffect
+    slot: outerClothing
+
+- type: loadout
+  id: AU14ColonistClothingGloves
+  effects:
+  - !type:CustomClothingLoadoutEffect
+    slot: gloves
+
+- type: loadout
+  id: AU14ColonistClothingShoes
+  effects:
+  - !type:CustomClothingLoadoutEffect
+    slot: shoes

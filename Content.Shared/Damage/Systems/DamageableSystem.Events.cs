@@ -1,4 +1,5 @@
 using Content.Shared.CCVar;
+using Content.Shared.CMU14.Atmos; // CMU14
 using Content.Shared.CMU14.Medical.Anatomy.BodyParts;
 using Content.Shared.Body.Part;
 using Content.Shared.Damage.Components;
@@ -167,7 +168,13 @@ public sealed partial class DamageableSystem
 
     private void OnIrradiated(Entity<DamageableComponent> ent, ref OnIrradiatedEvent args)
     {
-        var damageValue = FixedPoint2.New(args.TotalRads);
+        // CMU14: wearable rad shielding scales the dose before it becomes damage.
+        var rad = new GetRadProtectionEvent();
+        RaiseLocalEvent(ent, ref rad);
+        if (_inventoryQuery.TryComp(ent, out var inventory))
+            _inventory.RelayEvent((ent, inventory), ref rad);
+
+        var damageValue = FixedPoint2.New(args.TotalRads * rad.Multiplier);
 
         // Radiation should really just be a damage group instead of a list of types.
         DamageSpecifier damage = new();
@@ -355,7 +362,9 @@ public record struct DamageDealtEvent(
     public DamageSpecifier? AppliedDamage;
 }
 
-[Obsolete("Will be replaced with damage-model specific events; general 'took damage' can be served by DamageDealtEvent")]
+// CMU14: this post-change event also reports healing, direct damage assignments, and body-damage projection.
+// DamageDealtEvent is the injury request and cannot replace those notifications.
+// [Obsolete("Will be replaced with damage-model specific events; general 'took damage' can be served by DamageDealtEvent")]
 public sealed class DamageChangedEvent : EntityEventArgs
 {
     /// <summary>

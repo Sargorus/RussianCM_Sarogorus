@@ -1,6 +1,7 @@
 - type: job
   abstract: true
   parent: AU14JobMilitaryBase
+  displayWeight: 3
   id: AU14JobDCCBaseAbstract
   name: au14-job-name-govfordcc
   description: au14-job-description-govfordcc
@@ -25,7 +26,7 @@
   - AU14RoundJobProfileMilitaryBase
   roundComponents:
   - type: AU14CallsignRole
-    suffix: CHIEF
+    suffix: "02"
     commandElement: true
     category: AIR
   - type: Skills
@@ -90,6 +91,9 @@
       prefix: au14-job-prefix-AU14JobGOVFORDCCWYPMC
 
   requirements:
+  - !type:TotalDepartmentsTimeRequirement
+    group: CMUDepartmentsMilitary
+    time: 18000 # 5 hours
   - !type:TraitsRequirement
     inverted: true
     traits:
@@ -103,6 +107,8 @@
     - SlowRunner
     - Anemic
     - Asthmatic
+    - CMUAlcoholic
+    - CMUDrugAddict
   ranks:
     RMCRankCivilian: []
   chevrons:
@@ -180,6 +186,7 @@
   - AU14OpforPilot
   - AU14OpforCorpsman
   - AU14OpforSquad
+  useLoadoutOfJob: AU14JobGOVFORDCC
 
 - type: startingGear
   id: AU14GearopforDCC

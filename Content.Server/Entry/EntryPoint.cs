@@ -1,4 +1,5 @@
 using Content.Server.CMU14.Diagnostics.Performance;
+using Content.Server.CMU14.ZLevels.Core;
 using Content.Server.Acz;
 using Content.Server.Administration;
 using Content.Server.Administration.Logs;
@@ -194,6 +195,8 @@ namespace Content.Server.Entry
                 {
                     _euiManager.SendUpdates();
                     _voteManager.Update();
+                    // Prepare falling-entity visibility after simulation, before parallel state generation.
+                    _entSys.GetEntitySystem<CMUZLevelsSystem>().PrepareOverheadPvs();
                     break;
                 }
 

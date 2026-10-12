@@ -118,6 +118,7 @@ namespace Content.Client.UserInterface.Systems.Alerts.Controls
         protected override void FrameUpdate(FrameEventArgs args)
         {
             base.FrameUpdate(args);
+            CMUUpdateTrainingText(); // CMU14: name/distance of the owner-only teaching target.
             UserInterfaceManager.GetUIController<AlertsUIController>().UpdateAlertSpriteEntity(_spriteViewEntity, Alert);
 
             if (!Cooldown.HasValue)

@@ -1,187 +1,830 @@
 <Document>
-  # Краткий справочник по связи
+  # Краткий справочник связи
 
-  Компактная памятка по элементам управления, дальности и состояниям радиосвязи.
+  Краткий справочник по управлению радиостанцией, дальности, настройкам и распространённым эффектам.
 
-  Подробные инструкции: [textlink="Радиостанция AN/PRC-117G" link="AU14CommsANPRC"] и [textlink="Полевые гарнитуры" link="AU14CommsHeadsets"].
+  Полные инструкции см. в разделах [textlink="Радиостанция AN/PRC-117G" link="AU14CommsANPRC"] и [textlink="Полевые гарнитуры" link="AU14CommsHeadsets"].
 
   ## Префиксы чата
 
   <Table Columns="2" MinForcedColumnWidth="120">
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Префикс[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Функция[/bold]</Box></ColorBox>
-    <ColorBox><Box Margin="4">[color=#a4885c]:h[/color]</Box></ColorBox><ColorBox><Box Margin="4">Передача в основную сеть гарнитуры.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[color=#a4885c]:v[/color], [color=#a4885c]:a[/color] и другие</Box></ColorBox><ColorBox><Box Margin="4">Передача в другую сеть, ключ которой есть в гарнитуре. Осмотрите гарнитуру для списка префиксов.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[color=#a4885c]:r[/color]</Box></ColorBox><ColorBox><Box Margin="4">Передача через активный слот AN/PRC или её трубку.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[color=#a4885c]:x[/color]</Box></ColorBox><ColorBox><Box Margin="4">Передача на настроенной прямой частоте гарнитуры.</Box></ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Префикс[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Функция[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[color=#a4885c]:h[/color]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Передача в сеть гарнитуры по умолчанию.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[color=#a4885c]:v[/color], [color=#a4885c]:a[/color] и т. д.</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Передача в другую сеть гарнитуры. Осмотрите её, чтобы узнать доступные префиксы.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[color=#a4885c]:r[/color]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Передача через ячейку AN/PRC с отметкой В ЭФИРЕ.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[color=#a4885c]:x[/color]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Передача на прямой частоте, настроенной в гарнитуре.</Box>
+    </ColorBox>
   </Table>
 
-  Панель AN/PRC могут использовать:
+  ## Подготовка оператора AN/PRC
 
-  - [bold]GOVFOR и OPFOR[/bold] — Командир, Адъютант, штабные офицеры, инженерные офицеры, офицеры разведки, синтетики, командиры отрядов, командиры боевых групп и операторы радиосвязи.
-  - [bold]CLF[/bold] — Лидер ячейки и Радист.
-  - Любой, кто прочитал [bold]памятку полевого радиооператора[/bold].
+  Панель управления AN/PRC могут использовать:
 
-  Трубкой может пользоваться любой человек в радиусе независимо от подготовки.
+  - [bold]GOVFOR и OPFOR[/bold] — Командующий Офицер, адъютант, штабные офицеры, инженерные офицеры, офицеры разведки, синтетики, командиры отделений, командиры огневых групп и радисты
+  - [bold]CLF[/bold] — лидер ячейки и радист
+  - любой, прочитавший [bold]памятку полевого радиста[/bold]
+
+  Трубку можно использовать без подготовки радиста.
 
   ## Дальность сигнала
 
-  Дальности AN/PRC ниже предполагают [bold]TX MED[/bold] и штыревую антенну.
+  Если не указано иное, параметры AN/PRC приведены для [bold]мощности MED[/bold] и [bold]антенны WHIP[/bold].
 
   <Table Columns="3" MinForcedColumnWidth="90">
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Система[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Чистая дальность[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Ухудшение/потеря[/bold]</Box></ColorBox>
-    <ColorBox><Box Margin="4">Именованная сеть через AN/PRC</Box></ColorBox><ColorBox><Box Margin="4">0–30 тайлов от радиостанции.</Box></ColorBox><ColorBox><Box Margin="4">Ухудшение до 45 тайлов, дальше сигнала нет.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Прямая частота</Box></ColorBox><ColorBox><Box Margin="4">0–30 тайлов от передатчика.</Box></ColorBox><ColorBox><Box Margin="4">Ухудшение до 50 тайлов, дальше сигнала нет.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Мост AN/PRC на частоте</Box></ColorBox><ColorBox><Box Margin="4">Оба пользователя в пределах 50 тайлов от радиостанции.</Box></ColorBox><ColorBox><Box Margin="4">Не работает, если хотя бы один пользователь вне радиуса моста.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Мачта командного пункта</Box></ColorBox><ColorBox><Box Margin="4">0–75 тайлов.</Box></ColorBox><ColorBox><Box Margin="4">Ухудшение до 100 тайлов, дальше сигнала нет.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Закреплённый ретранслятор CLF</Box></ColorBox><ColorBox><Box Margin="4">0–35 тайлов.</Box></ColorBox><ColorBox><Box Margin="4">Ухудшение до 50 тайлов, дальше сигнала нет.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Закреплённая базовая станция CLF</Box></ColorBox><ColorBox><Box Margin="4">0–55 тайлов.</Box></ColorBox><ColorBox><Box Margin="4">Ухудшение до 80 тайлов, дальше сигнала нет.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Корабельный коммуникационный массив</Box></ColorBox><ColorBox><Box Margin="4">Покрывает подключённый корабль при наличии питания.</Box></ColorBox><ColorBox><Box Margin="4">Не даёт покрытия при уничтожении или отсутствии питания.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Врезка CLF в фидер</Box></ColorBox><ColorBox><Box Margin="4">Использует покрытие взломанной мачты или массива.</Box></ColorBox><ColorBox><Box Margin="4">Добавляет сети CLF, ничего не отключая. Исходная система продолжает работать для владельцев.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Провод трубки</Box></ColorBox><ColorBox><Box Margin="4">Около 2,5 тайлов от радиостанции.</Box></ColorBox><ColorBox><Box Margin="4">Отключается при выходе пользователя из радиуса.</Box></ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Система[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Чистый сигнал[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Ухудшение / потеря[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Именованная сеть через AN/PRC</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">0-30 тайлов</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Искажения до 45; потеря далее 45.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Прямая частота</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">0-30 тайлов</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Искажения до 50; потеря далее 50.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Частотный мост AN/PRC</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Оба пользователя в пределах 50 тайлов</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Перестаёт работать, если любой пользователь выходит из зоны моста.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Мачта командного пункта</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">0-75 тайлов</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Искажения до 100; потеря далее 100.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Ретранслятор CLF</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">0-35 тайлов</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Искажения до 50; потеря далее 50.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Базовая станция CLF</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">0-55 тайлов</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Искажения до 80; потеря далее 80.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Корабельный комплекс связи</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Весь связанный корабль</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Нет покрытия при разрушении или отсутствии питания.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Подключение CLF к фидеру</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Как у основной мачты или комплекса связи</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Добавляет сети CLF без изменения существующего покрытия.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Шнур трубки</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Примерно 2.5 тайла</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Отсоединяется за пределами дальности.</Box>
+    </ColorBox>
   </Table>
 
-  Мощность передачи и тип антенны изменяют дальность ретрансляции AN/PRC.
+  Дальность ретрансляции AN/PRC изменяется антенной и выходной мощностью.
 
-  Фракционные сети — отрядная, командная, разведывательная, JTAC, MP и другие — требуют покрытия хотя бы от одного из источников:
+  ### Ретрансляторы боевых сетей
 
-  - Включённая AN/PRC на подготовленном операторе.
-  - Развёрнутая ретрансляционная станция.
-  - Мачта командного пункта.
-  - Включённый коммуникационный массив.
-  - Бортовая радиостанция десантного корабля или техники, покрывающая немного больше корпуса.
-  - Полевая мачта из десяти листов металла, установленная инженерно подготовленным персоналом.
-  - Закреплённая подпольная базовая станция или ретранслятор CLF — только для сетей CLF.
-  - Любая мачта или массив с врезкой CLF — только для сетей CLF до снятия врезки.
+  Боевые сети требуют покрытия хотя бы одного совместимого источника:
 
-  Колониальный и гражданские каналы не требуют ретрансляторов и работают по обычным правилам.
+  - включённая AN/PRC на подготовленном операторе
+  - развёрнутая станция ретрансляции
+  - антенная мачта командного пункта
+  - включённый комплекс связи
+  - радиостанция транспорта
+  - включённая полевая антенная мачта с ключом вашей фракции
+  - скрытая базовая станция или ретранслятор CLF
+  - мачта или комплекс связи с подключением CLF к фидеру
 
-  ## Врезка в сеть
+  Каналы колонии и гражданских не требуют ретранслятора.
 
-  Радист CLF с комплектом для врезки может подключиться к мачте или массиву и добавить к нему сети ячейки. Исходная система не отключается и продолжает обслуживать владельцев. Необходимо проверять диапазон, находить скрытые несущие и фиксировать их. Количество попыток PROBE общее для всей операции. Если попытки закончатся или заполнится шкала обнаружения, операция провалится, а соединительная коробка перейдёт в аварийное состояние.
+  ## Подключение к радиосети
+
+  Радист CLF может использовать [bold]комплект подключения к радиосети[/bold], чтобы добавить сети CLF в совместимую инфраструктуру связи.
+
+  Подключение не удаляет существующие сети и не мешает им.
 
   <Table Columns="4" MinForcedColumnWidth="80">
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Цель[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Несущие[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]PROBE[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Время открытия[/bold]</Box></ColorBox>
-    <ColorBox><Box Margin="4">Полевая антенная мачта</Box></ColorBox><ColorBox><Box Margin="4">2</Box></ColorBox><ColorBox><Box Margin="4">24</Box></ColorBox><ColorBox><Box Margin="4">6 секунд</Box></ColorBox>
-    <ColorBox><Box Margin="4">Мачта командного пункта</Box></ColorBox><ColorBox><Box Margin="4">3</Box></ColorBox><ColorBox><Box Margin="4">32</Box></ColorBox><ColorBox><Box Margin="4">8 секунд</Box></ColorBox>
-    <ColorBox><Box Margin="4">Коммуникационный массив</Box></ColorBox><ColorBox><Box Margin="4">4</Box></ColorBox><ColorBox><Box Margin="4">40</Box></ColorBox><ColorBox><Box Margin="4">12 секунд</Box></ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Цель[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Несущие[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Проверки[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Время открытия[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Полевая антенная мачта</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">2</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">24</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">6 секунд</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Мачта командного пункта</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">3</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">32</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">8 секунд</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Комплекс связи</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">4</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">40</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">12 секунд</Box>
+    </ColorBox>
   </Table>
 
-  Сигнал равен нулю дальше чем в 30 позициях от несущей. LOCK срабатывает при отклонении до 4 позиций. Каждая попытка PROBE добавляет 1,5% обнаружения. Ошибка LOCK добавляет 30% и расходует 2 попытки. Во время работы мачта искрит; после неудачи она остаётся в аварийном состоянии 90 секунд, и повторная врезка невозможна.
+  ### Правила подключения
 
-  Любой человек может снять врезку за восемь секунд и получит карту ключей CLF.
+  - PROBE показывает ноль, если ближайшая несущая дальше 30 позиций
+  - LOCK успешен в пределах 4 позиций от несущей
+  - каждая проверка добавляет 1.5% обнаружения
+  - неудачный захват добавляет 30% обнаружения и расходует 2 проверки
+  - исчерпание проверок или заполнение шкалы обнаружения проваливает попытку
+  - после провала узел остаётся неисправным 90 секунд
+  - узлы искрят во время работы с ними и при неисправности
+  - установленное подключение можно снять за восемь секунд
+  - снятие подключения возвращает карту ключей CLF
+  - открытие узла питания подключённой полевой мачты отсоединяет устройство и роняет его карту ключей CLF
 
   ## Антенны
 
   <Table Columns="3" MinForcedColumnWidth="90">
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Антенна[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Работа[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Дальность[/bold]</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]WHIP[/bold]</Box></ColorBox><ColorBox><Box Margin="4">В движении или на месте.</Box></ColorBox><ColorBox><Box Margin="4">Стандартная дальность.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]MAST[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Лучше всего в неподвижном состоянии.</Box></ColorBox><ColorBox><Box Margin="4">Примерно двойная дальность на месте и половина стандартной при движении.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]WIRE[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Самодельная, только для ретранслятора CLF.</Box></ColorBox><ColorBox><Box Margin="4">35 тайлов чистого и 50 ухудшенного сигнала на месте; половина стандартной дальности в движении.</Box></ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Антенна[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Применение[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Дальность[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]WHIP[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">В движении или неподвижно</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Стандартная дальность</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]MAST[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Лучше в неподвижном состоянии</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Примерно двойная дальность без движения; половина стандартной при движении</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]WIRE[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Ретранслятор CLF</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">35 чистый / 50 ухудшенный без движения; половина стандартной при движении</Box>
+    </ColorBox>
   </Table>
 
   ## Режимы работы
 
   <Table Columns="4" MinForcedColumnWidth="80">
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Режим[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Функция[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Преимущества[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Ограничения[/bold]</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]FH[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Перестройка частоты.</Box></ColorBox><ColorBox><Box Margin="4">Снижает глушение на одну ступень и позволяет передавать внутри поля помех.</Box></ColorBox><ColorBox><Box Margin="4">1,5× расход заряда и небольшая сигнатура пеленгации.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]SC[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Обычный защищённый трафик.</Box></ColorBox><ColorBox><Box Margin="4">0,75× расход заряда и отсутствие сигнатуры при защищённой передаче.</Box></ColorBox><ColorBox><Box Margin="4">Нет защиты от глушения.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]CT[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Шифрованная связь между AN/PRC.</Box></ColorBox><ColorBox><Box Margin="4">Скрыта от приёмников без совпадающего ключа и не создаёт сигнатуру пеленгации.</Box></ColorBox><ColorBox><Box Margin="4">Требует AN/PRC с ключами и не защищает от глушения.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]PT[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Передача открытым текстом.</Box></ColorBox><ColorBox><Box Margin="4">0,5× расход заряда.</Box></ColorBox><ColorBox><Box Margin="4">Читается любым совместимым приёмником, повышает эффект глушения на одну ступень и создаёт наибольший риск пеленгации.</Box></ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Режим[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Функция[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Преимущества[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Ограничения[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]FH[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Перестройка частоты</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Уменьшает помехи на один уровень.</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Расход аккумулятора x1.5 и небольшой сигнал для пеленгации.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]SC[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Зашифрованный обмен на одном канале</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Расход аккумулятора x0.75 и отсутствие сигнала для пеленгации при шифровании.</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Нет защиты от помех.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]CT[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Шифрованный обмен между AN/PRC</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Скрыт без соответствующего ключа; нет сигнала для пеленгации.</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Требует AN/PRC с картами ключей и не защищает от помех.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]PT[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Обмен открытым текстом</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Расход аккумулятора x0.5.</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Не шифруется, усиливает помехи на один уровень и создаёт самый сильный сигнал для пеленгации.</Box>
+    </ColorBox>
   </Table>
 
-  Совпадающий COMSEC-ключ защищает FH-, SC- и CT-трафик. PT всегда передаётся открытым текстом.
+  Соответствующий ключ COMSEC защищает обмен FH, SC и CT.
 
-  ## Мощность передачи
+  PT всегда передаётся открытым текстом.
+
+  ## Выходная мощность
 
   <Table Columns="4" MinForcedColumnWidth="70">
-    <ColorBox Color="#263238"><Box Margin="4">[bold]TX[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Дальность[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Расход заряда[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Сигнатура пеленгации[/bold]</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]LO[/bold]</Box></ColorBox><ColorBox><Box Margin="4">0,6×</Box></ColorBox><ColorBox><Box Margin="4">0,5×</Box></ColorBox><ColorBox><Box Margin="4">0,5×</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]MED[/bold]</Box></ColorBox><ColorBox><Box Margin="4">1×</Box></ColorBox><ColorBox><Box Margin="4">1×</Box></ColorBox><ColorBox><Box Margin="4">1×</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]HI[/bold]</Box></ColorBox><ColorBox><Box Margin="4">1,5×</Box></ColorBox><ColorBox><Box Margin="4">2×</Box></ColorBox><ColorBox><Box Margin="4">2×</Box></ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]TX[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Дальность[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Аккумулятор[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Сигнал для пеленгации[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]LO[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">0.6x</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">0.5x</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">0.5x</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]MED[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">1x</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">1x</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">1x</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]HI[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">1.5x</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">2x</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">2x</Box>
+    </ColorBox>
   </Table>
 
   ## Шумоподавление
 
-  Качество сигнала плавно ухудшается с расстоянием от ближайшего ретранслятора: рядом сигнал чистый, во внешней зоне появляется лёгкий шум, у границы остаются отдельные фрагменты. SQL определяет, сколько повреждённого трафика вы услышите: он не восстанавливает сообщение, а только заглушает его.
+  Шумоподавление фильтрует искажённые и зашумлённые передачи. Оно не улучшает качество сигнала.
 
   <Table Columns="2" MinForcedColumnWidth="100">
-    <ColorBox Color="#263238"><Box Margin="4">[bold]SQL[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Фильтрация[/bold]</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]0[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Пропускает всё, включая сильный шум.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]1[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Подавляет сильный шум и нерасшифровываемый защищённый трафик.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]2[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Подавляет среднее ухудшение от глушения.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]3[/bold]</Box></ColorBox><ColorBox><Box Margin="4">По умолчанию. Подавляет лёгкое глушение и рваный трафик у границы дальности.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]4[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Максимальная фильтрация. Подавляет даже слегка зашумлённый дальний трафик.</Box></ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]SQL[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Фильтрация[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]0[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Пропускает все передачи, включая сильный шум.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]1[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Подавляет сильный шум и нерасшифровываемые зашифрованные передачи.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]2[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Подавляет средние искажения от подавителя.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]3[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">По умолчанию. Подавляет слабые помехи и сильно искажённые передачи на границе покрытия.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]4[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Максимальная фильтрация. Может подавлять слегка искажённые дальние передачи.</Box>
+    </ColorBox>
   </Table>
 
-  Низкий SQL позволяет слышать больше ухудшенных сообщений. Высокий SQL делает эфир тише ценой потери слабых удалённых станций.
+  Низкое шумоподавление пропускает больше искажённых передач.
 
-  ## Управление COMSEC
+  Высокое шумоподавление делает приём тише, но может скрывать слабые станции.
+
+  ## COMSEC
 
   <Table Columns="2" MinForcedColumnWidth="110">
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Действие[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Результат[/bold]</Box></ColorBox>
-    <ColorBox><Box Margin="4">Вставить карту ключей</Box></ColorBox><ColorBox><Box Margin="4">Защищает совместимый фракционный трафик в режимах FH, SC и CT.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]ZEROIZE[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Извлекает карту без повреждения.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]DESTROY[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Безвозвратно уничтожает загруженную карту.</Box></ColorBox>
-    <ColorBox><Box Margin="4">[bold]RECRYPTO[/bold]</Box></ColorBox><ColorBox><Box Margin="4">Делает все старые карты фракции устаревшими, включая захваченные. Только командные полномочия: Командир, Адъютант, Советник.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Актуальная захваченная карта</Box></ColorBox><ColorBox><Box Margin="4">Позволяет расшифровывать совместимый защищённый трафик этой фракции до RECRYPTO.</Box></ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Действие[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Результат[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Вставить карту ключей</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Защищает совместимые передачи фракции в FH, SC и CT.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]ZEROIZE[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Извлекает загруженную карту ключей.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]DESTROY[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Уничтожает загруженную карту ключей.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">[bold]RECRYPTO[/bold]</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Делает все старые карты ключей фракции недействительными. Требует полномочий Командующего Офицера, адъютанта или советника.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Захваченная действующая карта ключей</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Позволяет расшифровывать совместимые защищённые передачи этой фракции до смены ключа.</Box>
+    </ColorBox>
   </Table>
 
-  Запасные карты получают через обычную систему снабжения.
+  Новые карты ключей доступны через снабжение.
 
   ## Радиопеленгация
 
-  Следующий трафик создаёт сигнатуру пеленгации от наибольшего к наименьшему риску:
+  Сигналы для радиопеленгации, от большего риска к меньшему:
 
-  - PT-трафик.
-  - Трафик фракционной сети без подходящего ключа.
-  - Защищённый FH-трафик.
+  - передачи PT
+  - передачи сети фракции без соответствующего ключа
+  - зашифрованные передачи FH
 
-  Защищённый SC- и CT-трафик сигнатуру не создаёт.
+  Secured SC and CT traffic produce no DF signature.
 
-  Повторные передачи из одного места увеличивают вероятность обнаружения. Риск снижается примерно через минуту без новой подходящей передачи.
+  Повторные обнаруживаемые передачи с одной позиции повышают вероятность обнаружения.
 
-  [bold]RADIO CHECK[/bold] сообщает, какие станции принимают активную сеть чисто или с ухудшением.
+  Риск пеленгации начинает снижаться примерно через минуту без новой подходящей передачи.
 
-  Внутри поля помех также выдаётся направление на самый мощный источник глушения.
+  [bold]ПРОВЕРКА СВЯЗИ[/bold] сообщает, какие станции принимают текущую сеть и чистый ли у них приём.
 
-  ## SEARCH
+  В зоне подавителя ПРОВЕРКА СВЯЗИ также даёт пеленг на самый сильный подавитель.
 
-  [bold]START SEARCH[/bold] сканирует диапазон в поиске частот других фракций.
+  ## Поисковый приёмник
+
+  [bold]НАЧАТЬ ПОИСК[/bold] ищет радиопереговоры других фракций.
 
   Во время поиска:
 
   <Table Columns="2" MinForcedColumnWidth="110">
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Эффект[/bold]</Box></ColorBox>
-    <ColorBox Color="#263238"><Box Margin="4">[bold]Значение[/bold]</Box></ColorBox>
-    <ColorBox><Box Margin="4">Загруженные сети</Box></ColorBox><ColorBox><Box Margin="4">Все отключаются. Вы ничего не слышите.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Передача</Box></ColorBox><ColorBox><Box Margin="4">Заблокирована.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Полный проход диапазона</Box></ColorBox><ColorBox><Box Margin="4">Около 80 секунд.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Частота фиксируется, если</Box></ColorBox><ColorBox><Box Margin="4">На ней передавали в последние 20 секунд, источник в пределах 60 тайлов и на том же уровне.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Обнаружений до полного определения</Box></ColorBox><ColorBox><Box Margin="4">4.</Box></ColorBox>
-    <ColorBox><Box Margin="4">Исчезновение неполного контакта</Box></ColorBox><ColorBox><Box Margin="4">Полностью исчезает примерно за 50 секунд без нового обнаружения.</Box></ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Эффект[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Значение[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Загруженные сети</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Отключены на время поиска.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Передача</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Отключена.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Обзор всего диапазона</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Примерно 20 секунд.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Окно обнаружения</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Сигнал передан в течение 20 секунд, на том же уровне и в пределах 120 тайлов при MED, 72 при LO или 180 при HI.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Определение сети</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Около 3 строк при одной передаче в минуту; активные сети определяются примерно за 1 минуту.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Угасание частичного контакта</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Начинается через 2 минуты без переговоров.</Box>
+    </ColorBox>
   </Table>
 
-  Контакты ниже половины уверенности скрыты; выше половины показывают примерную частоту; при полной уверенности определяется точная частота и имя сети.
+  При обнаружении новых передач контакты раскрывают дополнительные цифры частоты.
+
+  После определения сети:
+
+  <Table Columns="2" MinForcedColumnWidth="110">
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Результат[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Эффект[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Пеленг</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Направление по компасу и расстояние, округлённое до 10 тайлов, не чаще раза в 10 секунд на сеть. Зашифрованные SC и CT не дают пеленга.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Тактическая карта</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Отмечает передатчик на 8 секунд для вашей фракции.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Попытка подбора ключа</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Одна на зашифрованную строку, хранится до 12. Вражеские ключи содержат 6 уникальных символов из A-H.</Box>
+    </ColorBox>
+  </Table>
+
+  Взломанный ключ позволяет этой радиостанции читать зашифрованные переговоры фракции до смены ключа.
 
   ## Журнал сети
 
-  Хранит последние [bold]50[/bold] записей. Трафик других фракций помечается [bold]INTERCEPT[/bold].
+  AN/PRC хранит последние [bold]50[/bold] записей радиообмена.
 
-  [bold]PRINT LOG[/bold] и [bold]PRINT INTERCEPTS[/bold] переносят журнал на бумагу.
+  Вражеские переговоры помечены [bold]ПЕРЕХВАТ[/bold].
+
+  - [bold]ПЕЧАТЬ ЖУРНАЛА[/bold] — печать всех сохранённых переговоров
+  - [bold]ПЕЧАТЬ ПЕРЕХВАТОВ[/bold] — печать только перехваченных переговоров
+
+  ## Аккумулятор
+
+  Значения ниже приведены для [bold]аккумулятора повышенной ёмкости 10000[/bold].
+
+  <Table Columns="2" MinForcedColumnWidth="110">
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Активность[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Расход энергии[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Ожидание, надета или развёрнута</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">2 в секунду</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Ожидание с POWER SAVE</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">1.2 в секунду</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Ожидание с EMCON</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">0.5 в секунду</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Ретрансляция</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">+1 в секунду; x0.5 при LO, x2 при HI</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Поиск по диапазону</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">+3 в секунду</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Передача, фраза по телефону или ретрансляция</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">18 x режим передачи x мощность; x0.7 с BURST</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Передача ключа по радио</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">100</Box>
+    </ColorBox>
+  </Table>
+
+  Примерное время работы:
+
+  - около 80 минут в ожидании
+  - около 55 минут при ретрансляции
+  - около 40-45 минут при обычной работе радиста
+
+  [bold]ENDURANCE[/bold] на расширенной панели показывает примерное оставшееся время работы при текущей конфигурации.
+
+  ## Приёмы работы с расширенной панелью
+
+  <Table Columns="3" MinForcedColumnWidth="90">
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Приём[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Расположение[/bold]</Box>
+    </ColorBox>
+    <ColorBox Color="#263238">
+      <Box Margin="4">[bold]Эффект[/bold]</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">BURST TX</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">OPT</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">На 30% меньший расход передачи и вдвое меньшая вероятность пеленгации.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">POWER SAVE</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">OPT</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">На 40% меньший расход в ожидании. Отключает SCAN и PRIORITY WATCH.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">PRIORITY WATCH</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">OPT</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Прослушивание другой ячейки при продолжении работы через ячейку В ЭФИРЕ.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">EMCON</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">OPT</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Нет передач, ретрансляции и телефонных переговоров. Нет сигнала для пеленгации. На 75% меньший расход в ожидании.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Мост ретрансляции</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">OPT > STAKED SET</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Ретранслирует переговоры между двумя ячейками развёрнутой радиостанции.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Оптимизация антенны</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">OPT > STAKED SET</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Оставайтесь неподвижны 15 секунд, чтобы увеличить дальность ретрансляции на 25% до сворачивания.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">SEND KEY OTA</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">SEC</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Передача текущего ключа доступным радиостанциям с устаревшими картами. Перезарядка 30 секунд.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Удержание контакта</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">SRCH</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Удержание частичного контакта. Каждая новая передача учитывается дважды при определении сети.</Box>
+    </ColorBox>
+
+    <ColorBox>
+      <Box Margin="4">Определение подавителя</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">SRCH</Box>
+    </ColorBox>
+    <ColorBox>
+      <Box Margin="4">Два пеленга с позиций на расстоянии не менее 12 тайлов отмечают подавитель на две минуты.</Box>
+    </ColorBox>
+  </Table>
+
+  ## Автоматическая конфигурация
+
+  Упрощённая панель обычно использует [bold]АВТО[/bold]:
+
+  - режим передачи FH
+  - мощность MED
+  - шумоподавление 3
+  - позывной владельца
+
+  [bold]ВЕРНУТЬ АВТО[/bold] на вкладке НАСТРОЙКИ восстанавливает эти параметры и сбрасывает ручные изменения расширенной панели.
 </Document>

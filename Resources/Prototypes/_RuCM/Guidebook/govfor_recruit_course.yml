@@ -1,0 +1,94 @@
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourse
+  name: rucm-guide-course-title
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Index.xml"
+  children:
+  - RuCMGOVFORRecruitCourseIntroduction
+  - RuCMGOVFORRecruitCourseMilitaryRegulations
+  - RuCMGOVFORRecruitCourseDrill
+  - RuCMGOVFORRecruitCourseCommunications
+  - RuCMGOVFORRecruitCourseFirearms
+  - RuCMGOVFORRecruitCourseTactics
+  - RuCMGOVFORRecruitCourseFirstAid
+  - RuCMGOVFORRecruitCourseTopography
+  - RuCMGOVFORRecruitCourseEngineeringBasics
+  - RuCMGOVFORRecruitCourseFieldExercise
+  - RuCMGOVFORRecruitCourseReference
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourseIntroduction
+  name: rucm-guide-course-introduction
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Introduction.xml"
+  priority: 0
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourseMilitaryRegulations
+  name: rucm-guide-course-militaryregulations
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/MilitaryRegulations.xml"
+  priority: 1
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourseDrill
+  name: rucm-guide-course-drill
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Drill.xml"
+  priority: 2
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourseCommunications
+  name: rucm-guide-course-communications
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Communications.xml"
+  priority: 3
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourseFirearms
+  name: rucm-guide-course-firearms
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Firearms.xml"
+  priority: 4
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourseTactics
+  name: rucm-guide-course-tactics
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Tactics.xml"
+  priority: 5
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourseFirstAid
+  name: rucm-guide-course-firstaid
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/FirstAid.xml"
+  priority: 6
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourseTopography
+  name: rucm-guide-course-topography
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Topography.xml"
+  priority: 7
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourseEngineeringBasics
+  name: rucm-guide-course-engineeringbasics
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/EngineeringBasics.xml"
+  priority: 8
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourseFieldExercise
+  name: rucm-guide-course-fieldexercise
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/FieldExercise.xml"
+  priority: 9
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORRecruitCourseReference
+  name: rucm-guide-course-reference
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/RecruitCourse/Reference.xml"
+  priority: 10

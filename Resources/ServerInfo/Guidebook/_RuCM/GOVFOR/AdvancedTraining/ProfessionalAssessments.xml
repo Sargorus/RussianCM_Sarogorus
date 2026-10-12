@@ -1,0 +1,24 @@
+<Document>
+  # Методики профессиональной аттестации
+
+  Выберите методику нужной специальности. Критерии публичны, чтобы кандидат заранее понимал достаточный результат. Знание профессии или прочитанная страница не заменяют активную аккредитацию по этому направлению либо предусмотренные права руководства.
+
+  Обсудите обязанности, подготовьте безопасную практическую задачу, добавьте одну реалистичную вводную и разберите результат. Различайте незнание кнопки, обычную ошибку, плохое решение, отсутствие основного навыка и опасное действие. Локальный пробел требует повторения своего блока, а не обучения всей профессии с нуля.
+
+  Используйте существующие учебные заметки для конкретного наблюдения и следующей попытки. Отметка в личном деле фиксирует показанный навык; чтение пособия, длительность занятия и запись заметки сами по себе не предоставляют квалификацию. Если кандидат соответствует надёжному базовому стандарту, не придумывайте дополнительные препятствия.
+  <!-- end-course-text -->
+  <GOVFORLocalizedText Key="rucm-guide-advanced-references"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORAssessmentMedical"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORAssessmentFieldEngineering"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORAssessmentTechnicalEngineering"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORAssessmentLogistics"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORAssessmentHeavyWeapons"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORAssessmentProfessionalCommunications"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORAssessmentAviation"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORAssessmentVehicleCrew"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORAssessmentDroneOperator"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORAssessmentMilitaryPolice"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORAssessmentIntelligence"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORProfessionalTraining"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORTrainingQualifications"/>
+</Document>

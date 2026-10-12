@@ -248,7 +248,7 @@ public abstract partial class SharedParaDropSystem : EntitySystem
             // Cancel the jump if there is no viable target
             if (randomCoordinates == null)
             {
-                _popup.PopupClient(Loc.GetString("rmc-dropship-paradrop-failed "), dropping, PopupType.SmallCaution);
+                _popup.PopupSelf(Loc.GetString("rmc-dropship-paradrop-failed "), dropping, PopupType.SmallCaution);
                 return;
             }
 
@@ -315,15 +315,16 @@ public abstract partial class SharedParaDropSystem : EntitySystem
     private bool TryGetParaDropLocation(EntityCoordinates targetLocation, int dropScatter, out EntityCoordinates adjustedLocation)
     {
         adjustedLocation = default;
+        var targetMap = _transform.GetMapId(targetLocation); // CMU: scatter on the chosen AO only.
         var distressQuery = EntityQueryEnumerator<RMCPlanetComponent>();
         while (distressQuery.MoveNext(out var grid, out _))
         {
-            if (!TryComp<MapGridComponent>(grid, out var gridComp))
+            if (Transform(grid).MapID != targetMap || !TryComp<MapGridComponent>(grid, out var gridComp))
                 continue;
 
             var position = _mapSystem.LocalToTile(grid, gridComp, targetLocation);
             var dropArea = new Box2(position.X - dropScatter, position.Y - dropScatter, position.X + dropScatter, position.Y + dropScatter);
-            var enumerable = _mapSystem.GetTilesEnumerator(grid, gridComp, dropArea);
+            var enumerable = _mapSystem.GetTilesIntersecting(grid, gridComp, dropArea);
 
             var viableTiles = new List<TileRef>();
             while (enumerable.MoveNext(out var tileRef))
@@ -335,7 +336,7 @@ public abstract partial class SharedParaDropSystem : EntitySystem
             }
 
             if (viableTiles.Count == 0)
-                return false;
+                continue; // CMU: another grid on this map may contain the target.
 
             var random = _random.Next(0, viableTiles.Count);
             adjustedLocation = _mapSystem.GridTileToLocal(grid, gridComp, viableTiles[random].GridIndices);

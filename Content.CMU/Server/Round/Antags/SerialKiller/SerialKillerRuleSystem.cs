@@ -7,7 +7,7 @@ namespace Content.Server.CMU14.Round.Antags.SerialKiller;
 
 public sealed partial class SerialKillerRuleSystem : GameRuleSystem<SerialKillerRuleComponent>
 {
-    [Dependency] private readonly WantedSystem _wantedSystem = default!;
+    [Dependency] private WantedSystem _wantedSystem = default!;
 
     public override void Initialize()
     {
@@ -16,7 +16,5 @@ public sealed partial class SerialKillerRuleSystem : GameRuleSystem<SerialKiller
     }
 
     private void OnSerialKillerSpawned(EntityUid uid, SerialKillerComponent component, ComponentStartup args)
-    {
-        _wantedSystem.SendPaperToGroup(ColonyCmbFax.MarshalBureauFaxGroup, "AUPaperSerialKiller");
-    }
+        => _wantedSystem.SendPaperToGroup(ColonyCmbFax.MarshalBureauFaxGroup, "AUPaperSerialKiller");
 }

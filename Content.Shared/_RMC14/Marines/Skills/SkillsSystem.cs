@@ -185,7 +185,7 @@ public sealed partial class SkillsSystem : EntitySystem
         if (!HasAllSkills(args.User, ent.Comp.Skills))
         {
             var msg = Loc.GetString("rmc-skills-cant-use", ("item", args.Used));
-            _popup.PopupClient(msg, args.User, PopupType.SmallCaution);
+            _popup.PopupSelf(msg, args.User, PopupType.SmallCaution);
             args.Handled = true;
         }
     }
@@ -198,7 +198,7 @@ public sealed partial class SkillsSystem : EntitySystem
         if (!HasAllSkills(args.User, ent.Comp.Skills))
         {
             var msg = Loc.GetString("rmc-skills-no-training", ("target", ent));
-            _popup.PopupClient(msg, args.User, PopupType.SmallCaution);
+            _popup.PopupSelf(msg, args.User, PopupType.SmallCaution);
             args.Cancel();
         }
     }
@@ -208,7 +208,7 @@ public sealed partial class SkillsSystem : EntitySystem
         if (!HasAllSkills(args.User, ent.Comp.Skills))
         {
             var msg = Loc.GetString("rmc-skills-cant-use", ("item", ent));
-            _popup.PopupClient(msg, args.User, args.User, PopupType.SmallCaution);
+            _popup.PopupEntity(msg, args.User, args.User, PopupType.SmallCaution);
             args.Handled = true;
         }
     }
@@ -218,7 +218,7 @@ public sealed partial class SkillsSystem : EntitySystem
         if (!HasAllSkills(args.User, ent.Comp.Skills))
         {
             var msg = Loc.GetString("rmc-skills-cant-use", ("item", ent));
-            _popup.PopupClient(msg, args.User, args.User, PopupType.SmallCaution);
+            _popup.PopupEntity(msg, args.User, args.User, PopupType.SmallCaution);
             args.Cancelled = true;
         }
     }
@@ -242,7 +242,7 @@ public sealed partial class SkillsSystem : EntitySystem
         if (!HasAllSkills(args.User, ent.Comp.Skills))
         {
             var msg = Loc.GetString("rmc-skills-cant-use", ("item", ent));
-            _popup.PopupClient(msg, args.User, args.User, PopupType.SmallCaution);
+            _popup.PopupEntity(msg, args.User, args.User, PopupType.SmallCaution);
             args.Handled = true;
         }
     }
@@ -272,7 +272,7 @@ public sealed partial class SkillsSystem : EntitySystem
             if (_toggle.IsActivated(ent.Owner) && _toggle.TryDeactivate(ent.Owner, args.EquipTarget) && ent.Comp.Popup != null)
             {
                 var msg = Loc.GetString(ent.Comp.Popup, ("item", ent));
-                _popup.PopupClient(msg, args.EquipTarget, args.EquipTarget, PopupType.SmallCaution);
+                _popup.PopupEntity(msg, args.EquipTarget, args.EquipTarget, PopupType.SmallCaution);
             }
         }
     }
@@ -365,7 +365,7 @@ public sealed partial class SkillsSystem : EntitySystem
         var skillsDict = ImmutableDictionary.CreateBuilder<string, EntProtoId<SkillDefinitionComponent>>();
         foreach (var prototype in _prototypes.EnumeratePrototypes<EntityPrototype>())
         {
-            if (!prototype.HasComponent<SkillDefinitionComponent>())
+            if (!prototype.HasComp<SkillDefinitionComponent>(_compFactory))
                 continue;
 
             var id = prototype.ID;
@@ -408,10 +408,9 @@ public sealed partial class SkillsSystem : EntitySystem
             DebugTools.Assert(msg);
         }
 
-        if (!_skillsQuery.Resolve(ent, ref ent.Comp, false))
-            return 0;
-
-        return ent.Comp.Skills.GetValueOrDefault(skill);
+        // CMU14: keep role skills immutable; every gameplay query sees the session overlay.
+        var normal = _skillsQuery.Resolve(ent, ref ent.Comp, false) ? ent.Comp.Skills.GetValueOrDefault(skill) : 0;
+        return CMUTrainingLevel(ent.Owner, skill, normal);
     }
 
     public bool HasSkills(Entity<SkillsComponent?> ent, SkillWhitelist whitelist)
@@ -430,11 +429,7 @@ public sealed partial class SkillsSystem : EntitySystem
             if (requiredLevel <= 0)
                 continue;
 
-            if (ent.Comp == null)
-                return false;
-
-            if (!ent.Comp.Skills.TryGetValue(requiredSkill, out var level) ||
-                level < requiredLevel)
+            if (GetSkill(ent, requiredSkill) < requiredLevel) // CMU14
             {
                 return false;
             }
@@ -456,11 +451,7 @@ public sealed partial class SkillsSystem : EntitySystem
             if (required.Level <= 0)
                 continue;
 
-            if (ent.Comp == null)
-                return false;
-
-            if (!ent.Comp.Skills.TryGetValue(required.Type, out var level) ||
-                level < required.Level)
+            if (GetSkill(ent, required.Type) < required.Level) // CMU14
             {
                 return false;
             }
@@ -480,9 +471,7 @@ public sealed partial class SkillsSystem : EntitySystem
             if (requiredLevel <= 0)
                 continue;
 
-            if (ent.Comp != null &&
-                ent.Comp.Skills.TryGetValue(requiredSkill, out var level) &&
-                level >= requiredLevel)
+            if (GetSkill(ent, requiredSkill) >= requiredLevel) // CMU14
             {
                 return true;
             }
@@ -504,9 +493,7 @@ public sealed partial class SkillsSystem : EntitySystem
             if (required.Level <= 0)
                 continue;
 
-            if (ent.Comp != null &&
-                ent.Comp.Skills.TryGetValue(required.Type, out var level) &&
-                level >= required.Level)
+            if (GetSkill(ent, required.Type) >= required.Level) // CMU14
             {
                 return false;
             }
@@ -523,9 +510,7 @@ public sealed partial class SkillsSystem : EntitySystem
         if (required <= 0)
             return true;
 
-        return _skillsQuery.Resolve(ent, ref ent.Comp, false) &&
-               ent.Comp.Skills.TryGetValue(skill, out var level) &&
-               level >= required;
+        return GetSkill(ent, skill) >= required; // CMU14: authoritative temporary training access.
     }
 
     public void IncrementSkill(Entity<SkillsComponent?> ent, EntProtoId<SkillDefinitionComponent> skill, int by = 1)
@@ -575,7 +560,7 @@ public sealed partial class SkillsSystem : EntitySystem
         }
 
         DebugTools.Assert(_prototypes.TryIndex(skill, out var entProto) &&
-                     entProto.HasComponent<SkillDefinitionComponent>());
+                     entProto.HasComp<SkillDefinitionComponent>(_compFactory));
 
         ent.Comp ??= EnsureComp<SkillsComponent>(ent);
 

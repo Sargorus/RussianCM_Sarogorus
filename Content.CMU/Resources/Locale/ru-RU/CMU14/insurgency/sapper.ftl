@@ -65,7 +65,7 @@ insfor-sapper-atm-already-hacked = Этот банкомат уже полнос
 insfor-sapper-atm-hacked = Банкомат содрогается и выплёвывает наличные на сумму {$amount}.
 insfor-sapper-atm-malfunction = ОШИБКА: УСТРОЙСТВО НЕИСПРАВНО. ОБРАТИТЕСЬ К АДМИНИСТРАТОРУ.
 insfor-sapper-console-drained = Средства с консоли выводятся наружу — выпадает {$amount} наличными.
-insfor-sapper-asrs-drained = Средства со счёта ASRS оказываются у вас в руках — {$amount} наличными.
+insfor-sapper-asrs-drained = Средства со счёта АСХВ оказываются у вас в руках — {$amount} наличными.
 insfor-sapper-asrs-empty = На этом терминале нет средств для вывода.
 
 # Сеть шпионских камер.
@@ -76,3 +76,5 @@ insfor-sapper-snare-caught = Петля резко затягивается во
 insfor-sapper-snare-struggled-free = Вы с усилием освобождаетесь из петли.
 insfor-sapper-snare-cutting = Вы начинаете разрезать петлю, освобождая попавшего в неё.
 insfor-sapper-snare-cut-free = Петля перерезана, и вы падаете на землю.
+insfor-sapper-atm-message-title = Устройство для выкачивания средств
+insfor-sapper-atm-message-prompt = Оставьте сообщение на экране банкомата до завершения его самовосстановления (необязательно, до {$max} символов)

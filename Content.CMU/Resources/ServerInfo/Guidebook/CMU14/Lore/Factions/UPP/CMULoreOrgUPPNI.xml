@@ -1,0 +1,16 @@
+<Document>
+  # Морская пехота UPP
+
+  <Box>
+    <CMUGuideOutfitEmbed Gear="CMUGearUPPLineRifleman" Caption="Стрелок"/>
+    <CMUGuideOutfitEmbed Gear="CMUGearUPPLineMedic" Caption="Медик"/>
+    <CMUGuideOutfitEmbed Gear="CMUGearUPPLineLeader" Caption="Командир"/>
+  </Box>
+  [bold]Морская пехота[/bold] — ударные войска [textlink="Союза прогрессивных народов" link="CMUGuideLoreUPP"], аналог колониальных морпехов. Флоты UPP доставляют их на войну, и они сражаются на планетах везде, где расширяется Союз.
+
+  ## В разработке
+  Эта страница ещё пишется.
+
+  ## Доступные подразделения
+  - [textlink="UPP «Северные звёзды»" link="CMUGuideLorePlatoonUPP"]
+</Document>

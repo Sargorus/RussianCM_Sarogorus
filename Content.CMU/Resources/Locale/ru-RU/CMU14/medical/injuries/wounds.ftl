@@ -40,3 +40,5 @@ cmu-robotic-limb-repair-brute-finish-others = { THE($user) } устраняет 
 cmu-robotic-limb-repair-burn-finish-self = Вы ремонтируете обгоревшую проводку в своей { $limb } с помощью { THE($tool) }.
 cmu-robotic-limb-repair-burn-finish-user = Вы ремонтируете обгоревшую проводку в { $limb } у { THE($target) } с помощью { THE($tool) }.
 cmu-robotic-limb-repair-burn-finish-others = { THE($user) } ремонтирует обгоревшую проводку в { $limb } у { THE($target) } с помощью { THE($tool) }.
+cmu-medical-tourniquet-applied-stump = Жгут наложен на культю.
+cmu-medical-tourniquet-verb-remove-stump = Снять жгут с культи

@@ -1,0 +1,71 @@
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFOR
+  name: rucm-guide-entry-govfor
+  priority: 3
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/Index.xml"
+  children:
+  - RuCMGOVFORBasicDocuments
+  - RuCMGOVFORService
+  - RuCMGOVFORTraining
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORBasicDocuments
+  name: rucm-guide-entry-basic
+  priority: 0
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/BasicDocuments.xml"
+  children:
+  - AU14SOP
+  - AU14UCMJ
+  - RuCMGOVFORDrillRegulations
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORService
+  name: rucm-guide-entry-service
+  priority: 1
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/Service.xml"
+  children:
+  - RuCMGOVFORCommunications
+  - RuCMGOVFORUnitCommand
+  - RuCMGOVFORTrainingQualifications
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORTraining
+  name: rucm-guide-entry-training
+  priority: 2
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/Training.xml"
+  children:
+  - RuCMGOVFORRecruitCourse
+  - RuCMGOVFORInstructorHandbook
+  - RuCMGOVFORSergeantCourse
+  - RuCMGOVFORSergeantAssessment
+  - RuCMGOVFOROfficerCourse
+  - RuCMGOVFOROfficerAssessment
+  - RuCMGOVFORProfessionalTraining
+  - RuCMGOVFORProfessionalAssessments
+  - RuCMGOVFORCommandingOfficerCourse
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCommunications
+  name: rucm-guide-entry-communications
+  priority: 0
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/Communications.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORUnitCommand
+  name: rucm-guide-entry-command
+  priority: 1
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/UnitCommand.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORTrainingQualifications
+  name: rucm-guide-entry-qualifications
+  priority: 2
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/TrainingQualifications.xml"
+

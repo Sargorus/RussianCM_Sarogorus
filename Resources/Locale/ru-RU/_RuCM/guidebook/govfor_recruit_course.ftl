@@ -1,0 +1,14 @@
+rucm-guide-course-title = Курс молодого бойца GOVFOR
+rucm-guide-course-purpose = Практическое пособие для рекрутов по прохождению рядовой подготовки. Оно объясняет применение действующих правил и не заменяет СОП, ЕКВЮ и служебные документы. Выберите введение или нужное направление занятия. Чтение материала само по себе не засчитывает подготовку.
+rucm-guide-course-references = Связанные нормативные материалы
+rucm-guide-course-introduction = Введение
+rucm-guide-course-militaryregulations = Общевоинская подготовка
+rucm-guide-course-drill = Строевая подготовка
+rucm-guide-course-communications = Связь
+rucm-guide-course-firearms = Огневая подготовка
+rucm-guide-course-tactics = Тактическая подготовка
+rucm-guide-course-firstaid = Военно-медицинская подготовка
+rucm-guide-course-topography = Военная топография
+rucm-guide-course-engineeringbasics = Инженерная подготовка
+rucm-guide-course-fieldexercise = Учебные сборы
+rucm-guide-course-reference = Типичные ошибки и памятка

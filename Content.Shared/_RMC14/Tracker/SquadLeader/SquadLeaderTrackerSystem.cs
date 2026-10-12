@@ -183,6 +183,7 @@ public sealed partial class SquadLeaderTrackerSystem : EntitySystem
 
     private void OnSquadLeaderTrackerChangeMode(Entity<SquadLeaderTrackerComponent> ent, ref SquadLeaderTrackerChangeModeEvent args)
     {
+        if (HasComp<Content.Shared.CMU14.Qualifications.Training.CMUTrainingNavigationComponent>(ent)) return; // CMU14
         if (!_timing.IsFirstTimePredicted)
             return;
 
@@ -250,6 +251,7 @@ public sealed partial class SquadLeaderTrackerSystem : EntitySystem
 
     private void OnLeaderTrackerSelectTargetEvent(Entity<SquadLeaderTrackerComponent> ent, ref LeaderTrackerSelectTargetEvent args)
     {
+        if (HasComp<Content.Shared.CMU14.Qualifications.Training.CMUTrainingNavigationComponent>(ent)) return; // CMU14
         ent.Comp.ManualMode = true;
         SetTarget(ent, GetEntity(args.Target));
         SetMode(ent, args.Mode);
@@ -459,6 +461,11 @@ public sealed partial class SquadLeaderTrackerSystem : EntitySystem
 
     private bool CanChangeFireteamMember(EntityUid user, EntityUid target, bool add, EntityUid? trackerOwner = null)
     {
+        // cmu edit start: auxiliary squads have no fireteams
+        if (add && CMUInAuxiliarySquad(target))
+            return false;
+        // cmu edit end
+
         // Allow direct squad leaders immediately.
         if (HasComp<SquadLeaderComponent>(user))
         {
@@ -709,7 +716,7 @@ public sealed partial class SquadLeaderTrackerSystem : EntitySystem
                 var trackingComponent = _factory.GetComponent(trackerMode.Component).GetType();
                 var targetName = "";
 
-                if (EntityManager.TryGetComponent(trackableUid, trackingComponent, out _))
+                if (TryComp(trackableUid, trackingComponent, out _))
                 {
                     if (!_net.IsClient)
                         targetName = Name(trackableUid);
@@ -795,6 +802,7 @@ public sealed partial class SquadLeaderTrackerSystem : EntitySystem
                 continue;
 
             tracker.UpdateAt = time + tracker.UpdateEvery;
+            if (CMUUpdateTrainingNavigation((uid, tracker))) continue; // CMU14: only the server-assigned teaching target.
             var targetSquadName = "";
 
             if (tracker.Target is { } deletedTarget && TerminatingOrDeleted(deletedTarget)) // CMU14: target can die while tracked; prune before any use so map lookups and PVS sync don't error
@@ -895,7 +903,7 @@ public sealed partial class SquadLeaderTrackerSystem : EntitySystem
                 if (trackerMode.Component != null)
                 {
                     var trackingComponent = _factory.GetComponent(trackerMode.Component).GetType();
-                    if (EntityManager.TryGetComponent(trackableUid, trackingComponent, out _))
+                    if (TryComp(trackableUid, trackingComponent, out _))
                     {
                         SetTarget((uid, tracker), trackableUid);
 

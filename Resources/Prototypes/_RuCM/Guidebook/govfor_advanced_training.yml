@@ -1,0 +1,236 @@
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORSergeantCourse
+  name: rucm-guide-advanced-sergeantcourse
+  priority: 2
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/SergeantCourse.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORSergeantAssessment
+  name: rucm-guide-advanced-sergeantassessment
+  priority: 3
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/SergeantAssessment.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFOROfficerCourse
+  name: rucm-guide-advanced-officercourse
+  priority: 4
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/OfficerCourse.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFOROfficerAssessment
+  name: rucm-guide-advanced-officerassessment
+  priority: 5
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/OfficerAssessment.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCourseMedical
+  name: rucm-guide-advanced-coursemedical
+  priority: 4
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseMedical.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORAssessmentMedical
+  name: rucm-guide-advanced-assessmentmedical
+  priority: 5
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentMedical.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCourseFieldEngineering
+  name: rucm-guide-advanced-coursefieldengineering
+  priority: 6
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseFieldEngineering.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORAssessmentFieldEngineering
+  name: rucm-guide-advanced-assessmentfieldengineering
+  priority: 7
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentFieldEngineering.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCourseTechnicalEngineering
+  name: rucm-guide-advanced-coursetechnicalengineering
+  priority: 8
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseTechnicalEngineering.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORAssessmentTechnicalEngineering
+  name: rucm-guide-advanced-assessmenttechnicalengineering
+  priority: 9
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentTechnicalEngineering.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCourseLogistics
+  name: rucm-guide-advanced-courselogistics
+  priority: 10
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseLogistics.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORAssessmentLogistics
+  name: rucm-guide-advanced-assessmentlogistics
+  priority: 11
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentLogistics.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCourseHeavyWeapons
+  name: rucm-guide-advanced-courseheavyweapons
+  priority: 12
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseHeavyWeapons.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORAssessmentHeavyWeapons
+  name: rucm-guide-advanced-assessmentheavyweapons
+  priority: 13
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentHeavyWeapons.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCourseProfessionalCommunications
+  name: rucm-guide-advanced-courseprofessionalcommunications
+  priority: 14
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseProfessionalCommunications.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORAssessmentProfessionalCommunications
+  name: rucm-guide-advanced-assessmentprofessionalcommunications
+  priority: 15
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentProfessionalCommunications.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCourseAviation
+  name: rucm-guide-advanced-courseaviation
+  priority: 16
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseAviation.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORAssessmentAviation
+  name: rucm-guide-advanced-assessmentaviation
+  priority: 17
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentAviation.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCourseVehicleCrew
+  name: rucm-guide-advanced-coursevehiclecrew
+  priority: 18
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseVehicleCrew.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORAssessmentVehicleCrew
+  name: rucm-guide-advanced-assessmentvehiclecrew
+  priority: 19
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentVehicleCrew.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCourseDroneOperator
+  name: rucm-guide-advanced-coursedroneoperator
+  priority: 20
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseDroneOperator.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORAssessmentDroneOperator
+  name: rucm-guide-advanced-assessmentdroneoperator
+  priority: 21
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentDroneOperator.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCourseMilitaryPolice
+  name: rucm-guide-advanced-coursemilitarypolice
+  priority: 22
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseMilitaryPolice.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORAssessmentMilitaryPolice
+  name: rucm-guide-advanced-assessmentmilitarypolice
+  priority: 23
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentMilitaryPolice.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCourseIntelligence
+  name: rucm-guide-advanced-courseintelligence
+  priority: 24
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CourseIntelligence.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORAssessmentIntelligence
+  name: rucm-guide-advanced-assessmentintelligence
+  priority: 25
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/AssessmentIntelligence.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCommandingOfficerCourse
+  name: rucm-guide-advanced-commandingofficercourse
+  priority: 8
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CommandingOfficerCourse.xml"
+  children:
+  - RuCMGOVFORCommandingOfficerInterview
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORCommandingOfficerInterview
+  name: rucm-guide-advanced-commandingofficerinterview
+  priority: 27
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/CommandingOfficerInterview.xml"
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORProfessionalTraining
+  name: rucm-guide-advanced-professionaltraining
+  priority: 6
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/ProfessionalTraining.xml"
+  children:
+  - RuCMGOVFORCourseMedical
+  - RuCMGOVFORCourseFieldEngineering
+  - RuCMGOVFORCourseTechnicalEngineering
+  - RuCMGOVFORCourseLogistics
+  - RuCMGOVFORCourseHeavyWeapons
+  - RuCMGOVFORCourseProfessionalCommunications
+  - RuCMGOVFORCourseAviation
+  - RuCMGOVFORCourseVehicleCrew
+  - RuCMGOVFORCourseDroneOperator
+  - RuCMGOVFORCourseMilitaryPolice
+  - RuCMGOVFORCourseIntelligence
+
+- type: guideEntry
+  parent: RMC
+  id: RuCMGOVFORProfessionalAssessments
+  name: rucm-guide-advanced-professionalassessments
+  priority: 7
+  text: "/ServerInfo/Guidebook/_RuCM/GOVFOR/AdvancedTraining/ProfessionalAssessments.xml"
+  children:
+  - RuCMGOVFORAssessmentMedical
+  - RuCMGOVFORAssessmentFieldEngineering
+  - RuCMGOVFORAssessmentTechnicalEngineering
+  - RuCMGOVFORAssessmentLogistics
+  - RuCMGOVFORAssessmentHeavyWeapons
+  - RuCMGOVFORAssessmentProfessionalCommunications
+  - RuCMGOVFORAssessmentAviation
+  - RuCMGOVFORAssessmentVehicleCrew
+  - RuCMGOVFORAssessmentDroneOperator
+  - RuCMGOVFORAssessmentMilitaryPolice
+  - RuCMGOVFORAssessmentIntelligence
+

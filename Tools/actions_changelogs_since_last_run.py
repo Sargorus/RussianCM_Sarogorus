@@ -1,378 +1,349 @@
 #!/usr/bin/env python3
-"""
-Sends updates to a Discord webhook for new changelog entries.
-By default it compares against the last successful GitHub Actions run. Workflows can
-also pass CHANGELOG_PREVIOUS_REF to compare against a local git ref.
+# CMU14 Begin: downstream changelog assembly and Russian Discord delivery.
+"""Translate integrated changelogs and publish using a durable delivery journal.
+
+--dry-run reads journal state and writes a preview, without Discord or journal writes.
+Upstream entries are read from this checkout, never from an upstream's current HEAD.
 """
 
-import itertools
+import argparse
+import copy
+import datetime as dt
+import hashlib
+import json
 import os
-import subprocess
+import re
 import sys
-import urllib.parse
+import time
 from pathlib import Path
-from typing import Any, Iterable
+from urllib.parse import urlparse
 
 import requests
-import yaml
-import time
 
-DEBUG = os.environ.get("SS14_CHANGELOG_DEBUG", "").lower() in {"1", "true", "yes"}
-DEBUG_CHANGELOG_FILE_OLD = Path("Resources/Changelog/Old.yml")
-DEBUG_DISCORD_DUMP_FILE = Path("Resources/Changelog/DiscordDebug.md")
-GITHUB_API_URL = os.environ.get("GITHUB_API_URL", "https://api.github.com")
+sys.path.insert(0, str(Path(__file__).resolve().parent / "_CMU14" / "Changelog"))
 
-# https://discord.com/developers/docs/resources/webhook
+from changelog_discord_state import FileStateStore, GitHubStateStore, empty_state
+from changelog_translation import RussianTranslator, POLICY_FILE
+from changelog_translation_cache import load_translation_cache, save_translation_cache
+from update_changelog import load_yaml, entry_key
+from update_changelog_parts import parse_time
+
+DEFAULT_FILES = [f"Resources/Changelog/{name}.yml" for name in
+                 ("CMU", "RMC14", "Changelog", "Maps", "Admin", "Rules")]
+SECTION_NAMES = {"CMU": "CMU", "RMC14": "RMC14", "Changelog": "SS14",
+                 "Maps": "Карты", "Admin": "Администрирование", "Rules": "Правила"}
+TYPES_TO_EMOJI = {"Fix": "🔧", "Add": "✨", "Remove": "🔥", "Tweak": "🎚️",
+                  "Code": "🛠️", "Map": "📍", "Admin": "🛡️"}
 DISCORD_SPLIT_LIMIT = 2000
-DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
-TRUNCATION_SUFFIX = " [...]"
-
-CHANGELOG_FILE = os.environ.get("CHANGELOG_FILE", "Resources/Changelog/CMU.yml")
-CHANGELOG_PREVIOUS_REF = os.environ.get("CHANGELOG_PREVIOUS_REF")
-
-TYPES_TO_EMOJI = {
-    "Fix": "🔧",
-    "Add": "✨",
-    "Remove": "🔥",
-    "Tweak": "🎚️",
-    "Code": "🛠️",
-    "Map": "📍",
-    "Admin": "🛡️",
-}
-
-EXPERIMENTAL_LABEL = "Intent: Experimental"
-EXPERIMENTAL_EMOJI = "🧪"
-
-ChangelogEntry = dict[str, Any]
 
 
-def main():
-    if not DEBUG and not DISCORD_WEBHOOK_URL:
-        print("No discord webhook URL found, skipping discord send")
-        exit(1)
-
-    if DEBUG:
-        # to debug this script locally, you can use
-        # a separate local file as the old changelog
-        last_changelog_stream = DEBUG_CHANGELOG_FILE_OLD.read_text(encoding="utf-8-sig")
-    elif CHANGELOG_PREVIOUS_REF:
-        last_changelog_stream = get_last_changelog_by_ref(CHANGELOG_PREVIOUS_REF)
-    else:
-        # when running this normally in a GitHub actions workflow,
-        # it will get the old changelog from the GitHub API
-        last_changelog_stream = get_last_changelog()
-
-    last_changelog = yaml.safe_load(last_changelog_stream)
-    with open(CHANGELOG_FILE, "r", encoding="utf-8-sig") as f:
-        cur_changelog = yaml.safe_load(f)
-
-    diff = diff_changelog(last_changelog, cur_changelog)
-    message_lines = changelog_entries_to_message_lines(diff)
-
-    if DEBUG:
-        dump_debug_markdown(message_lines)
-        return
-
-    send_message_lines(message_lines)
+class DeliveryRejected(RuntimeError):
+    """Discord explicitly rejected a message, so retrying is safe."""
 
 
-def get_most_recent_workflow(
-    sess: requests.Session, github_repository: str, github_run: str
-) -> Any:
-    workflow_run = get_current_run(sess, github_repository, github_run)
-    past_runs = get_past_runs(sess, workflow_run)
-    for run in past_runs:
-        return run
-    return None  # no previous successful run
+def entry_signature(entry):
+    return entry_key(entry)
 
 
-def get_current_run(
-    sess: requests.Session, github_repository: str, github_run: str
-) -> Any:
-    resp = sess.get(
-        f"{GITHUB_API_URL}/repos/{github_repository}/actions/runs/{github_run}"
-    )
-    resp.raise_for_status()
-    return resp.json()
-
-
-def get_past_runs(sess: requests.Session, current_run: Any) -> Iterable[Any]:
-    """
-    Get all successful workflow runs before our current one.
-    """
-    params = {
-        "status": "success",
-        "created": f"<={current_run['created_at']}",
-        "per_page": 100,
-    }
-    url = f"{current_run['workflow_url']}/runs"
-
-    while url:
-        resp = sess.get(url, params=params)
-        resp.raise_for_status()
-
-        for run in resp.json()["workflow_runs"]:
-            # First past successful run that isn't our current run.
-            if run["id"] == current_run["id"]:
-                continue
-
-            yield run
-
-        next_url = resp.links.get("next", {}).get("url")
-        if not next_url:
-            break
-
-        url = next_url
-        params = None
-
-
-def get_last_changelog() -> str:
-    github_repository = os.environ["GITHUB_REPOSITORY"]
-    github_run = os.environ["GITHUB_RUN_ID"]
-    github_token = os.environ["GITHUB_TOKEN"]
-
-    session = requests.Session()
-    session.headers["Authorization"] = f"Bearer {github_token}"
-    session.headers["Accept"] = "application/vnd.github+json"
-    session.headers["X-GitHub-Api-Version"] = "2022-11-28"
-
-    most_recent = get_most_recent_workflow(session, github_repository, github_run)
-    if most_recent is None:
-        print("No previous successful run found.")
-        # return yaml.dump({"Entries": []}) # use this to seed (send all changelogs)
-        exit(0)  # use this if we want to send new changes only
-
-    last_sha = most_recent["head_commit"]["id"]
-    print(f"Last successful publish job was {most_recent['id']}: {last_sha}")
-    last_changelog_stream = get_last_changelog_by_sha(
-        session, last_sha, github_repository
-    )
-
-    return last_changelog_stream
-
-
-def get_last_changelog_by_sha(
-    sess: requests.Session, sha: str, github_repository: str
-) -> str:
-    """
-    Use GitHub API to get the previous version of the changelog YAML (Actions builds are fetched with a shallow clone)
-    """
-    params = {
-        "ref": sha,
-    }
-    headers = {"Accept": "application/vnd.github.raw"}
-
-    resp = sess.get(
-        f"{GITHUB_API_URL}/repos/{github_repository}/contents/{CHANGELOG_FILE}",
-        headers=headers,
-        params=params,
-    )
-    resp.raise_for_status()
-    return resp.text
-
-
-def get_last_changelog_by_ref(ref: str) -> str:
-    """
-    Get the previous changelog from a local git ref.
-    """
-    return subprocess.check_output(
-        ["git", "show", f"{ref}:{CHANGELOG_FILE}"],
-        text=True,
-    )
-
-
-def changelog_entry_signature(
-    entry: ChangelogEntry,
-) -> tuple[str | None, str | None, str | None]:
-    """
-    After reaching MAX_ENTRIES, IDs will renumber at newest and prunes old.
-    So this serves as a stable diff PK (previously IDs) to check for new changes.
-    """
-    return (
-        entry.get("author"),
-        entry.get("time"),
-        entry.get("url"),
-    )
-
-
-def diff_changelog(
-    old: dict[str, Any], cur: dict[str, Any]
-) -> Iterable[ChangelogEntry]:
-    """
-    Find all new entries not present in the previous publish.
-    """
-    old_entries = {changelog_entry_signature(e) for e in old.get("Entries", [])}
-    diff = [
-        e
-        for e in cur.get("Entries", [])
-        if changelog_entry_signature(e) not in old_entries
-    ]
-    print(
-        f"Old={len(old.get('Entries', []))} "
-        f"Current={len(cur.get('Entries', []))} "
-        f"New={len(diff)}"
-    )
+def diff_changelog(old, current):
+    previous = {entry_signature(e) for e in (old or {}).get("Entries", [])}
+    seen = set(previous)
+    diff = []
+    for entry in (current or {}).get("Entries", []):
+        key = entry_signature(entry)
+        if key not in seen:
+            diff.append(entry)
+            seen.add(key)
     return diff
 
 
-def get_discord_body(content: str):
-    return {
-        "content": content,
-        # Do not allow any mentions.
-        "allowed_mentions": {"parse": []},
-        # SUPPRESS_EMBEDS
-        "flags": 1 << 2,
-    }
+def delivery_key(source, entry):
+    return hashlib.sha256(json.dumps([source, entry_signature(entry)], ensure_ascii=False).encode()).hexdigest()
 
 
-def send_discord_webhook(lines: list[str]):
-    content = "".join(lines)
-    body = get_discord_body(content)
-    retry_attempt = 0
-
-    try:
-        response = requests.post(DISCORD_WEBHOOK_URL, json=body, timeout=10)
-        while response.status_code == 429:
-            retry_attempt += 1
-            if retry_attempt > 20:
-                print(
-                    "Too many retries on a single request despite following retry_after header... giving up"
-                )
-                exit(1)
-            retry_after = response.json().get("retry_after", 5)
-            print(f"Rate limited, retrying after {retry_after} seconds")
-            time.sleep(retry_after)
-            response = requests.post(DISCORD_WEBHOOK_URL, json=body, timeout=10)
-        response.raise_for_status()
-    except requests.exceptions.RequestException as e:
-        print(f"Failed to send message: {e}")
-        exit(1)
+def entry_date(entry):
+    if not entry.get("time"):
+        # Legacy hand-written records without dates are historical at bootstrap,
+        # but a newly arriving undated record is still delivered after initialization.
+        return dt.datetime.min.replace(tzinfo=dt.timezone.utc)
+    return parse_time(str(entry["time"]))
 
 
-def truncate_to_limit(text: str, limit: int) -> str:
-    if len(text) <= limit:
-        return text
-
-    if limit <= len(TRUNCATION_SUFFIX):
-        return TRUNCATION_SUFFIX[:limit]
-
-    return text[: limit - len(TRUNCATION_SUFFIX)].rstrip() + TRUNCATION_SUFFIX
-
-
-def create_change_line(emoji: str, message: str, url: str | None) -> str:
-    if url is None:
-        prefix = f"{emoji} - "
-        suffix = "\n"
-    else:
-        pr_number = urllib.parse.urlparse(url).path.rstrip("/").split("/")[-1]
-        prefix = f"{emoji} - "
-        suffix = f" ([#{pr_number}]({url}))\n"
-
-    available_message_length = DISCORD_SPLIT_LIMIT - len(prefix) - len(suffix)
-    if available_message_length < 1:
-        raise ValueError(f"Rendered changelog line has no room for a message: {url}")
-
-    message = truncate_to_limit(message, available_message_length)
-    return f"{prefix}{message}{suffix}"
+def load_entries(files):
+    entries = {}
+    for filename in files:
+        source = Path(filename).stem
+        for raw in load_yaml(filename).get("Entries", []):
+            entry = copy.deepcopy(raw)
+            if not entry.get("changes"):
+                continue
+            entry_date(entry)
+            key = delivery_key(source, entry)
+            if key in entries:
+                for change in entry["changes"]:
+                    if change not in entries[key]["changes"]:
+                        entries[key]["changes"].append(change)
+                continue
+            entry["source"] = source
+            entry["key"] = key
+            entries[key] = entry
+    return sorted(entries.values(), key=lambda e: (entry_date(e), e["source"], e["key"]))
 
 
-def changelog_entries_to_message_lines(entries: Iterable[ChangelogEntry]) -> list[str]:
-    """Process structured changelog entries into a list of lines making up a formatted message."""
-    message_lines = []
-
-    for contributor_name, group in itertools.groupby(entries, lambda x: x["author"]):
-        message_lines.append("\n")
-        message_lines.append(f"**{contributor_name}** updated:\n")
-
-        for entry in group:
-            url = entry.get("url")
-            if url and not url.strip():
-                url = None
-
-            for change in entry["changes"]:
-                emoji = TYPES_TO_EMOJI.get(change["type"], "❓")
-                message = change["message"]
-
-                if EXPERIMENTAL_LABEL in entry.get("labels", []):
-                    emoji = f"{emoji}{EXPERIMENTAL_EMOJI}"
-
-                message_lines.append(create_change_line(emoji, message, url))
-
-    return message_lines
+def initial_state(entries, start_date=None, now=None):
+    state = empty_state()
+    now = now or dt.datetime.now(dt.timezone.utc)
+    cutoff = parse_time(start_date) if start_date else now - dt.timedelta(days=30)
+    state["bootstrap_since"] = cutoff.isoformat()
+    state["baseline"] = [e["key"] for e in entries if entry_date(e) < cutoff]
+    print(f"First run: recover entries since {cutoff.isoformat()}; older entries form a baseline")
+    return state
 
 
-def split_message_lines(message_lines: list[str]) -> list[list[str]]:
-    """Join message lines into chunks that are each below Discord's message length limit."""
+def select_entries(entries, state, start_date=None):
+    baseline = set(state["baseline"])
+    cutoff = parse_time(start_date) if start_date else None
+    # New upstream arrivals can have old timestamps. Do not use time as a delivery cursor.
+    return [e for e in entries if e["key"] not in state["delivered"]
+            and (e["key"] not in baseline or
+                 (cutoff is not None and entry_date(e) >= cutoff))]
+
+
+def discord_length(text):
+    return len(text.encode("utf-16-le")) // 2
+
+
+def split_text(text, limit):
+    remaining = text
+    while remaining:
+        size = 0
+        end = 0
+        for char in remaining:
+            added = 2 if ord(char) > 0xFFFF else 1
+            if size + added > limit:
+                break
+            size += added
+            end += 1
+        if not end:
+            raise ValueError("No room for changelog text")
+        if end < len(remaining):
+            boundary = remaining.rfind(" ", 0, end)
+            if boundary > end // 2:
+                end = boundary + 1
+        yield remaining[:end]
+        remaining = remaining[end:]
+
+
+def escape_author(value):
+    return re.sub(r"([\\*_~`|<>])", r"\\\1", str(value)).replace("\n", " ")[:150]
+
+
+def entry_chunks(entry):
+    section = SECTION_NAMES.get(entry["source"], entry["source"])
+    date = entry_date(entry)
+    date_label = f" · {date:%d.%m.%Y}" if date.year > 1 else ""
+    heading = f"**{section} · {escape_author(entry['author'])}**{date_label}\n"
+    url = str(entry.get("url") or "").strip()
+    footer = ""
+    if url:
+        parsed = urlparse(url)
+        if parsed.scheme != "https" or parsed.netloc != "github.com" or not re.fullmatch(r"/[^/]+/[^/]+/pull/\d+/?", parsed.path):
+            raise ValueError("Invalid changelog PR link")
+        footer = f"[Изменение #{parsed.path.rstrip('/').split('/')[-1]}]({url})\n"
+    limit = DISCORD_SPLIT_LIMIT - discord_length(heading + footer)
+    if limit < 100:
+        raise ValueError("Changelog header is too long")
+    lines = []
+    for change in entry["changes"]:
+        emoji = TYPES_TO_EMOJI.get(change["type"], "❓")
+        if "Intent: Experimental" in entry.get("labels", []):
+            emoji += "🧪"
+        prefix = emoji + " "
+        for fragment in split_text(change["message"], limit - discord_length(prefix + "\n")):
+            lines.append(prefix + fragment + "\n")
     chunks = []
-    chunk_lines = []
-    chunk_length = 0
-
-    for line in message_lines:
-        line_length = len(line)
-        if line_length > DISCORD_SPLIT_LIMIT:
-            raise ValueError(
-                f"Changelog line is too long for Discord after truncation: {line_length}"
-            )
-
-        new_chunk_length = chunk_length + line_length
-
-        if new_chunk_length > DISCORD_SPLIT_LIMIT:
-            if chunk_lines:
-                chunks.append(chunk_lines)
-
-            new_chunk_length = line_length
-            chunk_lines = []
-
-        chunk_lines.append(line)
-        chunk_length = new_chunk_length
-
-    if chunk_lines:
-        chunks.append(chunk_lines)
-
+    current = ""
+    for line in lines:
+        if current and discord_length(current + line) > limit:
+            chunks.append(heading + current + footer)
+            current = ""
+        current += line
+    if current:
+        chunks.append(heading + current + footer)
     return chunks
 
 
-def dump_debug_markdown(message_lines: list[str]):
-    chunks = split_message_lines(message_lines)
+def prepare_delivery(entries, translator):
+    messages = [c["message"] for e in entries for c in e["changes"]]
+    translated = iter(translator.translate(messages))
+    chunks = []
+    for raw in entries:
+        entry = copy.deepcopy(raw)
+        for change in entry["changes"]:
+            change["message"] = next(translated)
+        chunks.extend(entry_chunks(entry))
+    return {"keys": [e["key"] for e in entries], "chunks": chunks, "next": 0, "receipts": []}
 
-    with DEBUG_DISCORD_DUMP_FILE.open("w", encoding="utf-8", newline="\n") as f:
-        f.write("# Discord Changelog Debug Dump\n\n")
-        f.write(
-            f"Generated from `{DEBUG_CHANGELOG_FILE_OLD}` to `{CHANGELOG_FILE}`.\n\n"
-        )
 
-        if not chunks:
-            f.write("_No changelog entries to send._\n")
+def get_discord_body(content):
+    return {"content": content, "allowed_mentions": {"parse": []}, "flags": 1 << 2}
+
+
+def send_discord_webhook(content, webhook_url=None):
+    webhook_url = webhook_url or os.environ.get("DISCORD_WEBHOOK_URL")
+    if not webhook_url:
+        raise RuntimeError("CHANGELOG_DISCORD_WEBHOOK is missing")
+    for attempt in range(8):
+        try:
+            response = requests.post(webhook_url, params={"wait": "true"},
+                                     json=get_discord_body(content), timeout=30)
+        except requests.RequestException:
+            raise RuntimeError("Discord connection failed; delivery is paused for channel verification.") from None
+        if response.status_code == 429:
+            delay = float(response.json().get("retry_after", 5))
+            if not 0 <= delay <= 60:
+                raise DeliveryRejected("Discord rate limit exceeds retry budget")
+            time.sleep(delay)
+            continue
+        if response.status_code != 200:
+            if response.status_code < 500:
+                raise DeliveryRejected(f"Discord returned HTTP {response.status_code}; delivery stopped")
+            raise RuntimeError(f"Discord returned HTTP {response.status_code}; delivery is paused for verification")
+        receipt = response.json().get("id")
+        if not receipt:
+            raise RuntimeError("Discord did not confirm a message ID")
+        return receipt
+    raise DeliveryRejected("Discord rate limit retries exhausted")
+
+
+def publish_pending(state, store, sender=send_discord_webhook):
+    pending = state["pending"]
+    if not pending:
+        return
+    if pending.get("in_flight") is not None:
+        raise RuntimeError("An interrupted Discord request needs verification; use --resolve-ambiguous after checking the channel")
+    while pending["next"] < len(pending["chunks"]):
+        index = pending["next"]
+        pending["in_flight"] = index
+        store.save(state)
+        try:
+            receipt = sender(pending["chunks"][index])
+        except DeliveryRejected:
+            pending["in_flight"] = None
+            store.save(state)
+            raise
+        pending["receipts"].append(receipt)
+        pending["next"] += 1
+        pending["in_flight"] = None
+        store.save(state)
+        print(f"Discord confirmed part {pending['next']}/{len(pending['chunks'])}")
+    for key in pending["keys"]:
+        state["delivered"][key] = dt.datetime.now(dt.timezone.utc).isoformat()
+    state["pending"] = None
+    store.save(state)
+
+
+def resolve_ambiguous(state, resolution, store):
+    pending = state["pending"]
+    if not pending or pending.get("in_flight") is None:
+        raise RuntimeError("No ambiguous Discord delivery to resolve")
+    if resolution == "delivered":
+        pending["receipts"].append("operator-confirmed")
+        pending["next"] += 1
+    pending["in_flight"] = None
+    store.save(state)
+
+
+def write_preview(path, chunks):
+    text = "# Предпросмотр чейнджлога Discord\n\nНичего не отправлено.\n\n"
+    for i, content in enumerate(chunks, 1):
+        text += f"## Сообщение {i} ({discord_length(content)}/2000)\n\n{content}\n"
+    if not chunks:
+        text += "Нет новых записей для отправки.\n"
+    Path(path).parent.mkdir(parents=True, exist_ok=True)
+    Path(path).write_text(text, encoding="utf-8", newline="\n")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--files", nargs="+", default=DEFAULT_FILES)
+    parser.add_argument("--start-date", default=os.environ.get("CHANGELOG_START_DATE") or None)
+    parser.add_argument("--dry-run", action="store_true")
+    parser.add_argument("--output", default="discord-preview.md")
+    parser.add_argument("--translation-cache", default=os.environ.get("CHANGELOG_TRANSLATION_CACHE"),
+                        help="Reusable validated translations; preview may write this cache, never delivery state")
+    parser.add_argument("--state-file", help="Local journal for tests/preview; production uses GitHub")
+    parser.add_argument("--translation-policy", default=str(POLICY_FILE))
+    parser.add_argument("--resolve-ambiguous", choices=["retry", "delivered"],
+                        help="Operator decision after checking the channel for an interrupted request")
+    args = parser.parse_args()
+    if args.start_date:
+        parse_time(args.start_date)
+    if args.dry_run and args.resolve_ambiguous:
+        raise RuntimeError("Preview cannot resolve or change delivery state")
+    if not args.dry_run and not os.environ.get("DISCORD_WEBHOOK_URL"):
+        raise RuntimeError("CHANGELOG_DISCORD_WEBHOOK is missing; nothing will be marked delivered")
+    if args.state_file:
+        store = FileStateStore(args.state_file)
+    else:
+        store = GitHubStateStore(os.environ["GITHUB_REPOSITORY"], os.environ["GITHUB_TOKEN"])
+    entries = load_entries(args.files)
+    state = store.load()
+    if state is None:
+        state = initial_state(entries, args.start_date)
+        if not args.dry_run:
+            store.save(state)
+    if state["pending"]:
+        if args.dry_run:
+            write_preview(args.output, state["pending"]["chunks"][state["pending"]["next"]:])
+            print("Previewing remaining parts of an interrupted delivery")
             return
+        if args.resolve_ambiguous:
+            resolve_ambiguous(state, args.resolve_ambiguous, store)
+        publish_pending(state, store)
+    elif args.resolve_ambiguous:
+        raise RuntimeError("No ambiguous Discord delivery to resolve")
+    selected = select_entries(entries, state, args.start_date)
+    print(f"Integrated={len(entries)} Delivered={len(state['delivered'])} Pending={len(selected)}")
+    if not selected:
+        if args.dry_run:
+            write_preview(args.output, [])
+        return
+    if args.translation_cache:
+        reusable = load_translation_cache(args.translation_cache)
+        reusable.update(state["translations"])
+        state["translations"] = reusable
 
-        for i, chunk_lines in enumerate(chunks, start=1):
-            content = "".join(chunk_lines)
-            f.write(
-                f"<!-- Discord message break: chunk {i}/{len(chunks)}, {len(content)}/{DISCORD_SPLIT_LIMIT} characters -->\n\n"
-            )
-            f.write(f"## Discord Message {i}\n\n")
-            f.write(content.lstrip("\n"))
-            f.write("\n")
+    def checkpoint_translation():
+        if args.translation_cache:
+            save_translation_cache(args.translation_cache, state["translations"])
+        if not args.dry_run:
+            store.save(state)
 
-    print(f"Wrote Discord changelog debug dump to {DEBUG_DISCORD_DUMP_FILE}")
-
-
-def send_message_lines(message_lines: list[str]):
-    """Join a list of message lines into chunks that are each below Discord's message length limit, and send them."""
-    chunks = split_message_lines(message_lines)
-
-    for chunk_lines in chunks[:-1]:
-        print("Split changelog and sending to discord")
-        send_discord_webhook(chunk_lines)
-
-    if chunks:
-        print("Sending final changelog to discord")
-        send_discord_webhook(chunks[-1])
+    translator = RussianTranslator(state["translations"], args.translation_policy, checkpoint=checkpoint_translation)
+    try:
+        pending = prepare_delivery(selected, translator)
+    except Exception:
+        if not args.dry_run:
+            store.save(state)
+        raise
+    checkpoint_translation()
+    if args.dry_run:
+        write_preview(args.output, pending["chunks"])
+        print(f"Preview written to {args.output}; no Discord or journal writes")
+        return
+    state["pending"] = pending
+    store.save(state)
+    publish_pending(state, store)
 
 
 if __name__ == "__main__":
     try:
         main()
-    except Exception as e:
-        print(f"Failed to publish changelog to Discord: {e}", file=sys.stderr)
-        exit(1)
+    except (requests.RequestException, KeyError):
+        print("Changelog failed: journal connection or configuration error", file=sys.stderr)
+        sys.exit(1)
+    except Exception as error:
+        print(f"Changelog failed: {error}", file=sys.stderr)
+        sys.exit(1)
+# CMU14 End

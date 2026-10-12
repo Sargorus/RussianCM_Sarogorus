@@ -1,0 +1,114 @@
+# The training job never inherits rifleman requirements, weapon access or loadouts.
+- type: job
+  parent: AU14JobMilitaryBase
+  id: RuCMJobGOVFORRecruit
+  name: rucm-recruit-job-name
+  description: rucm-recruit-job-description
+  spawnMenuRoleName: rucm-recruit-job-name
+  supervisors: rucm-recruit-supervisors
+  icon: AU14JobIconGovRifleman
+  hasIcon: false # CMU14: native recruit insignia, without a combat role icon.
+  hidden: false
+  setPreference: true
+  characterSetupPresets: [Insurgency] # CMU14: keep the entry in its actual CMU mode.
+  canBeAntag: false
+  hasSquad: false
+  roundRole: Recruit
+  roundProfiles:
+  - AU14RoundJobProfileMilitaryBase
+  startingGear: RuCMGearGOVFORRecruit
+  dummyStartingGear: RuCMGearGOVFORRecruit
+  playTimeTracker: RuCMJobGOVFORRecruit
+  basePlaytimeTracker: true
+  displayWeight: -2
+  requirements: []
+  ranks: # CMU14: E0 is common to training recruits of every selected platoon.
+    RMCRankRecruit: []
+  chevrons:
+    RMCRankRecruit:
+      entity: CMUChevronRecruit
+      requirements: []
+  access:
+  - AU14AccessGovfor
+  accessGroups: []
+  extendedAccess: []
+  extendedAccessGroups: []
+  roundComponents:
+  - type: Rank # CMU14: E0 is present immediately, even before account timers arrive.
+    rank: RMCRankRecruit
+  - type: RegulationAppearance
+  - type: SpawnHungryThirsty
+  - type: Skills
+    skills:
+      RMCSkillFirearms: 0
+      RMCSkillConstruction: 0
+      RMCSkillMedical: 0
+  - type: JobPrefix
+    prefix: rucm-recruit-prefix
+  - type: TacticalMapIcon
+    icon:
+      sprite: /Textures/CMU14/Interface/au14govforjobicons.rsi
+      state: rifleman
+
+- type: department
+  parent: CMDepartmentBase
+  id: RuCMDepartmentGOVFORTraining
+  name: rucm-recruit-department-name
+  description: rucm-recruit-department-description
+  color: "#e3ce94"
+  faction: govfor
+  ignoreForDepartmentFallback: true
+  roles:
+  - RuCMJobGOVFORRecruit
+
+- type: playTimeTracker
+  id: RuCMJobGOVFORRecruit
+  isHumanoid: true
+
+- type: roleLoadout
+  id: JobRuCMJobGOVFORRecruit
+  points: 0
+  groups: []
+
+- type: startingGear
+  id: RuCMGearGOVFORRecruit
+  equipment:
+    id: RuCMIDCardGOVFORRecruit
+    jumpsuit: AU14JungleFatigues
+    shoes: AU14BootsJungle
+    back: CMSatchelMarine
+    ears: AU14HeadsetGovforMarine
+  inhand:
+  - RuCMGuidebookGOVFORRecruit
+
+- type: entity
+  parent: AU14IDCardGOVFOR
+  id: RuCMIDCardGOVFORRecruit
+  name: GOVFOR recruit identification card
+  description: An identification card with access to the GOVFOR base, issued for training.
+  components:
+  - type: PresetIdCard
+    job: RuCMJobGOVFORRecruit
+
+- type: entity
+  parent: RMCGuidebookBase
+  id: RuCMGuidebookGOVFORRecruit
+  name: GOVFOR recruit training handbook
+  description: Open it to read the recruit course and the GOVFOR regulations. Reading does not award qualifications.
+  components:
+  - type: GuideHelp
+    openOnActivation: true
+    guides:
+    - RuCMGOVFOR
+
+# Optional map marker. Without it the owned system uses existing instructor/rifleman arrivals.
+- type: entity
+  parent: CMSpawnPointJobBase
+  id: RuCMSpawnPointGOVFORRecruit
+  name: GOVFOR recruit training spawn
+  components:
+  - type: SpawnPoint
+    spawn_type: Job
+    job_id: RuCMJobGOVFORRecruit
+  - type: Sprite
+    state: syn_spawn

@@ -254,6 +254,7 @@ public sealed partial class HumanoidProfileEditor
         UpdateGenderControls();
         UpdateVoiceControls();
         _markingsModel.SetOrganSexes(newSex);
+        UpdateTTSControls(); // CMU14: refresh TTS selection after changing sex.
         ReloadPreview();
     }
 

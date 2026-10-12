@@ -4,7 +4,7 @@
   name: Sierra
   components:
   - type: AU14SquadCallsign
-    word: VIOLET
+    word: cmu-callsign-word-violet
   - type: SquadTeam
     roundStart: true
     color: "#bb91d8"
@@ -21,7 +21,7 @@
   name: Tango
   components:
   - type: AU14SquadCallsign
-    word: TAN
+    word: cmu-callsign-word-tan
   - type: SquadTeam
     roundStart: true
     color: "#c6c1a8"
@@ -38,7 +38,7 @@
   name:  Uniform
   components:
   - type: AU14SquadCallsign
-    word: SAGE
+    word: cmu-callsign-word-sage
   - type: SquadTeam
     roundStart: true
     color: "#7A967E"
@@ -54,8 +54,9 @@
   id: SquadOpforIntel
   name: Intel # this will cause confusion, but better than x2 Auxiliary
   components:
+  - type: CMUAuxiliarySquad
   - type: AU14SquadCallsign
-    word: BLUE
+    word: cmu-callsign-word-blue
   - type: SquadTeam
     roundStart: true
     color: "#1E90FF"

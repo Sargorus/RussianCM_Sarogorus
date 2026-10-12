@@ -19,8 +19,8 @@ namespace Content.Server.CMU14.Construction;
 /// </summary>
 public sealed partial class AU14MaterialShortfallSystem : EntitySystem
 {
-    [Dependency] private  IPrototypeManager _prototypes = default!;
-    [Dependency] private  IComponentFactory _componentFactory = default!;
+    [Dependency] private IPrototypeManager _prototypes = default!;
+    [Dependency] private IComponentFactory _componentFactory = default!;
 
     public override void Initialize()
     {
@@ -36,20 +36,34 @@ public sealed partial class AU14MaterialShortfallSystem : EntitySystem
             var remaining = ent.Comp.MissingByStack[stackType];
             for (var i = 0; i < args.Actions.Count && remaining > 0; i++)
             {
-                if (args.Actions[i] is not SpawnPrototype spawn ||
-                    !_prototypes.TryIndex<EntityPrototype>(spawn.Prototype, out var prototype) ||
-                    !prototype.TryGetComponent<StackComponent>(out var stack, _componentFactory) ||
-                    stack.StackTypeId != stackType)
+                // Refunds come in both action flavors; missing one reopens the skill-discount exploit.
+                string prototype;
+                int amount;
+                switch (args.Actions[i])
                 {
-                    continue;
+                    case SpawnPrototype spawn:
+                        prototype = spawn.Prototype;
+                        amount = spawn.Amount;
+                        break;
+                    case GivePrototype give:
+                        prototype = give.Prototype;
+                        amount = give.Amount;
+                        break;
+                    default:
+                        continue;
                 }
 
-                var deducted = Math.Min(remaining, spawn.Amount);
-                var refund = spawn.Amount - deducted;
+                if (!_prototypes.TryIndex<EntityPrototype>(prototype, out var entity)
+                    || !entity.TryComp<StackComponent>(out var stack, _componentFactory)
+                    || stack.StackTypeId != stackType)
+                    continue;
+
+                var deducted = Math.Min(remaining, amount);
+                var refund = amount - deducted;
                 remaining -= deducted;
 
                 if (refund > 0)
-                    args.Actions[i] = new AU14ExactStackRefundAction(spawn.Prototype, refund);
+                    args.Actions[i] = new AU14ExactStackRefundAction(prototype, refund);
                 else
                     args.Actions.RemoveAt(i--);
             }
@@ -98,6 +112,6 @@ public sealed partial class AU14ExactStackRefundAction : IGraphAction
         var coordinates = entityManager.GetComponent<TransformComponent>(uid).Coordinates;
         var stackUid = entityManager.SpawnEntity(_prototype, coordinates);
         var stack = entityManager.GetComponent<StackComponent>(stackUid);
-        entityManager.EntitySysManager.GetEntitySystem<StackSystem>().SetCount(stackUid, _amount, stack);
+        entityManager.EntitySysManager.GetEntitySystem<StackSystem>().SetCount((stackUid, stack), _amount);
     }
 }

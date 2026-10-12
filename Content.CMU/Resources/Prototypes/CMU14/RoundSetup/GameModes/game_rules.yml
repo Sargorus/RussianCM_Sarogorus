@@ -16,7 +16,7 @@
     jobs:
       AU14JobGOVFORPlatCo: 1
       AU14JobGOVFORAdjutant: 1
-      AU14JobGOVFORadvisor: 1
+      AU14JobGOVFORadvisor: 4
       AU14JobGOVFORPlatOp: 3
       AU14JobGOVFOROfficerIntel: 1
       AU14JobGOVFORSquadSergeant: 3
@@ -39,7 +39,10 @@
       AU14JobGOVFOROfficerEngi: 1
       AU14JobGOVFORVehicleCrewman: 2
       AU14JobGOVFORVehicleCommander: 1
-      AU14JobGOVFORDSPilot: 2
+      AU14JobGOVFORDSPilot: 1
+      AU14JobGOVFORGunshipPilot: 1
+      AU14JobGOVFORFighterPilot: 1
+      AU14JobGOVFORFighterSystemsOfficer: 1
       AU14JobGOVFORDCC: 2
       AU14JobGOVFORAuxSupportSynth: 2
       AU14JobGOVFORWorkingJoe: 1
@@ -55,7 +58,7 @@
     jobs:
       AU14JobOPFORPlatCo: 1
       AU14JobOPFORAdjutant: 1
-      AU14JobOPFORadvisor: 1
+      AU14JobOPFORadvisor: 4
       AU14JobOPFORPlatOp: 4
       AU14JobOPFOROfficerIntel: 1
       AU14JobOPFORSquadSergeant: 3
@@ -78,7 +81,10 @@
       AU14JobOPFOROfficerEngi: 1
       AU14JobOPFORVehicleCrewman: 2
       AU14JobOPFORVehicleCommander: 1
-      AU14JobOPFORDSPilot: 2
+      AU14JobOPFORDSPilot: 1
+      AU14JobOPFORGunshipPilot: 1
+      AU14JobOPFORFighterPilot: 1
+      AU14JobOPFORFighterSystemsOfficer: 1
       AU14JobOPFORDCC: 2
       AU14JobOPFORAuxSupportSynth: 2
       AU14JobOPFORWorkingJoe: 1
@@ -103,10 +109,9 @@
     jobs:
       AU14JobCLFCellLeader: 1
       AU14JobCLFRadioOperator: 1
-      AU14JobCLFPhysician: 1
-      AU14JobCLFSurgeon: 1
-      AU14JobCLFGuerilla: 3
-      AU14JobCLFSapper: 1
+      AU14JobCLFPhysician: 2
+      AU14JobCLFGuerilla: 2
+      AU14JobCLFSapper: 2
 
 - type: entity
   id: ColonyAntags

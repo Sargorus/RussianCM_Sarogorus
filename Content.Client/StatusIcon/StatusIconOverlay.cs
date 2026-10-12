@@ -14,6 +14,7 @@ namespace Content.Client.StatusIcon;
 public sealed partial class StatusIconOverlay : Overlay
 {
     private static readonly ProtoId<ShaderPrototype> UnshadedShader = "unshaded";
+    private static readonly ProtoId<ShaderPrototype> ShadedShader = "shaded"; // CMU14: HUD lighting.
 
     [Dependency] private IEntityManager _entity = default!;
     [Dependency] private IPrototypeManager _prototype = default!;
@@ -23,21 +24,26 @@ public sealed partial class StatusIconOverlay : Overlay
     private readonly TransformSystem _transform;
     private readonly StatusIconSystem _statusIcon;
     private readonly ShaderInstance _unshadedShader;
+    private readonly ShaderInstance _shadedShader; // CMU14: HUD lighting.
     private readonly List<StatusIconData> _icons = new();
     private readonly EntityLookupSystem _lookup;
     private readonly HashSet<Entity<StatusIconComponent>> _statusCandidates = new();
 
-    public override OverlaySpace Space => OverlaySpace.WorldSpaceBelowFOV;
+    // CMU14: medical HUD icons must be covered by foliage like the mobs they identify.
+    public override OverlaySpace Space => OverlaySpace.WorldSpaceEntities;
 
     internal StatusIconOverlay()
     {
         IoCManager.InjectDependencies(this);
+
+        ZIndex = (int) Content.Shared.DrawDepth.DrawDepth.OverMobs; // CMU14: below foliage.
 
         _sprite = _entity.System<SpriteSystem>();
         _transform = _entity.System<TransformSystem>();
         _statusIcon = _entity.System<StatusIconSystem>();
         _lookup = _entity.System<EntityLookupSystem>();
         _unshadedShader = _prototype.Index(UnshadedShader).Instance();
+        _shadedShader = _prototype.Index(ShadedShader).Instance(); // CMU14: HUD lighting.
     }
 
     protected override void Draw(in OverlayDrawArgs args)
@@ -142,7 +148,7 @@ public sealed partial class StatusIconOverlay : Overlay
                 }
 
                 if (proto.IsShaded)
-                    handle.UseShader(null);
+                    handle.UseShader(_shadedShader); // CMU14: HUD lighting.
                 else
                     handle.UseShader(_unshadedShader);
 

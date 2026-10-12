@@ -106,7 +106,7 @@
   name: Urist McHands
   components:
   - type: TTS
-    voice: PUCHKOW
+    # voice: PUCHKOW # CMU14: assign a random voice matching the humanoid's sex.
     faction: Human
   - type: Butcherable
     butcheringType: Spike

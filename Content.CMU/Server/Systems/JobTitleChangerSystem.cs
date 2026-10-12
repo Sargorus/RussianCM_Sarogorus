@@ -6,9 +6,6 @@ using Content.Shared.Access.Components;
 using Content.Shared._RMC14.UniformAccessories;
 using Content.Shared.CMU14.Util;
 using Robust.Shared.Containers;
-using Content.Server.CMU14.Marines.Roles.Ranks;
-using Content.Shared.CMU14.Marines.Roles.Ranks;
-using Content.Server._RMC14.Marines.Roles.Ranks;
 using Content.Shared.Clothing;
 
 namespace Content.Server.CMU14.Systems;
@@ -18,8 +15,6 @@ public sealed partial class JobTitleChangerSystem : EntitySystem
     [Dependency] private MindSystem _minds = default!;
     [Dependency] private JobSystem _jobs = default!;
     [Dependency] private SharedContainerSystem _containers = default!;
-    [Dependency] private RankChangerSystem _rankChanger = default!;
-    [Dependency] private RankSystem _rank = default!;
 
     public override void Initialize()
     {
@@ -113,15 +108,6 @@ public sealed partial class JobTitleChangerSystem : EntitySystem
                 }
             }
         }
-
-        if (TryComp<RankChangerComponent>(args.Entity, out var rankChanger))
-        {
-            if (_containers.TryGetContainingContainer(uid, out var wearerContainer)
-                && HasComp<InventoryComponent>(wearerContainer.Owner))
-            {
-                _pendingRankApply.Enqueue((wearerContainer.Owner, args.Entity));
-            }
-        }
     }
 
     private void OnAccessoryRemoved(EntityUid uid, UniformAccessoryHolderComponent comp, EntRemovedFromContainerMessage args)
@@ -142,26 +128,5 @@ public sealed partial class JobTitleChangerSystem : EntitySystem
                 Dirty(uid, idCard);
             }
         }
-
-        // Handle rank revert on accessory remove
-        if (TryComp<RankChangerComponent>(args.Entity, out var rankChanger))
-        {
-            if (_containers.TryGetContainingContainer(uid, out var wearerContainer))
-                _rankChanger.RevertRank(wearerContainer.Owner, rankChanger);
-        }
     }
-
-    public override void Update(float frameTime)
-    {
-        base.Update(frameTime);
-
-        while (_pendingRankApply.Count > 0)
-        {
-            var (wearer, changer) = _pendingRankApply.Dequeue();
-            if (Exists(wearer) && Exists(changer) && TryComp<RankChangerComponent>(changer, out var comp))
-                _rankChanger.ApplyRank(wearer, comp);
-        }
-    }
-
-    private readonly Queue<(EntityUid wearer, EntityUid chevron)> _pendingRankApply = new();
 }

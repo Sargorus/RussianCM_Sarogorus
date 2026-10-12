@@ -1,0 +1,147 @@
+- type: entity
+  parent: VehicleVanBase
+  id: AU14VehicleCivCar
+  name: Civilian car
+  description: An old passenger car. Not much to look at, but it still runs.
+  components:
+  - type: Damageable
+    damageModifierSet: VehicleFrameHumvee
+  - type: Injurable
+    damageContainer: StructuralMarine
+  - type: MeleeReceivedMultiplier
+    xenoMultiplier: 1
+    otherMultiplier: 1
+  - type: HardpointIntegrity
+    maxIntegrity: 1000
+    bypassEntryOnZero: true
+    integrity: 1000
+  - type: Sprite
+    scale: 1.1, 1.1
+    sprite: CMU14/Structures/vehicles/car.rsi
+    layers:
+    - map: [ base ]
+      state: car_base
+    - map: [ damaged_frame ]
+      state: damaged_frame
+      visible: false
+    - map: [ rmc-wheels ]
+      state: wheels_1
+  - type: Fixtures
+    fixtures:
+      world:
+        shape:
+          !type:PhysShapeAabb
+          bounds: -0.4675,-1.32,0.4675,1.32
+        density: 1000
+        hard: true
+        mask:
+        - Impassable
+        - HighImpassable
+        - LowImpassable
+        - LargeMobLayer
+        layer:
+        - LargeMobLayer
+      mob:
+        shape:
+          !type:PhysShapeAabb
+          bounds: -0.4675,-1.32,0.4675,1.32
+        density: 1000
+        hard: true
+        mask:
+        - MidImpassable
+        - BarricadeImpassable
+        - LargeMobLayer
+        layer:
+        - LargeMobLayer
+  - type: VehicleSound
+    collisionSoundCooldown: 1.5
+  - type: VehicleEnter
+    interiorPath: /Maps/CMU14/Vehicles/Interiors/truck_interior.yml
+    enterDoAfter: 1.0
+    exitDoAfter: 1.0
+    maxPassengers: 4
+    maxXenos: 1
+    entryPoints:
+    - offset: 0,0
+      radius: 0.11
+      interiorCoords: 3.5,-0.5
+    - offset: -1.1,-0.275
+      radius: 0.66
+      interiorCoords: 3.5,-0.5
+    - offset: 1.1,-0.275
+      radius: 0.66
+      interiorCoords: 3.5,-0.5
+
+- type: entity
+  parent: VehicleVanBase
+  id: AU14VehicleCivHippieVan
+  name: Hippie van
+  description: A cheerful old minibus that has seen more road trips than anyone can count.
+  components:
+  - type: Damageable
+    damageModifierSet: VehicleFrameHumvee
+  - type: Injurable
+    damageContainer: StructuralMarine
+  - type: MeleeReceivedMultiplier
+    xenoMultiplier: 1
+    otherMultiplier: 1
+  - type: HardpointIntegrity
+    maxIntegrity: 1000
+    bypassEntryOnZero: true
+    integrity: 1000
+  - type: Sprite
+    scale: 1.1, 1.1
+    sprite: CMU14/Structures/vehicles/hippie_van.rsi
+    layers:
+    - map: [ base ]
+      state: hippie_van_base
+    - map: [ damaged_frame ]
+      state: damaged_frame
+      visible: false
+    - map: [ rmc-wheels ]
+      state: wheels_1
+  - type: Fixtures
+    fixtures:
+      world:
+        shape:
+          !type:PhysShapeAabb
+          bounds: -0.4675,-1.32,0.4675,1.32
+        density: 1000
+        hard: true
+        mask:
+        - Impassable
+        - HighImpassable
+        - LowImpassable
+        - LargeMobLayer
+        layer:
+        - LargeMobLayer
+      mob:
+        shape:
+          !type:PhysShapeAabb
+          bounds: -0.4675,-1.32,0.4675,1.32
+        density: 1000
+        hard: true
+        mask:
+        - MidImpassable
+        - BarricadeImpassable
+        - LargeMobLayer
+        layer:
+        - LargeMobLayer
+  - type: VehicleSound
+    collisionSoundCooldown: 1.5
+  - type: VehicleEnter
+    interiorPath: /Maps/CMU14/Vehicles/Interiors/hippie_van.yml
+    enterDoAfter: 1.0
+    exitDoAfter: 1.0
+    maxPassengers: 10
+    maxXenos: 2
+    entryPoints:
+    - offset: 1.1,-1.1
+      radius: 0.66
+      interiorCoords: 3.25,0
+    - offset: -1.1,-1.1
+      radius: 0.66
+      interiorCoords: 3.25,-1
+    - offset: 0,2.2
+      radius: 0.825
+      interiorCoords: 0.25,-1

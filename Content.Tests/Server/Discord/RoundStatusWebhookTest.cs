@@ -1,13 +1,47 @@
 using System;
+using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using Content.Server.Discord;
 using NUnit.Framework;
+using Robust.Shared.ContentPack;
+using Robust.Shared.IoC;
+using Robust.Shared.Localization;
+using Robust.Shared.Utility;
 
 namespace Content.Tests.Server.Discord;
 
 [TestFixture]
-public sealed class RoundStatusWebhookTest
+public sealed class RoundStatusWebhookTest : ContentUnitTest
 {
+    [OneTimeSetUp]
+    public void SetupLocalization()
+    {
+        var resources = IoCManager.Resolve<IResourceManager>();
+        var ftlPath = Path.Combine(FindRepoRoot(), "Resources", "Locale", "en-US", "discord", "round-status.ftl");
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes(File.ReadAllText(ftlPath)));
+        var mount = resources.GetType().GetMethod("MountStreamAt", new[] { typeof(MemoryStream), typeof(ResPath) });
+        Assert.That(mount, Is.Not.Null);
+        mount!.Invoke(resources, new object[] { stream, new ResPath("/Locale/en-US/discord/round-status.ftl") });
+
+        var loc = IoCManager.Resolve<ILocalizationManager>();
+        var culture = new CultureInfo("en-US", false);
+        loc.LoadCulture(culture);
+        loc.SetCulture(culture);
+    }
+
+    private static string FindRepoRoot()
+    {
+        var dir = new DirectoryInfo(TestContext.CurrentContext.TestDirectory);
+        while (dir != null && !Directory.Exists(Path.Combine(dir.FullName, "Resources", "Locale")))
+        {
+            dir = dir.Parent;
+        }
+
+        return dir?.FullName ?? throw new DirectoryNotFoundException("Repository root not found");
+    }
+
     [Test]
     public void RoundEndPayloadIncludesStatusEmbedAndConfiguredRolePings()
     {

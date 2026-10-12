@@ -1,0 +1,16 @@
+- type: entity
+  parent: RMCArmbandBase
+  id: CMUChevronRecruit
+  name: recruit insignia
+  description: Universal E0 training insignia for recruits.
+  components:
+  - type: Sprite
+    sprite: CMU14/Clothing/Accessory/Chevrons/universal.rsi
+    state: ranks_enlisted
+  - type: UniformAccessory
+    playerSprite:
+      sprite: CMU14/Clothing/Accessory/Chevrons/universal.rsi
+      state: equipped-ranks_enlisted
+  - type: RankChanger
+    rank: RMCRankRecruit
+    override: true

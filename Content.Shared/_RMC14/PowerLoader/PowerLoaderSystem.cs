@@ -126,6 +126,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
         SubscribeLocalEvent<ActivePowerLoaderPilotComponent, StunnedEvent>(OnActivePilotStunned);
         SubscribeLocalEvent<ActivePowerLoaderPilotComponent, MobStateChangedEvent>(OnActivePilotMobStateChanged);
 
+        SubscribeLocalEvent<DropshipWeaponPointComponent, EntInsertedIntoContainerMessage>(OnWeaponPointContainerInserted); // CMU14
         SubscribeLocalEvent<DropshipWeaponPointComponent, EntRemovedFromContainerMessage>(OnWeaponPointContainerChanged);
         SubscribeLocalEvent<DropshipUtilityPointComponent, EntRemovedFromContainerMessage>(OnUtilityPointContainerChanged);
         SubscribeLocalEvent<DropshipEnginePointComponent, EntRemovedFromContainerMessage>(OnEnginePointContainerChanged);
@@ -200,7 +201,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
         if (!_skills.HasSkills(buckle.Owner, ent.Comp.Skills))
         {
             if (args.Popup)
-                _popup.PopupClient(Loc.GetString("rmc-skills-cant-operate", ("target", ent)), buckle, args.User);
+                _popup.PopupEntity(Loc.GetString("rmc-skills-cant-operate", ("target", ent)), buckle, args.User);
 
             args.Cancelled = true;
             return;
@@ -209,7 +210,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
         if (_hands.CountFreeHands(buckle.Owner) < 2)
         {
             if (args.Popup)
-                _popup.PopupClient(Loc.GetString("rmc-power-loader-hands-occupied", ("mech", ent)), buckle, args.User);
+                _popup.PopupEntity(Loc.GetString("rmc-power-loader-hands-occupied", ("mech", ent)), buckle, args.User);
 
             args.Cancelled = true;
         }
@@ -547,6 +548,10 @@ public sealed partial class PowerLoaderSystem : EntitySystem
         if (!TryGetPointContainer(args, out var user, out _, out var contained, out var slot))
             return;
 
+        // CMU14: enforce fixed mounts again when the removal finishes.
+        if (ent.Comp.FixedWeapon && slot.ID == ent.Comp.WeaponContainerSlotId)
+            return;
+
         _container.Remove(contained, slot);
 
         if (TryComp(contained, out DropshipAmmoComponent? ammo) &&
@@ -557,7 +562,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
             var msg = Loc.GetString("rmc-power-loader-discard-empty", ("ammo", contained));
             foreach (var buckled in GetBuckled(user))
             {
-                _popup.PopupClient(msg, buckled, PopupType.Medium);
+                _popup.PopupSelf(msg, buckled, PopupType.Medium);
             }
         }
         else
@@ -585,7 +590,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
                 var msg = Loc.GetString("rmc-power-loader-discard-empty", ("ammo", contained));
                 foreach (var buckled in GetBuckled(user))
                 {
-                    _popup.PopupClient(msg, buckled, PopupType.Medium);
+                    _popup.PopupSelf(msg, buckled, PopupType.Medium);
                 }
             }
         }
@@ -773,7 +778,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
                 msg = Loc.GetString("rmc-power-loader-ammo-no-weapon");
                 foreach (var buckled in GetBuckled(user))
                 {
-                    _popup.PopupClient(msg, target, buckled, PopupType.SmallCaution);
+                    _popup.PopupEntity(msg, target, buckled, PopupType.SmallCaution);
                 }
 
                 return false;
@@ -795,7 +800,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
 
         foreach (var buckled in GetBuckled(user))
         {
-            _popup.PopupClient(msg, target, buckled, PopupType.SmallCaution);
+            _popup.PopupEntity(msg, target, buckled, PopupType.SmallCaution);
         }
 
         slot = null;
@@ -837,7 +842,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
 
         foreach (var buckled in GetBuckled(user))
         {
-            _popup.PopupClient(msg, target, buckled, PopupType.SmallCaution);
+            _popup.PopupEntity(msg, target, buckled, PopupType.SmallCaution);
         }
 
         slot = null;
@@ -880,6 +885,11 @@ public sealed partial class PowerLoaderSystem : EntitySystem
     [NotNullWhen(true)] out ContainerSlot? slot)
     {
         slot = null;
+        // CMU14: ammunition remains removable on a fixed weapon mount.
+        if (TryComp<DropshipWeaponPointComponent>(target, out var point) &&
+            point.FixedWeapon && containerId == point.WeaponContainerSlotId)
+            return false;
+
         if (!Resolve(user, ref user.Comp, false))
         {
             return false;
@@ -892,7 +902,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
                 var msg = Loc.GetString("rmc-power-loader-cant-grab-full", ("mech", user.Owner));
                 foreach (var buckled in GetBuckled(user))
                 {
-                    _popup.PopupClient(msg, target, buckled, PopupType.SmallCaution);
+                    _popup.PopupEntity(msg, target, buckled, PopupType.SmallCaution);
                 }
             }
 
@@ -912,7 +922,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
                 foreach (var buckled in GetBuckled(user))
                 {
                     var msg = Loc.GetString("rmc-power-loader-nothing-attached");
-                    _popup.PopupClient(msg, user, buckled, PopupType.SmallCaution);
+                    _popup.PopupEntity(msg, user, buckled, PopupType.SmallCaution);
                 }
             }
 
@@ -1011,7 +1021,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
             var msg = Loc.GetString("rmc-power-loader-cant-grab-full", ("mech", loader));
             foreach (var buckled in GetBuckled(loader))
             {
-                _popup.PopupClient(msg, buckled, buckled, PopupType.SmallCaution);
+                _popup.PopupEntity(msg, buckled, buckled, PopupType.SmallCaution);
             }
         }
 
@@ -1397,6 +1407,14 @@ public sealed partial class PowerLoaderSystem : EntitySystem
         args.SlotId = slot.ID;
     }
 
+    // CMU14 method: include mapped equipment in appearance updates.
+    private void OnWeaponPointContainerInserted(Entity<DropshipWeaponPointComponent> ent, ref EntInsertedIntoContainerMessage args)
+    {
+        // Map fills and other normal container insertions also install weapons;
+        // they do not pass through the power-loader do-after completion handler.
+        SyncAppearance(ent.Owner);
+    }
+
     private void OnWeaponPointContainerChanged(Entity<DropshipWeaponPointComponent> ent, ref EntRemovedFromContainerMessage args)
     {
         SyncAppearance(ent.Owner);
@@ -1461,7 +1479,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
             var msg = Loc.GetString("rmc-power-loader-too-close");
             foreach (var buckled in GetBuckled(loader))
             {
-                _popup.PopupClient(msg, loader, buckled, PopupType.SmallCaution);
+                _popup.PopupEntity(msg, loader, buckled, PopupType.SmallCaution);
             }
 
             return true;
@@ -1472,7 +1490,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
             var msg = Loc.GetString("rmc-power-loader-too-far");
             foreach (var buckled in GetBuckled(loader))
             {
-                _popup.PopupClient(msg, loader, buckled, PopupType.SmallCaution);
+                _popup.PopupEntity(msg, loader, buckled, PopupType.SmallCaution);
             }
 
             return true;
@@ -1485,7 +1503,7 @@ public sealed partial class PowerLoaderSystem : EntitySystem
             var msg = Loc.GetString("rmc-power-loader-cant-drop-occupied", ("drop", item));
             foreach (var buckled in GetBuckled(loader))
             {
-                _popup.PopupClient(msg, loader, buckled, PopupType.SmallCaution);
+                _popup.PopupEntity(msg, loader, buckled, PopupType.SmallCaution);
             }
 
             return true;

@@ -1,0 +1,33 @@
+# CMU14 Begin: downstream changelog workflow.
+name: Changelog tools
+
+on:
+  pull_request:
+    paths:
+      - Tools/*changelog*
+      - Tools/_CMU14/Changelog/**
+      - .github/workflows/update-changelog.yml
+      - .github/workflows/changelog-tools-ci.yml
+  push:
+    branches: [master]
+    paths:
+      - Tools/*changelog*
+      - Tools/_CMU14/Changelog/**
+      - .github/workflows/update-changelog.yml
+      - .github/workflows/changelog-tools-ci.yml
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7.0.0
+        with:
+          python-version: "3.13"
+      - run: python3 -m pip install requests pyyaml
+      - run: python3 -m unittest discover -s Tools/_CMU14/Changelog -p 'test_changelog*.py'
+# CMU14 End

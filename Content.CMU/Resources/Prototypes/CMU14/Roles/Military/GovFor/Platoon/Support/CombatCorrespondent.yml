@@ -5,7 +5,7 @@
   name: au14-job-name-govforcombatcorrespondent
   description: au14-job-description-govforcombatcorrespondent
   icon: "AU14JobIconGovRifleman"
-  spawnMenuRoleName: Combat Correspondent (GOVFOR)
+  spawnMenuRoleName: cmu-spawn-role-combat-correspondent-govfor
   startingGear: AU14GearGOVFORCombatCorrespondent
   dummyStartingGear: AU14GearGOVFORCombatCorrespondentDummy
   playTimeTracker: AU14JobGOVFORCombatCorrespondent
@@ -38,6 +38,9 @@
         state: rifleman
 
   requirements:
+  - !type:TotalDepartmentsTimeRequirement
+    group: CMUDepartmentsMilitary
+    time: 18000 # 5 hours
   - !type:TraitsRequirement
     inverted: true
     traits:
@@ -50,6 +53,8 @@
     - SlowRunner
     - Anemic
     - Asthmatic
+    - CMUAlcoholic
+    - CMUDrugAddict
   ranks:
     RMCRankCivilian: []
   chevrons:
@@ -77,7 +82,7 @@
   id: AU14GearGOVFORCombatCorrespondent
   equipment:
     id: AU14IDCardGOVFORCombatCorrespondent
-    ears: AU14HeadsetGovforMarine
+    ears: AU14HeadsetGovforCommand
     pocket2: RMCCorrespondentMicrophone
 
 - type: startingGear
@@ -87,7 +92,7 @@
     shoes: AU14BootsJungle
     head: AU14JunglePatrolCap
     jumpsuit: AU14JungleFatigues
-    ears: AU14HeadsetGovforMarine
+    ears: AU14HeadsetGovforCommand
 
 - type: entity
   parent: CMSpawnPointJobBase
@@ -146,12 +151,13 @@
   dummyStartingGear: AU14GearOPFORCombatCorrespondentDummy
   accessGroups:
   - AU14OpforSquad
+  useLoadoutOfJob: AU14JobGOVFORCombatCorrespondent
 
 - type: startingGear
   id: AU14GearOPFORCombatCorrespondent
   equipment:
     id: AU14IDCardOPFORCombatCorrespondent
-    ears: AU14HeadsetOpforMarine
+    ears: AU14HeadsetOpforCommand
     pocket2: RMCCorrespondentMicrophone
 
 - type: startingGear
@@ -161,7 +167,7 @@
     shoes: AU14BootsJungle
     head: AU14JunglePatrolCap
     jumpsuit: AU14JungleFatigues
-    ears: AU14HeadsetOpforMarine
+    ears: AU14HeadsetOpforCommand
 
 - type: entity
   parent: CMSpawnPointJobBase

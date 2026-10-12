@@ -18,6 +18,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Client.Corvax.TTS;
 
 [GenerateTypedNameReferences]
+// CMU14 class: TTS voice selection, ordered delivery and playback.
 public sealed partial class TTSTab : Control
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
@@ -259,10 +260,9 @@ public sealed partial class TTSTab : Control
         if (profile != null)
             _selectedVoiceId = profile.TTSVoice;
 
-        // 🔥 ВАЖНО: грузим ВСЕ голоса здесь
         _allVoices = _prototypeManager
             .EnumeratePrototypes<TTSVoicePrototype>()
-            .Where(o => HumanoidCharacterProfile.IsSelectableTTSVoice(o))
+            .Where(o => CMUTTSVoiceSelection.IsSelectable(o, sex))
             .OrderBy(o => o.Name)
             .ToList();
 
@@ -277,15 +277,7 @@ public sealed partial class TTSTab : Control
 
         foreach (var voice in _allVoices)
         {
-            var name = voice.Name.ToLowerInvariant();
-
-            var category = string.IsNullOrWhiteSpace(voice.Category)
-                ? Loc.GetString("humanoid-profile-editor-voice-other")
-                : voice.Category;
-
-            var match = CategoryRegex.Match(name);
-            if (match.Success)
-                category = match.Groups[2].Value.Trim();
+            var category = GetCategory(voice);
 
             if (!_categorizedVoices.TryGetValue(category, out var list))
             {
@@ -295,6 +287,21 @@ public sealed partial class TTSTab : Control
 
             list.Add(voice);
         }
+
+        if (_selectedCategory != null && !_categorizedVoices.ContainsKey(_selectedCategory))
+            _selectedCategory = null;
+
+        var allButton = new Button
+        {
+            Text = Loc.GetString("cmu-humanoid-profile-editor-voice-all"),
+            HorizontalExpand = true,
+        };
+        allButton.OnPressed += _ =>
+        {
+            _selectedCategory = null;
+            UpdateResults();
+        };
+        CategoriesContainer.AddChild(allButton);
 
         foreach (var category in _categorizedVoices.Keys.OrderBy(k => k))
         {
@@ -307,8 +314,8 @@ public sealed partial class TTSTab : Control
 
             button.OnPressed += _ =>
             {
-                _selectedCategory = category;
                 SearchEdit.Text = "";
+                _selectedCategory = category;
                 UpdateResults();
             };
 
@@ -322,10 +329,30 @@ public sealed partial class TTSTab : Control
         UpdateResults();
     }
 
+    private static string GetCategory(TTSVoicePrototype voice)
+    {
+        if (!string.IsNullOrWhiteSpace(voice.Category) && voice.Category != "Other")
+            return voice.Category;
+
+        var match = CategoryRegex.Match(voice.Name);
+        return match.Success ? match.Groups[2].Value.Trim() : Loc.GetString("humanoid-profile-editor-voice-other");
+    }
+
     private void UpdateResults()
     {
         VoicesGrid.RemoveAllChildren();
         _filteredVoices.Clear();
+
+        var randomButton = new Button
+        {
+            Text = Loc.GetString("cmu-humanoid-profile-editor-voice-random"),
+            ToolTip = Loc.GetString("cmu-humanoid-profile-editor-voice-random-tooltip"),
+            HorizontalExpand = true,
+        };
+        if (_selectedVoiceId == CMUTTSVoiceSelection.RandomVoice)
+            randomButton.AddStyleClass(StyleNano.ButtonCaution);
+        randomButton.OnPressed += _ => OnVoiceSelected?.Invoke(CMUTTSVoiceSelection.RandomVoice);
+        VoicesGrid.AddChild(randomButton);
 
         var searchText = SearchEdit.Text?.ToLowerInvariant() ?? "";
 
@@ -340,7 +367,7 @@ public sealed partial class TTSTab : Control
 
             var matchesCategory =
                 string.IsNullOrEmpty(_selectedCategory)
-                || voice.Category == _selectedCategory;
+                || GetCategory(voice) == _selectedCategory;
 
             if (matchesSearch && matchesCategory)
             {

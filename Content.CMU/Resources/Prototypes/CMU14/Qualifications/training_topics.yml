@@ -1,0 +1,55 @@
+- type: cmuTrainingTopic
+  id: CMUBasicFirearmsTraining
+  name: cmu-training-topic-firearms
+  qualification: enlisted
+  item: firearms
+  temporarySkills:
+    RMCSkillFirearms: 1
+
+- type: cmuTrainingTopic
+  id: CMUBasicFirstAidTraining
+  name: cmu-training-topic-first-aid
+  qualification: enlisted
+  item: first_aid
+  temporarySkills:
+    RMCSkillMedical: 1
+
+- type: cmuTrainingTopic
+  id: CMUBasicEngineeringTraining
+  name: cmu-training-topic-engineering
+  qualification: enlisted
+  item: engineering_basics
+  temporarySkills:
+    RMCSkillEngineer: 2
+    RMCSkillConstruction: 2
+
+- type: cmuTrainingTopic
+  id: CMUFieldEngineeringPracticeTraining
+  name: cmu-training-topic-field-engineering
+  qualification: field_engineering
+  item: practice
+  temporarySkills:
+    RMCSkillEngineer: 2
+    RMCSkillConstruction: 2
+
+- type: cmuTrainingTopic
+  id: CMUMedicalPracticeTraining
+  name: cmu-training-topic-medical
+  qualification: medical
+  item: practice
+  temporarySkills:
+    RMCSkillMedical: 2
+
+- type: alert
+  parent: SquadTracker
+  id: CMUTrainingInstructor
+  clickEvent: null
+  name: cmu-training-nav-instructor
+  description: cmu-training-nav-description
+
+- type: alert
+  parent: SquadTracker
+  id: CMUTrainingRecruit
+  clickEvent: null
+  name: cmu-training-nav-recruit
+  description: cmu-training-nav-description

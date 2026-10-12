@@ -18,7 +18,7 @@ namespace Content.Client.Humanoid;
 /// A narrow organ-layer picker for the separate CMU regulation appearance fields.
 /// Normal profile markings continue to use <see cref="MarkingsViewModel"/>.
 /// </summary>
-public sealed class RegulationMarkingPicker : BoxContainer
+public sealed partial class RegulationMarkingPicker : BoxContainer
 {
     [Dependency] private MarkingManager _markingManager = default!;
     [Dependency] private IEntityManager _entityManager = default!;
@@ -169,6 +169,7 @@ public sealed class RegulationMarkingPicker : BoxContainer
         if (showColors)
         {
             foreach (var (name, color) in DropdownColors
+                         .Select(entry => (Name: GetColorDisplayName(entry.Name), entry.Color))  // CMU14 hardcode Localization
                          .Where(entry => entry.Name.Contains(filter, StringComparison.OrdinalIgnoreCase))
                          .OrderBy(entry => entry.Name))
             {
@@ -182,6 +183,12 @@ public sealed class RegulationMarkingPicker : BoxContainer
         _updating = false;
     }
 
+    //CMU14 hardcode Localization Begin: Fix hardcode localization for forks
+    private static string GetColorDisplayName(string name)
+    {
+        return Loc.GetString($"regulation-hair-color-{name.ToLowerInvariant().Replace(' ', '-')}");
+    }
+    // CMU14 hardcode Localization End
     private void SelectMarking(ItemList.ItemListSelectedEventArgs args)
     {
         if (_updating)

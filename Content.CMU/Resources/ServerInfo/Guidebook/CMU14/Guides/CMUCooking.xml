@@ -1,0 +1,101 @@
+<Document>
+  # Кулинария
+
+  Хорошая еда очень помогает во время долгой службы. Здесь описаны кухонное оборудование, базовые ингредиенты, которые вы готовите сами, и все рецепты для микроволновки.
+
+  ## Оборудование
+  <Box>
+    <GuideEntityEmbed Entity="CMMicrowave" Caption="Микроволновка"/>
+    <GuideEntityEmbed Entity="RMCKitchenReagentGrinder" Caption="Универсальный измельчитель"/>
+    <GuideEntityEmbed Entity="KitchenSpike" Caption="Мясной крюк"/>
+  </Box>
+  <Box>
+    <GuideEntityEmbed Entity="RMCKitchenKnifeChef" Caption="Кухонный нож"/>
+    <GuideEntityEmbed Entity="RMCKitchenKnifeButcher" Caption="Мясницкий тесак"/>
+    <GuideEntityEmbed Entity="CMLockerFridge" Caption="Холодильник"/>
+  </Box>
+  - [bold]Микроволновка[/bold]: здесь готовится почти вся еда. Положите твёрдые ингредиенты, влейте жидкости и включите её. Если содержимое не соответствует рецепту, получится горелая масса. Никогда не кладите внутрь металл.
+  - [bold]Универсальный измельчитель[/bold]: [bold]измельчает[/bold] продукты в реагенты (например, пшеницу в муку) или [bold]выжимает сок[/bold] из фруктов и овощей. Загрузите продукты, присоедините мензурку и выберите измельчение или отжим.
+  - [bold]Мясной крюк[/bold]: повесьте на него мёртвое животное, чтобы разделать его на мясо.
+  - [bold]Ножи[/bold]: режьте продукты ножом — например, мясо на котлеты, а тесто на кусочки. Скалка раскатывает тесто.
+  - [bold]Холодильник[/bold]: хранит ингредиенты и готовые блюда.
+
+  ## Базовые ингредиенты
+  Многие рецепты начинаются с ингредиентов, которые смешивают в мензурке или миске, а не готовят нагреванием.
+  - [bold]Тесто[/bold]: 45 ед. муки и 15 ед. воды.
+  - [bold]Тесто для пирога[/bold]: 40 ед. муки, 10 ед. сливочного масла и 5 ед. воды.
+  - [bold]Кукурузное тесто[/bold]: 15 ед. кукурузной муки и 6 ед. яйца.
+  - [bold]Тесто для тортильи[/bold]: 15 ед. кукурузной муки и 10 ед. воды.
+  - [bold]Тесто для торта[/bold]: 20 ед. муки, 10 ед. сливочного масла, 6 ед. яйца и 10 ед. молока; либо 15 ед. муки и 15 ед. соевого молока.
+  - [bold]Сливочное масло[/bold]: 30 ед. сливок и 1 ед. соли.
+  - [bold]Сыр[/bold]: 40 ед. молока и 5 ед. фермента.
+  - [bold]Тофу[/bold]: 55 ед. соевого молока и 5 ед. фермента.
+  - [bold]Фрикаделька[/bold]: 5 ед. сырого животного белка, 5 ед. муки и 6 ед. яйца.
+  - [bold]Шоколадная плитка[/bold]: 4 ед. какао-порошка и 2 ед. молока.
+
+  ## Соусы
+  - [bold]Кетчуп[/bold]: томатный сок.
+  - [bold]Майонез[/bold]: 5 ед. масла, 6 ед. яйца и 5 ед. уксуса или лимонного сока.
+  - [bold]Соус барбекю[/bold]: кетчуп и уксус.
+  - [bold]Кетчунез[/bold]: кетчуп и майонез.
+  - [bold]Острый соус[/bold]: томатный сок, соль и капсаициновое масло.
+  - [bold]Соевый соус[/bold]: 2 ед. соевого молока и 1 ед. серной кислоты.
+  - [bold]Уксус[/bold]: этанол и кислород.
+  - [bold]Винегретная заправка[/bold]: уксус, оливковое масло и чёрный перец.
+
+  ## Рецепты для микроволновки
+  ### Пиццы
+  <GuideMicrowaveGroupEmbed Group="Pizza"/>
+  <GuideMicrowaveEmbed Recipe="RecipeRMCPizzaSupreme"/>
+  <GuideMicrowaveEmbed Recipe="RecipeRMCPizzaCalabresa"/>
+
+  ### Несладкие блюда
+  <GuideMicrowaveGroupEmbed Group="Savory"/>
+
+  ### Мясо
+  <GuideMicrowaveGroupEmbed Group="Meat"/>
+
+  ### Хлеб
+  <GuideMicrowaveGroupEmbed Group="Breads"/>
+
+  ### Завтраки
+  <GuideMicrowaveGroupEmbed Group="Breakfast"/>
+
+  ### Еда для мотыльков
+  <GuideMicrowaveGroupEmbed Group="Moth"/>
+
+  ### Макароны и лапша
+  <GuideMicrowaveGroupEmbed Group="Pasta"/>
+
+  ### Выпечка и десерты
+  <GuideMicrowaveGroupEmbed Group="Dessert"/>
+
+  ### Супы и рагу
+  <GuideMicrowaveGroupEmbed Group="Soup"/>
+
+  ### Пироги и тарты
+  <GuideMicrowaveGroupEmbed Group="Pie"/>
+
+  ### Батончики и печенье
+  <GuideMicrowaveGroupEmbed Group="BarsAndCookies"/>
+
+  ### Торты
+  <GuideMicrowaveGroupEmbed Group="Cake"/>
+  <GuideMicrowaveEmbed Recipe="RecipeCakeBlackForest"/>
+  <GuideMicrowaveEmbed Recipe="RecipeRMCSuppermatter"/>
+
+  ### Салаты
+  <GuideMicrowaveGroupEmbed Group="Salad"/>
+
+  ### Лечебные блюда
+  <GuideMicrowaveGroupEmbed Group="Medicinal"/>
+
+  ### Прочее
+  <GuideMicrowaveGroupEmbed Group="Other"/>
+
+  ### Секретные рецепты
+  <GuideMicrowaveGroupEmbed Group="Secret"/>
+
+  ## Напитки
+  Все напитки и способы их смешивания описаны в разделе [textlink="Рецепты напитков" link="RMCGuideDrinks"].
+</Document>

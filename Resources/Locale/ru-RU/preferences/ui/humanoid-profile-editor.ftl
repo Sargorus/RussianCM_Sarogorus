@@ -70,9 +70,9 @@ humanoid-profile-editor-character-description-tab = Персонаж
 humanoid-profile-editor-short-examine-label = Короткое описание при осмотре:
 humanoid-profile-editor-short-examine-tooltip = Короткая строка, показываемая при обычном осмотре вашего персонажа. Должна быть короче 100 символов.
 humanoid-profile-editor-height-label = Рост:
-humanoid-profile-editor-height-tooltip = Рост вашего персонажа, в футах и дюймах (от 4'0 до 6'11).
+humanoid-profile-editor-height-tooltip = Рост вашего персонажа, в футах и дюймах (от 4'0 до 6'11). 1 фут = 30,48 см. 1 дюйм = 2,54 см. Учитывайте это при создании персонажа и переводе в метрическую систему.
 humanoid-profile-editor-weight-label = Вес:
-humanoid-profile-editor-weight-tooltip = Вес вашего персонажа в фунтах, от 90 до 300.
+humanoid-profile-editor-weight-tooltip = Вес вашего персонажа в фунтах, от 90 до 300. 1 фунт = 0,45 кг. Учитывайте это при создании персонажа и переводе в метрическую систему.
 humanoid-profile-editor-build-label = Телосложение:
 humanoid-profile-editor-build-tooltip = Телосложение вашего персонажа.
 humanoid-profile-editor-skin-tone-label = Оттенок кожи:
@@ -104,7 +104,7 @@ humanoid-profile-editor-preference-satchel = Сумка
 humanoid-profile-editor-preference-duffelbag = Спортивная сумка
 humanoid-profile-editor-guidebook-button-tooltip = Нажмите для дополнительной информации
 
-# Spawn priority
+# Приоритет появления
 humanoid-profile-editor-preference-spawn-priority-none = Нет
 humanoid-profile-editor-preference-spawn-priority-arrivals = Прибытие
 humanoid-profile-editor-preference-spawn-priority-cryosleep = Криосон
@@ -123,7 +123,7 @@ humanoid-profile-editor-naming-rules-warning = Внимание: оскорби�
 humanoid-profile-editor-markings-tab = Метки
 humanoid-profile-editor-flavortext-tab = Описание
 
-# Traits
+# Черты
 humanoid-profile-editor-traits-tab = Черты
 humanoid-profile-editor-no-traits = Нет доступных черт
 
@@ -133,7 +133,7 @@ trait-category-disabilities = Инвалидности
 trait-category-speech = Речевые черты
 trait-category-quirks = Причуды
 
-# Armor
+# Броня
 humanoid-profile-editor-preference-armor-random = Случайная
 humanoid-profile-editor-preference-armor-padded = С подкладками
 humanoid-profile-editor-preference-armor-padless = Без подкладок
@@ -151,42 +151,45 @@ humanoid-profile-editor-segment-line = Линейная пехота
 humanoid-profile-editor-segment-officer = Офицеры
 humanoid-profile-editor-segment-leader = Сержантский состав
 
-humanoid-profile-editor-threat-marker-suffix =  (Маркер)
+humanoid-profile-editor-threat-marker-suffix = (Маркер)
+humanoid-profile-editor-threat-jobs-section = Должности угроз
+humanoid-profile-editor-threat-neomorph = Неоморфы
+humanoid-profile-editor-threat-badbloodclan = Клан Плохой Крови
 humanoid-profile-editor-threat-xeno = Ксеноморфы
 humanoid-profile-editor-threat-ape = Обезьяны
 humanoid-profile-editor-threat-cultist = Культисты
 humanoid-profile-editor-threat-wendigo = Вендиго
-humanoid-profile-editor-threat-abomination = Мерзости
+humanoid-profile-editor-threat-abomination = Биоморфы
 humanoid-profile-editor-threat-tribal = Дикари
 
 
 
-humanoid-profile-editor-randomize = Randomize
+humanoid-profile-editor-randomize = Рандомизировать
 
-humanoid-profile-editor-randomize-unlocked-button = Randomize unlocked
+humanoid-profile-editor-randomize-unlocked-button = Случайно для разблокированных
 
-humanoid-profile-editor-randomize-name-button = Name
+humanoid-profile-editor-randomize-name-button = Имя
 
-humanoid-profile-editor-randomize-species-button = Species
+humanoid-profile-editor-randomize-species-button = Вид
 
-humanoid-profile-editor-randomize-age-button = Age
+humanoid-profile-editor-randomize-age-button = Возраст
 
-humanoid-profile-editor-randomize-sex-button = Sex
+humanoid-profile-editor-randomize-sex-button = Пол
 
-humanoid-profile-editor-randomize-skin-button = Skin color
+humanoid-profile-editor-randomize-skin-button = Цвет кожи
 
-humanoid-profile-editor-randomize-eye-button = Eye color
+humanoid-profile-editor-randomize-eye-button = Цвет глаз
 
-humanoid-profile-editor-randomize-markings-button = Markings
+humanoid-profile-editor-randomize-markings-button = Отметины
 
-humanoid-profile-editor-voice-label = Voice:
+humanoid-profile-editor-voice-label = Голос:
 
-humanoid-profile-editor-randomizer-lock-tooltip = Prevents the value from being randomized
+humanoid-profile-editor-randomizer-lock-tooltip = Запрещает случайное изменение этого значения
 
-humanoid-profile-editor-voice-masculine = Masculine
+humanoid-profile-editor-voice-masculine = Мужской
 
-humanoid-profile-editor-voice-feminine = Feminine
+humanoid-profile-editor-voice-feminine = Женский
 
-humanoid-profile-editor-voice-neutral = Neutral
+humanoid-profile-editor-voice-neutral = Нейтральный
 
-humanoid-profile-editor-voice-none = Unnamed Voice
+humanoid-profile-editor-voice-none = Безымянный голос

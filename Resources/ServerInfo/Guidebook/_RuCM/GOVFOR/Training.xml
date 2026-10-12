@@ -1,0 +1,13 @@
+<Document>
+  <GOVFORLocalizedText Key="rucm-guide-index-training"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORRecruitCourse"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORInstructorHandbook"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORSergeantCourse"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORSergeantAssessment"/>
+  <GOVFORGuideLink Guide="RuCMGOVFOROfficerCourse"/>
+  <GOVFORGuideLink Guide="RuCMGOVFOROfficerAssessment"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORProfessionalTraining"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORProfessionalAssessments"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORCommandingOfficerCourse"/>
+  <GOVFORGuideLink Guide="RuCMGOVFORTrainingQualifications"/>
+</Document>

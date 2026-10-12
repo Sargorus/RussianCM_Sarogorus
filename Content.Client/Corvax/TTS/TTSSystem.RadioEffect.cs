@@ -4,6 +4,7 @@ using Robust.Shared.Audio.Effects;
 
 namespace Content.Client.Corvax.TTS;
 
+// CMU14 class: TTS voice selection, ordered delivery and playback.
 public sealed partial class TTSSystem
 {
     private EntityUid? _radioAuxiliary;
@@ -13,7 +14,7 @@ public sealed partial class TTSSystem
     {
         // Фильтруем непосредственно голос.
         // Чем больше значение — тем сильнее "зажата" полоса.
-        audio.Component.Occlusion = 3.0f;
+        audio.Component.Occlusion = 1.0f;
 
         if (!EnsureRadioEffect())
             return;
@@ -81,27 +82,27 @@ public sealed partial class TTSSystem
             density: 1.0f,
             diffusion: 0.1f,
 
-            gain: 0.3f,
-            gainHF: 0.01f,
-            gainLF: 0.05f,
+            gain: 0.12f,
+            gainHF: 0.15f,
+            gainLF: 0.1f,
 
             decayTime: 0.15f,
             decayHFRatio: 0.9f,
             decayLFRatio: 0.1f,
 
-            reflectionsGain: 0.15f,
+            reflectionsGain: 0.02f,
             reflectionsDelay: 0.005f,
             reflectionsPan: new Vector3(0.1f, 0f, 0f),
 
-            lateReverbGain: 0.8f,
+            lateReverbGain: 0.05f,
             lateReverbDelay: 0.02f,
             lateReverbPan: new Vector3(-0.1f, 0f, 0f),
 
             echoTime: 0.1f,
-            echoDepth: 0.8f,
+            echoDepth: 0f,
 
             modulationTime: 0.25f,
-            modulationDepth: 0.7f,
+            modulationDepth: 0f,
 
             airAbsorptionGainHF: 0.994f,
 

@@ -8,7 +8,7 @@
   suffix: RMC14
   components:
   - type: TTS
-    voice: PUCHKOW
+    # voice: PUCHKOW # CMU14: assign a random voice matching the humanoid's sex.
     faction: Human
   - type: FlareStomper
   - type: Vocal

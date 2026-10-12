@@ -25,9 +25,51 @@
     - AU14JobCivilianHeadPhysician
     - AU14JobCivilianHeadOfEngineering
     - AU14JobCivilianColonyAdministrator
-#   - AU14JobCivilianColonyAdminAssistant
+    - AU14JobCivilianColonyAdminAssistant
+    - AU14JobCivilianCorporateAdministrator
+    - AU14JobCivilianCorporateAdminAssistant
+    - AU14JobCivilianForeman
     - AU14JobCivilianOrbitalArbiter
+    - AU14JobCivilianOrbitalManager
     - AU14JobCivilianCMBMarshal
+
+- type: antagJobBlacklist
+  id: CMUAmbassadorJobs
+  jobs:
+    - AU14JobCivilianAmbassadorCCA
+    - AU14JobCivilianAmbassadorICSC
+    - AU14JobCivilianAmbassadorTWE
+    - AU14JobCivilianAmbassadorUA
+    - AU14JobCivilianAmbassadorUPP
+
+- type: antagJobBlacklist
+  id: CMUColonyLawEnforcementJobs
+  jobs:
+    - AU14JobLEOBase
+    - AU14JobLEOLeaderBase
+    - AU14JobCivilianCMBDeputy
+    - AU14JobCivilianCMBMarshal
+    - AU14JobCivilianCWPSRanger
+    - AU14JobCivilianPaPOfficer
+    - AU14JobCivilianNSPAConstable
+    - AU14JobCivilianNSPAInspector
+    - AU14JobCivilianColonySecurityOfficer
+    - AU14JobCivilianColonySecurityLeader
+    - AU14JobCivilianKellandWarden
+    - AU14JobCivilianOrbitalSecurity
+    - CMUJobColonyPrisonGuard
+    - CMUJobColonyRiotControlOfficer
+    - CMUJobColonyRiotControlTeamLeader
+    - CMUJobCMBBureauObserver
+    - AU14JobInvestigationCMBDeputy
+    - AU14JobInvestigationCMBDeputyShotgun
+    - AU14JobInvestigationCMBMarshal
+    - AU14JobInvestigationCMBRightsObserver
+    - AU14JobParoleeReleaseCMBDeputyJob
+    - CMBureauDeputy
+    - CMBureauMarshal
+    - CMBureauObserver
+    - CMICBLiaison
 
 - type: antagJobBlacklist
   id: AllSynthJobs
@@ -71,6 +113,9 @@
     - AU14JobGOVFORAuxSupportSynth
     - AU14JobGOVFORWorkingJoe
     - AU14JobGOVFORDSPilot
+    - AU14JobGOVFORGunshipPilot
+    - AU14JobGOVFORFighterPilot
+    - AU14JobGOVFORFighterSystemsOfficer
     - AU14JobGOVFORDCC
     - AU14JobGOVFORVehicleCrewman
     - AU14JobGOVFORVehicleCommander
@@ -110,6 +155,9 @@
     - AU14JobOPFORAuxSupportSynth
     - AU14JobOPFORWorkingJoe
     - AU14JobOPFORDSPilot
+    - AU14JobOPFORGunshipPilot
+    - AU14JobOPFORFighterPilot
+    - AU14JobOPFORFighterSystemsOfficer
     - AU14JobOPFORDCC
     - AU14JobOPFORVehicleCrewman
 
@@ -133,6 +181,9 @@
     - AU14JobGOVFORSectionSergeant
     - AU14JobGOVFORSquadSergeant
     - AU14JobGOVFORDSPilot
+    - AU14JobGOVFORGunshipPilot
+    - AU14JobGOVFORFighterPilot
+    - AU14JobGOVFORFighterSystemsOfficer
     - AU14JobGOVFORDCC
     - AU14JobGOVFORVehicleCrewman
     - AU14JobGOVFORVehicleCommander
@@ -157,6 +208,9 @@
     - AU14JobOPFORSectionSergeant
     - AU14JobOPFORSquadSergeant
     - AU14JobOPFORDSPilot
+    - AU14JobOPFORGunshipPilot
+    - AU14JobOPFORFighterPilot
+    - AU14JobOPFORFighterSystemsOfficer
     - AU14JobOPFORDCC
     - AU14JobOPFORVehicleCrewman
     - AU14JobOPFORVehicleCommander

@@ -1,5 +1,6 @@
 using System.Linq;
 using Content.Server.Players.PlayTimeTracking;
+using Content.Server._RMC14.Marines.Roles.Ranks;
 using Content.Shared.GameTicking;
 using Content.Shared.Roles;
 using Robust.Shared.Prototypes;
@@ -38,7 +39,8 @@ public sealed partial class ChevronSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete);
+        // The selected platoon's insignia overrides the generic job rank, including Civilian fallbacks.
+        SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete, after: new[] { typeof(RankSystem) });
         SubscribeLocalEvent<PlayerAttachedEvent>(OnPlayerAttached);
         SubscribeLocalEvent<DidEquipEvent>(OnJumpsuitEquipped);
     }
@@ -249,7 +251,7 @@ public sealed partial class ChevronSystem : EntitySystem
         if (!TryComp<NpcFactionMemberComponent>(mob, out var factionMember))
             return null;
 
-        var platoonRule = EntitySystem.Get<PlatoonSpawnRuleSystem>();
+        var platoonRule = EntityManager.System<PlatoonSpawnRuleSystem>();
 
         foreach (var faction in factionMember.Factions)
         {
@@ -277,35 +279,40 @@ public sealed partial class ChevronSystem : EntitySystem
     {
         if (platoon?.ChevronOverrides != null)
         {
+            Dictionary<ProtoId<RankPrototype>, ChevronDefinition>? best = null;
+            var bestDistance = int.MaxValue;
             foreach (var (overrideJobId, overrideChevrons) in platoon.ChevronOverrides)
             {
-                if (JobInheritsFrom(job.ID, overrideJobId.Id))
+                if (InheritanceDistance(job.ID, overrideJobId.Id) is { } distance && distance < bestDistance)
                 {
-                    return overrideChevrons.ToDictionary(
-                        kvp => kvp.Key.Id,
-                        kvp => kvp.Value);
+                    best = overrideChevrons;
+                    bestDistance = distance;
                 }
             }
+
+            if (best != null)
+                return best.ToDictionary(kvp => kvp.Key.Id, kvp => kvp.Value);
         }
 
         return job.Chevrons;
     }
 
-    private bool JobInheritsFrom(string jobId, string ancestorId)
+    private int? InheritanceDistance(string jobId, string ancestorId)
     {
         if (jobId == ancestorId)
-            return true;
+            return 0;
 
         if (!_prototypes.TryIndex<JobPrototype>(jobId, out var job) || job.Parents == null)
-            return false;
+            return null;
 
+        int? closest = null;
         foreach (var parent in job.Parents)
         {
-            if (JobInheritsFrom(parent, ancestorId))
-                return true;
+            if (InheritanceDistance(parent, ancestorId) is { } distance && (closest == null || distance + 1 < closest))
+                closest = distance + 1;
         }
 
-        return false;
+        return closest;
     }
 
     private void TrySpawnFirstValidChevron(

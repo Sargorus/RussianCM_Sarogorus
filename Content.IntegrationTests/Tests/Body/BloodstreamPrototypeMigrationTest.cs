@@ -44,13 +44,13 @@ public sealed class BloodstreamPrototypeMigrationTest : GameTest
     }
 
     [Test]
-    public async Task AbominationRemainsBloodlessWithoutBloodlossStatusThreshold()
+    public async Task BiomorphRemainsBloodlessWithoutBloodlossStatusThreshold() // CMU14
     {
         var map = await Pair.CreateTestMap();
 
         await Server.WaitAssertion(() =>
         {
-            var target = SSpawnAtPosition("AU14AbominationGrunt", map.GridCoords);
+            var target = SSpawnAtPosition("AU14BiomorphGrunt", map.GridCoords);
             var bloodstream = SEntity<BloodstreamComponent>(target);
             var reference = _bloodstream.GetBloodReferenceSolution(bloodstream);
 
@@ -78,7 +78,9 @@ public sealed class BloodstreamPrototypeMigrationTest : GameTest
             Assert.Multiple(() =>
             {
                 Assert.That(SEntMan.HasComponent<SolutionManagerComponent>(target), Is.True);
+#pragma warning disable CS0612 // CMU14: Regression coverage intentionally inspects the legacy solution schema.
                 Assert.That(SEntMan.HasComponent<SolutionContainerManagerComponent>(target), Is.False);
+#pragma warning restore CS0612
                 Assert.That(SComp<InjectableSolutionComponent>(target).Solution,
                     Is.EqualTo(BloodstreamComponent.DefaultBloodSolutionName));
             });

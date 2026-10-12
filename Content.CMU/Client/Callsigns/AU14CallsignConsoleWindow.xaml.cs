@@ -56,7 +56,7 @@ public sealed partial class AU14CallsignConsoleWindow : DefaultWindow
 
         GroupCreateRow.Visible = canEdit;
 
-        FactionLabel.Text = Loc.GetString("au14-callsign-console-net", ("faction", state.Faction.ToUpperInvariant()));
+        FactionLabel.Text = Loc.GetString("au14-callsign-console-net", ("faction", Loc.GetString($"cmu-callsign-faction-{state.Faction.ToLowerInvariant()}")));
         EditModeLabel.Text = canEdit
             ? Loc.GetString("au14-callsign-console-mode-edit")
             : Loc.GetString("au14-callsign-console-mode-readonly");

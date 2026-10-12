@@ -1,8 +1,10 @@
 using Content.Client.Corvax.TTS;
 using Content.Shared.Corvax.CCCVars;
+using Content.Shared.Preferences;
 
 namespace Content.Client.Lobby.UI;
 
+// CMU14 class: TTS voice selection, ordered delivery and playback.
 public sealed partial class HumanoidProfileEditor
 {
     private TTSTab? _ttsTab;
@@ -37,6 +39,14 @@ public sealed partial class HumanoidProfileEditor
             TabContainer.CurrentTab = 0;
 
         if (Profile != null)
+        {
+            var voice = HumanoidCharacterProfile.ValidateTTSVoice(Profile.TTSVoice, _prototypeManager, Profile.Sex);
+            if (voice != Profile.TTSVoice)
+            {
+                Profile = Profile.WithTTSVoice(voice);
+                SetDirty();
+            }
             _ttsTab.UpdateControls(Profile, Profile.Sex);
+        }
     }
 }

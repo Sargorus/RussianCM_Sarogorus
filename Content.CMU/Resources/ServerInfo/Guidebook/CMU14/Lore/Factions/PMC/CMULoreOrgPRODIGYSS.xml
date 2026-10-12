@@ -1,0 +1,17 @@
+<Document>
+  # Служба безопасности Prodigy
+
+  <Box>
+    <CMUGuideOutfitEmbed Gear="AU14GearCivilianProdigyGuardSurv" Caption="Охранник"/>
+    <CMUGuideOutfitEmbed Gear="AU14GearCivilianProdigyGuardMedicSurv" Caption="Медик"/>
+    <CMUGuideOutfitEmbed Gear="AU14GearCivilianProdigyGuardLeaderSurv" Caption="Командир"/>
+  </Box>
+
+  [bold]Служба безопасности[/bold] — частная армия [textlink="корпорации Prodigy" link="CMUGuideLoreCorporations"]. Поддерживает порядок в городе Продиджи, проводит поисково-спасательные операции и защищает город от конкурентов. Для поддержки оставшейся деятельности солдат также отправляют по контрактам в дальний космос как [bold]Силы безопасности корпорации Prodigy[/bold].
+
+  ## В разработке
+  Эта страница ещё пишется.
+
+  ## Доступные подразделения
+  - [textlink="Силы безопасности Prodigy" link="CMUGuideLorePlatoonPRODIGYSF"]
+</Document>

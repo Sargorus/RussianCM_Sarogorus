@@ -58,7 +58,7 @@ public sealed partial class CMUXenoCycloneSystem : EntitySystem
 
         _audio.PlayPredicted(xeno.Comp.WindupSound, xeno, xeno);
 
-        _popup.PopupPredicted(
+        _popup.PopupEntity(
             Loc.GetString("cmu14-xeno-cyclone-charge"),
             Loc.GetString("cmu14-xeno-cyclone-charge-others", ("xeno", xeno.Owner)),
             xeno, xeno, PopupType.MediumCaution);
@@ -76,7 +76,7 @@ public sealed partial class CMUXenoCycloneSystem : EntitySystem
 
     private void OnDoAfter(Entity<CMUXenoCycloneComponent> xeno, ref CMUXenoCycloneDoAfterEvent args)
     {
-        if (args.Cancelled || args.Handled)
+        if (args.Cancelled || args.Handled || _mobState.IsDead(xeno))
             return;
 
         args.Handled = true;
@@ -108,7 +108,7 @@ public sealed partial class CMUXenoCycloneSystem : EntitySystem
 
             Timer.Spawn(delay, () =>
             {
-                if (TerminatingOrDeleted(xeno))
+                if (TerminatingOrDeleted(xeno) || _mobState.IsDead(xeno))
                     return;
 
                 var hits = SpinHit(xeno, range, damagePerSpin,
@@ -185,7 +185,7 @@ public sealed partial class CMUXenoCycloneSystem : EntitySystem
         }
 
         // Play spin popup text on each spin tick, not just the first
-        _popup.PopupPredicted(
+        _popup.PopupEntity(
             Loc.GetString("cmu14-xeno-cyclone-spin"),
             Loc.GetString("cmu14-xeno-cyclone-spin-others", ("xeno", xeno.Owner)),
             xeno, xeno, PopupType.LargeCaution);
@@ -211,7 +211,7 @@ public sealed partial class CMUXenoCycloneSystem : EntitySystem
 
         Timer.Spawn(delay, () =>
         {
-            if (TerminatingOrDeleted(xeno))
+            if (TerminatingOrDeleted(xeno) || _mobState.IsDead(xeno))
                 return;
 
             ExecuteCycleSpins(xeno, nextRange, nextDamage,

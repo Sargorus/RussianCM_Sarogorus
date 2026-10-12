@@ -1,7 +1,7 @@
 cm-vending-machine-wrong-card = Обнаружен несоответствующий владелец ID-карты.
 cm-vending-machine-access-denied = Доступ запрещен.
 cm-vending-machine-specialist-max = Этот комплект уже занят.
-rmc-vending-machine-can-hack = Кажется, вы можете взломать этот автомат с помощью [color=cyan]мультитула[/color], чтобы снять ограничения.
+rmc-vending-machine-can-hack = Кажется, вы можете взломать этот автомат с помощью [color=cyan]Мультитул[/color], чтобы снять ограничения.
 rmc-vending-machine-cannot-hack = Вам не удается обойти ограничения доступа в {$vendor}.
 rmc-vending-machine-hack-no-skill = Вы не понимаете, как изменить параметры доступа в {$vendor}.
 rmc-vending-machine-hack-start = Вы начинаете изменять параметры доступа в {$vendor}.
@@ -20,5 +20,5 @@ rmc-vending-stock-personal = {$stock} (личный лимит: осталось
 
 rmc-vendor-entry-mandatory = Обязательно: {$name}
 rmc-vendor-entry-recommended = Рекомендуется: {$name}
-rmc-vendor-win-points = Очки победы {$faction}: {$points}
 rmc-vendor-points-remaining = Осталось баллов: {$points}
+
