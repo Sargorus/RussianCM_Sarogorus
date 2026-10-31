@@ -52,7 +52,7 @@
         crate: CMUCrateM54C2
       - cost: 1000
         crate: CMUCrateNSG23
-      - cost: 6000
+      - cost: 5500
         crate: CMUCrateWYSentryOmni
       - cost: 4500
         crate: CMUCrateWYSentry
