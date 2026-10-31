@@ -40,25 +40,21 @@
       entries:
       - cost: 700
         crate: CMUCrateBiosuitWYTSSArmor
-      - cost: 200
-        crate: RMCAttachmentSuppressor
-      - cost: 200
+      - cost: 400
         crate: RMCAttachmentAngledGrip
-      - cost: 500
+      - cost: 700
         crate: RMCAttachmentS42xTelescopicMiniscope
-      - cost: 300
-        crate: CMUAttachmentNightVisionScope
     - name: WEYSEC Weapons
       entries:
-      - cost: 750
+      - cost: 1250
         crate: CMUCrateP90
-      - cost: 800
+      - cost: 1300
         crate: CMUCrateM54C2
-      - cost: 500
+      - cost: 1000
         crate: CMUCrateNSG23
-      - cost: 5500
+      - cost: 6000
         crate: CMUCrateWYSentryOmni
-      - cost: 4000
+      - cost: 4500
         crate: CMUCrateWYSentry
     - name: WEYSEC Ammo
       entries:

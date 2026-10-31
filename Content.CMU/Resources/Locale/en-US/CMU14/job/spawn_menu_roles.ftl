@@ -22,7 +22,8 @@ au14-spawn-role-name-govfor-vehicle-crewman = Vehicle Crewman (GOVFOR)
 
 au14-spawn-role-name-colony-prisoner = Prisoner (CMU)
 au14-spawn-role-name-wy-liaison = WY Liaison (CMU)
-au14-spawn-role-name-wy-scientist = WY Scientist (CMU)
+au14-spawn-role-name-wy-scientist = WY Scientist-Pharmacist (CMU)
+au14-spawn-role-name-wy-scientist-surgeon = WY Scientist-Surgeon (CMU)
 au14-spawn-role-name-working-joe-colony = Working Joe (Colony)
 au14-spawn-role-name-wy-corporate-goon = Complex Security Officer
 

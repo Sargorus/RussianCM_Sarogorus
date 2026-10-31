@@ -5,11 +5,6 @@ au14-job-name-wyguardleader = Глава отдела безопасности �
 au14-job-description-wyguardleader = Вы возглавляете отдел безопасности комплекса Вейланд-Ютани. Организуйте охрану, распределяйте посты и отвечайте за безопасность объекта.
 au14-job-prefix-wyguardleader = Гл. КБ
 
-au14-job-name-wyguardmedic = Санитар отдела безопасности комплекса
-au14-job-description-wyguardmedic = Вы санитар корпоративной охраны. Поддерживайте бойцов в строю, оказывайте первую помощь и следите за медицинским обеспечением отдела.
-au14-job-prefix-wyguardmedic = Сан. КБ
-
 au14-job-supervisors-wysecurityleader = Глава отдела безопасности комплекса
 
 au14-spawn-role-name-wy-security-leader = Глава отдела безопасности комплекса
-au14-spawn-role-name-wy-security-medic = Санитар отдела безопасности комплекса

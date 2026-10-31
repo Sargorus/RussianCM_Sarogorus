@@ -130,10 +130,10 @@
             AU14JobCivilianCorporateAssistant: [1, 1]
             AU14JobCivilianCorporateHandyman: [1, 1]
 
-            AU14JobCivilianScientist: [8, 8]
+            AU14JobCivilianScientist: [6, 6]
+            AU14JobCivilianScientistSurgeon: [2, 2]
             AU14JobCorporateSynthetic: [1, 1]
             AU14JobWYGuardLeader: [1, 1]
-            AU14JobWYGuardMedic: [1, 1]
             AU14JobWYGuard: [6, 6]
 
             # Security/LEO

@@ -23,7 +23,7 @@
       RMCSkillDomestics: 1
       RMCSkillMedical: 3
       RMCSkillFirearms: 2
-      RMCSkillSurgery: 4
+      RMCSkillSurgery: 2
   - type: JobPrefix
     prefix: au14-job-prefix-civilianscientist
   - type: TacticalMapIcon
@@ -62,10 +62,78 @@
   - aumed
   roleWeight: 0.25
 
+- type: job
+  parent: CMJobBase
+  id: AU14JobCivilianScientistSurgeon
+  roundSide: Civilian
+  roundForce: WY
+  roundProfiles:
+  - AU14RoundJobProfileThirdParty
+  roundRole: CivilianScientistSurgeon
+  roundComponents:
+  - type: Skills
+    skills:
+      RMCSkillFireman: 1
+      RMCSkillVehicles: 1
+      RMCSkillDomestics: 1
+      RMCSkillMedical: 4
+      RMCSkillFirearms: 2
+      RMCSkillSurgery: 5
+  - type: JobPrefix
+    prefix: au14-job-prefix-civilianscientistsurgeon
+  - type: TacticalMapIcon
+    icon:
+      sprite: /Textures/_RMC14/Interface/cm_job_icons.rsi
+      state: weya_scientist
+  - type: AssignSquad
+    whitelist:
+      tags:
+      - CMUSquadStaffTag
+
+  name: au14-job-name-civilianscientistsurgeon
+  description: au14-job-description-civilianscientistsurgeon
+  setPreference: true
+  canBeAntag: true
+  playTimeTracker: AU14JobCivilianScientistSurgeon
+  ranks:
+    AU14RankScientistProfessor:
+    - !type:RoleTimeRequirement
+      role: AU14JobCivilianScientistSurgeon
+      time: 86400 # 24 hours
+    AU14RankScientistAssociate:
+    - !type:RoleTimeRequirement
+      role: AU14JobCivilianScientistSurgeon
+      time: 36000 # 10 hours
+    AU14RankScientistAssistant: []
+  startingGear: AU14GearCivilianScientistSurgeon
+  icon: "RMCJobIconPMCScientist"
+  requireAdminNotify: false
+  joinNotifyCrew: false
+  supervisors: au14-job-supervisors-colonycivilian
+  spawnMenuRoleName: au14-spawn-role-name-wy-scientist-surgeon
+  accessGroups:
+  - Colonist
+  - auwy
+  - aumed
+  roleWeight: 0.25
+
 - type: startingGear
   id: AU14GearCivilianScientist
   equipment:
     id: AU14IDCardCivilianScientist
+    jumpsuit: AU14CivilianWorkwearBlue
+    shoes: RMCShoesBlack
+    ears: AU14ColonyWeylandHeadset
+    ears2: RMCM5CameraGear
+    outerClothing: RMCLabcoatOpened
+  storage:
+    back:
+    - AU14StampWYSci
+
+- type: startingGear
+  id: AU14GearCivilianScientistSurgeon
+  equipment:
+    id: AU14IDCardCivilianScientistSurgeon
     jumpsuit: AU14CivilianWorkwearBlue
     shoes: RMCShoesBlack
     ears: AU14ColonyWeylandHeadset
@@ -85,6 +153,7 @@
   - type: CMUSpawnPointExtraJobs
     jobs:
     - AU14JobCivilianCorporateHandyman
+    - AU14JobCivilianScientistSurgeon
   - type: Sprite
     state: syn_spawn
 
@@ -92,8 +161,35 @@
   id: AU14JobCivilianScientist
   isHumanoid: true
 
+- type: playTimeTracker
+  id: AU14JobCivilianScientistSurgeon
+  isHumanoid: true
+
 - type: roleLoadout
   id: JobAU14JobCivilianScientist
+  points: 7
+  groups:
+  - MedGlovesAU14
+  - MedMaskAU14
+  - ScientistPouchAU14
+  - ScientistPouchRightAU14
+  - MedBackpackAU14
+  - PaperworkRMC
+  - WYCLJumpsuitAU14
+  - WYCLOuterwearAU14
+  - MedJacketAU14
+  - CivJacketAU14
+  - WYCLHeadwearAU14
+  - WYCLFootwearAU14
+  - RecreationalRMC
+  - CannedDrinksAU14
+  - SmokablesRMC
+  - EyewearRMC
+  - MasksRMC
+  - HeadwearCLFAU14
+
+- type: roleLoadout
+  id: JobAU14JobCivilianScientistSurgeon
   points: 7
   groups:
   - MedGlovesAU14

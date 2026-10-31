@@ -149,6 +149,17 @@
     factions:
     - FactionWEYU
 
+- type: entity
+  parent: AU14IDCardBaseCivilianNoIFF
+  id: AU14IDCardCivilianScientistSurgeon
+  name: scientist-surgeon ID card
+  components:
+  - type: PresetIdCard
+    job: AU14JobCivilianScientistSurgeon
+  - type: ItemIFF
+    factions:
+    - FactionWEYU
+
 # ├──[ SYNTHS ]──────────────────────────────────────────────────────┤
 - type: entity
   parent: AU14IDCardBaseCivilianNoIFF
@@ -249,17 +260,6 @@
   components:
   - type: PresetIdCard
     job: AU14JobWYGuardLeader
-  - type: ItemIFF
-    factions:
-    - FactionWEYU
-
-- type: entity
-  parent: AU14IDCardBaseCivilianNoIFF
-  id: AU14IDCardWYSecurityMedic
-  name: WY complex security corpsman ID card
-  components:
-  - type: PresetIdCard
-    job: AU14JobWYGuardMedic
   - type: ItemIFF
     factions:
     - FactionWEYU

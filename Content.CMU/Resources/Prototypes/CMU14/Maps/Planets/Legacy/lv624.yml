@@ -127,6 +127,7 @@
             AU14JobCivilianCorporateHandyman: [1, 1]
 
             AU14JobCivilianScientist: [3, 3]
+            AU14JobCivilianScientistSurgeon: [1, 1]
             AU14JobWYGuardLeader: [1, 1]
             AU14JobWYGuard: [1, 1]
 

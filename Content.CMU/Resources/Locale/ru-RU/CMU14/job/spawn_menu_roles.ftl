@@ -98,7 +98,8 @@ au14-spawn-role-name-govfor-vehicle-crewman = Член экипажа броне
 au14-spawn-role-name-working-joe-colony = Рабочий Джо
 au14-spawn-role-name-wy-corporate-goon = Сотрудник отдела безопасности комплекса
 au14-spawn-role-name-wy-liaison = Связной Ве-Ю
-au14-spawn-role-name-wy-scientist = Учёный Ве-Ю
+au14-spawn-role-name-wy-scientist = Учёный-Фармацевт Ве-Ю
+au14-spawn-role-name-wy-scientist-surgeon = Учёный-Хирург Ве-Ю
 cmu-colony-name-atmosian = Атмосферный техник колонии
 
 cmu-spawn-role-auxiliary-staff-opfor = Вспомогательный персонал (OPFOR)

@@ -17,9 +17,10 @@
             AU14JobCivilianPrisoner: [ -1, -1 ]
             # CMU14: split WY corporate security roles
             AU14JobWYGuardLeader: [1, 1]
-            AU14JobWYGuardMedic: [1, 1]
+            # AU14JobWYGuardMedic: [1, 1] # CMU14: replaced by the scientist-surgeon
             AU14JobWYGuard: [2, 2]
             AU14JobCivilianKellandWarden: [1, 1]
             AU14JobCivilianScientist: [3, 3]
+            AU14JobCivilianScientistSurgeon: [1, 1]
             AU14JobCivilianFreightSystemsSpecialist: [1, 1]
             AU14JobCivilianPhysician: [1, 1]

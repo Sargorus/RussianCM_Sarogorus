@@ -135,9 +135,13 @@ au14-job-name-colonysecurityleader = Colony Security Leader
 au14-job-description-colonysecurityleader = Senior Colony Security Officer. Lead security operations across both the CMB and corporate security apparatus on-colony.
 au14-job-prefix-colonysecurityleader = CSLDR
 
-au14-job-name-civilianscientist = Scientist
-au14-job-description-civilianscientist = You're a scientist employed by the Weyland-Yutani corporation or government institution.
-au14-job-prefix-civilianscientist = SCI.
+au14-job-name-civilianscientist = Scientist-Pharmacist
+au14-job-description-civilianscientist = You're a scientist-pharmacist employed by the Weyland-Yutani corporation or government institution. Prepare medicine and assist the surgeons.
+au14-job-prefix-civilianscientist = PHARM.
+
+au14-job-name-civilianscientistsurgeon = Scientist-Surgeon
+au14-job-description-civilianscientistsurgeon = You're a scientist-surgeon employed by the Weyland-Yutani corporation or government institution. Perform surgery and keep the complex personnel alive.
+au14-job-prefix-civilianscientistsurgeon = SURG.
 
 au14-job-name-usasfrecruiter = UA Recruiter
 au14-job-description-usasfrecruiter = You're a recruiter from the United Americas. You've been stationed on the colony to legally enlist civilians into the UA Military. (Role available on LV-624)

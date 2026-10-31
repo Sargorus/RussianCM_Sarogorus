@@ -1,2 +1,2 @@
-ent-CMUSquadSecurity = Охрана
-ent-CMUSquadStaff = Гражданский персонал
+ent-CMUSquadSecurity = СБ
+ent-CMUSquadStaff = Персонал

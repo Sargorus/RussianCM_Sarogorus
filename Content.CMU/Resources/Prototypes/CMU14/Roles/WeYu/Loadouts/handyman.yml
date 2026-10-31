@@ -17,6 +17,21 @@
   - CorporateHandymanIDEngineerAU14
   - CorporateHandymanIDCookAU14
 
+- type: loadout
+  id: CorporateHandymanApronAU14
+  equipment:
+    outerClothing: AU14CivilianBaristaApron
+
+- type: loadoutGroup
+  id: CorporateHandymanJacketAU14
+  name: au14-loadout-group-civilian-jacket
+  minLimit: 0
+  maxLimit: 2
+  loadouts:
+  - CorporateHandymanApronAU14
+  - HazardVestAU14
+  - CivilianJacketSnowSuitAU14
+
 - type: loadoutGroup
   id: CorporateHandymanJumpsuitAU14
   name: au14-loadout-group-corporate-handyman-jumpsuit
