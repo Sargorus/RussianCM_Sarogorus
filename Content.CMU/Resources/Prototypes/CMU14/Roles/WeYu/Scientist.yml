@@ -82,6 +82,9 @@
   components:
   - type: SpawnPoint
     job_id: AU14JobCivilianScientist
+  - type: CMUSpawnPointExtraJobs
+    jobs:
+    - AU14JobCivilianCorporateHandyman
   - type: Sprite
     state: syn_spawn
 

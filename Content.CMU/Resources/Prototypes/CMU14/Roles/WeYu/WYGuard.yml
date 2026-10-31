@@ -305,7 +305,6 @@
     jobs:
     - AU14JobWYGuardLeader
     - AU14JobWYGuardMedic
-    - AU14JobCivilianCorporateHandyman
   - type: Sprite
     state: syn_spawn
 
