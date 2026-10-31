@@ -37,7 +37,7 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - SquadPMC
+      - CMUSquadWhiskeyTag
 
   name: au14-job-name-wysecurityofficer
   description: au14-job-description-wysecurityofficer
@@ -116,7 +116,8 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - SquadPMC
+      - CMUSquadWhiskeyTag
+  - type: MarineOrders
 
   name: au14-job-name-wyguardleader
   description: au14-job-description-wyguardleader
@@ -182,7 +183,7 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - SquadPMC
+      - CMUSquadWhiskeyTag
 
   name: au14-job-name-wyguardmedic
   description: au14-job-description-wyguardmedic

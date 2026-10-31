@@ -167,11 +167,23 @@
   components:
   - type: StorageFill
     contents:
-    - id: AU14SentryMiniWeYu
+    - id: CMUSentryMiniWeYu
       amount: 1
     - id: RMCSentryLaptop
       amount: 1
     - id: RMCMagazineSentry
+      amount: 1
+
+# CMU14: WEYSEC sentry upgrade kit, applies to the WY 571-D.
+- type: entity
+  parent: RMCCrateWeapons
+  id: CMUCrateSentryUpgrade
+  name: sentry upgrade kit crate
+  description: A crate containing one engineering upgrade kit. Fits the WY 571-D, which refits into the 571-DX pattern.
+  components:
+  - type: StorageFill
+    contents:
+    - id: RMCEngineeringUpgrade
       amount: 1
 
 - type: entity

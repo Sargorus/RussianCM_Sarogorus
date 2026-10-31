@@ -15,8 +15,9 @@ public sealed partial class CMDistressSignalRuleComponent : Component
     [DataField]
     public List<EntProtoId> SquadIds = new() { "SquadAlpha", "SquadBravo", "SquadCharlie", "SquadDelta" };
 
+    // CMU14: WY overwatch squads Whiskey/Kilo/Lima, manual assignment only.
     [DataField]
-    public List<EntProtoId> ExtraSquadIds = new() { "SquadIntel", "SquadFORECON", "SquadWhiskey", "SquadKilo", "SquadLima" };
+    public List<EntProtoId> ExtraSquadIds = new() { "SquadIntel", "SquadFORECON", "CMUSquadWhiskey", "CMUSquadKilo", "CMUSquadLima" };
 
     [DataField]
     public Dictionary<EntProtoId, EntityUid> Squads = new();

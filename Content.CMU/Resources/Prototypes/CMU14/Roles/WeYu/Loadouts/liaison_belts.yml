@@ -1,10 +1,11 @@
+# CMU14: corporate liaison sidearm belts.
 - type: loadout
-  id: CorporateLiaisonBeltGeneralPistolAU14
+  id: CMULiaisonBeltGeneralPistol
   equipment:
-    belt: AU14BeltHolsterPistolBlackFilledM77
+    belt: CMUBeltHolsterPistolBlackFilledM77
 
 - type: loadout
-  id: CorporateLiaisonBeltMatebaCustomAU14
+  id: CMULiaisonBeltMatebaCustom
   effects:
   - !type:JobRequirementLoadoutEffect
     requirement:
@@ -15,70 +16,22 @@
     belt: AU14MatebaCustomBeltFilledAmmo
 
 - type: loadout
-  id: CorporateLiaisonBeltMatebaSpecialAU14
+  id: CMULiaisonBeltLuxuriousMateba
   effects:
   - !type:JobRequirementLoadoutEffect
     requirement:
       !type:RoleTimeRequirement
       role: AU14JobCivilianCorporateLiaison
-      time: 36000 # 10 hours
+      time: 360000 # 100 hours
   equipment:
-    belt: AU14MatebaSpecialBeltFilledAmmo
-
-- type: loadout
-  id: CorporateLiaisonBeltHandcannonAU14
-  effects:
-  - !type:JobRequirementLoadoutEffect
-    requirement:
-      !type:RoleTimeRequirement
-      role: AU14JobCivilianCorporateLiaison
-      time: 72000 # 20 hours
-  equipment:
-    belt: AU14BeltHolsterPistolBlackHandcannonFilled
-
-- type: loadout
-  id: CorporateLiaisonBeltGoldHandcannonAU14
-  effects:
-  - !type:JobRequirementLoadoutEffect
-    requirement:
-      !type:RoleTimeRequirement
-      role: AU14JobCivilianCorporateLiaison
-      time: 72000 # 20 hours
-  equipment:
-    belt: AU14BeltHolsterPistolBlackHandcannonGoldFilled
-
-- type: loadout
-  id: CorporateLiaisonBeltWinterWyvernAU14
-  effects:
-  - !type:JobRequirementLoadoutEffect
-    requirement:
-      !type:RoleTimeRequirement
-      role: AU14JobCivilianCorporateLiaison
-      time: 72000 # 20 hours
-  equipment:
-    belt: AU14BeltHolsterPistolBlackHandcannonWinterWyvernFilled
-
-- type: loadout
-  id: CorporateLiaisonBeltLuxuriousMatebaAU14
-  effects:
-  - !type:JobRequirementLoadoutEffect
-    requirement:
-      !type:RoleTimeRequirement
-      role: AU14JobCivilianCorporateLiaison
-      time: 108000 # 30 hours
-  equipment:
-    belt: AU14MatebaBeltLuxuriousFilledWEYADirector
+    belt: CMUMatebaBeltLuxuriousFilledWEYADirector
 
 - type: loadoutGroup
-  id: CorporateLiaisonBeltAU14
+  id: CMULiaisonBelt
   name: au14-loadout-group-commander-sidearm-belt
   minLimit: 1
   maxLimit: 1
   loadouts:
-  - CorporateLiaisonBeltGeneralPistolAU14
-  - CorporateLiaisonBeltMatebaCustomAU14
-  - CorporateLiaisonBeltMatebaSpecialAU14
-  - CorporateLiaisonBeltHandcannonAU14
-  - CorporateLiaisonBeltGoldHandcannonAU14
-  - CorporateLiaisonBeltWinterWyvernAU14
-  - CorporateLiaisonBeltLuxuriousMatebaAU14
+  - CMULiaisonBeltGeneralPistol
+  - CMULiaisonBeltMatebaCustom
+  - CMULiaisonBeltLuxuriousMateba

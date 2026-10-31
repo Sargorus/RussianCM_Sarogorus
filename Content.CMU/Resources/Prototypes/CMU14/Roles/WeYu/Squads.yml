@@ -1,9 +1,10 @@
-# WY PMC overwatch squads. These intentionally have no SquadPMC tag, so
-# AssignSquad never puts anyone in them automatically. They start empty and
-# only accept manual transfers from a WeYa overwatch console.
+# CMU14: WY PMC overwatch squads. These intentionally have no SquadPMC tag, so
+# AssignSquad never puts anyone in them automatically. Kilo and Lima start empty
+# and only accept manual transfers from a WeYa overwatch console. Whiskey is the
+# default guard squad and has its own tag so WY guard jobs spawn into it.
 - type: entity
   parent: SquadBase
-  id: SquadWhiskey
+  id: CMUSquadWhiskey
   name: Whiskey
   components:
   - type: SquadTeam
@@ -26,10 +27,13 @@
     leaderIcon:
       sprite: _RMC14/Interface/cm_job_icons.rsi
       state: weya_goon_lead
+  - type: Tag
+    tags:
+    - CMUSquadWhiskeyTag
 
 - type: entity
   parent: SquadBase
-  id: SquadKilo
+  id: CMUSquadKilo
   name: Kilo
   components:
   - type: SquadTeam
@@ -55,7 +59,7 @@
 
 - type: entity
   parent: SquadBase
-  id: SquadLima
+  id: CMUSquadLima
   name: Lima
   components:
   - type: SquadTeam
@@ -78,3 +82,6 @@
     leaderIcon:
       sprite: _RMC14/Interface/cm_job_icons.rsi
       state: weya_goon_lead
+
+- type: Tag
+  id: CMUSquadWhiskeyTag

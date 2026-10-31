@@ -11,6 +11,9 @@
   - type: Tag
     tags:
     - RMCSentryWeYa
+  - type: Sentry
+    upgrades:
+    - CMUSentryOmniWeYuMk2
   - type: SentryTargeting
     lockedFriendlyFactions:
     - AUWeYu
@@ -21,9 +24,22 @@
     deployedFriendlyFactions:
     - AUWeYu
     - WeYa
+
+# CMU14: result of applying RMCEngineeringUpgrade to the WY 571-D.
+- type: entity
+  parent: AU14SentryOmniWeYu
+  id: CMUSentryOmniWeYuMk2
+  name: WY 571-DX omnidirectional sentry gun
+  description: A Weyland-Yutani 571-D refitted with the corporate accuracy package. The rebuilt feed delivers the full M30 autocannon punch of a standard sentry while keeping the 360-degree mount.
+  components:
+  - type: GunDamageModifier
+    multiplier: 1
+  - type: Sentry
+    upgrades: null
+
 - type: entity
   parent: RMCSentryMiniWeYa
-  id: AU14SentryMiniWeYu
+  id: CMUSentryMiniWeYu # CMU14
   components:
   - type: UserIFF
     factions:

@@ -653,7 +653,7 @@
 
 - type: entity
   parent: AU14BeltHolsterPistolBlack
-  id: AU14BeltHolsterPistolBlackFilledM77
+  id: CMUBeltHolsterPistolBlackFilledM77 # CMU14
   suffix: Black, AU14, Filled, M77
   components:
   - type: StorageFill
@@ -665,7 +665,7 @@
 
 - type: entity
   parent: RMCMatebaBeltLuxuriousFilledWEYA
-  id: AU14MatebaBeltLuxuriousFilledWEYADirector
+  id: CMUMatebaBeltLuxuriousFilledWEYADirector # CMU14
   suffix: Заполнен, Директор Ве-Ю
 
 - type: entity
