@@ -1,63 +1,13 @@
-# CMU14: WY PMC overwatch squads. These intentionally have no SquadPMC tag, so
-# AssignSquad never puts anyone in them automatically. Whiskey and Kilo start
-# empty and only accept manual transfers from a WeYa overwatch console. Lima is
-# the default guard squad and has its own tag so WY guard jobs spawn into it.
+# CMU14: WY overwatch squads. These intentionally have no SquadPMC tag, so
+# AssignSquad never puts anyone in them automatically. Security holds the WY
+# guards, the liaison and his assistant; Civilian staff holds the scientists,
+# the handyman and the corporate administration. Membership comes from the
+# per-job AssignSquad tags below, and both squads are visible in the WeYa
+# overwatch console.
 - type: entity
   parent: SquadBase
-  id: CMUSquadWhiskey
-  name: Whiskey
-  components:
-  - type: SquadTeam
-    color: "#D3D3D3"
-    background:
-      sprite: _RMC14/Interface/cm_job_icons.rsi
-      state: empty
-    blacklistedSquadArmor:
-    - Helmet
-    - Goggles
-    - Armor
-    - Gloves
-    radio: radioWEYU
-    minimapBackground:
-      sprite: /Textures/_RMC14/Interface/map_blips.rsi
-      state: background_pmc
-    canSupplyDrop: false
-    group: WeYa
-    maxRoles: {}
-    leaderIcon:
-      sprite: _RMC14/Interface/cm_job_icons.rsi
-      state: weya_goon_lead
-
-- type: entity
-  parent: SquadBase
-  id: CMUSquadKilo
-  name: Kilo
-  components:
-  - type: SquadTeam
-    color: "#E25822"
-    background:
-      sprite: _RMC14/Interface/cm_job_icons.rsi
-      state: empty
-    blacklistedSquadArmor:
-    - Helmet
-    - Goggles
-    - Armor
-    - Gloves
-    radio: radioWEYU
-    minimapBackground:
-      sprite: /Textures/_RMC14/Interface/map_blips.rsi
-      state: background_pmc
-    canSupplyDrop: false
-    group: WeYa
-    maxRoles: {}
-    leaderIcon:
-      sprite: _RMC14/Interface/cm_job_icons.rsi
-      state: weya_goon_lead
-
-- type: entity
-  parent: SquadBase
-  id: CMUSquadLima
-  name: Lima
+  id: CMUSquadSecurity
+  name: Охрана
   components:
   - type: SquadTeam
     color: "#FFA500"
@@ -81,7 +31,39 @@
       state: weya_goon_lead
   - type: Tag
     tags:
-    - CMUSquadLimaTag
+    - CMUSquadSecurityTag
+
+- type: entity
+  parent: SquadBase
+  id: CMUSquadCivilianStaff
+  name: Гражданский персонал
+  components:
+  - type: SquadTeam
+    color: "#D3D3D3"
+    background:
+      sprite: _RMC14/Interface/cm_job_icons.rsi
+      state: empty
+    blacklistedSquadArmor:
+    - Helmet
+    - Goggles
+    - Armor
+    - Gloves
+    radio: radioWEYU
+    minimapBackground:
+      sprite: /Textures/_RMC14/Interface/map_blips.rsi
+      state: background_pmc
+    canSupplyDrop: false
+    group: WeYa
+    maxRoles: {}
+    leaderIcon:
+      sprite: _RMC14/Interface/cm_job_icons.rsi
+      state: weya_scientist
+  - type: Tag
+    tags:
+    - CMUSquadCivilianStaffTag
 
 - type: Tag
-  id: CMUSquadLimaTag
+  id: CMUSquadSecurityTag
+
+- type: Tag
+  id: CMUSquadCivilianStaffTag

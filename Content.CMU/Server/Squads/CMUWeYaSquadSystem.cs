@@ -15,9 +15,8 @@ public sealed class CMUWeYaSquadSystem : EntitySystem
 {
     private static readonly EntProtoId[] WeYaSquads =
     {
-        "CMUSquadWhiskey",
-        "CMUSquadKilo",
-        "CMUSquadLima",
+        "CMUSquadSecurity",
+        "CMUSquadCivilianStaff",
     };
 
     [Dependency] private SquadSystem _squad = default!;

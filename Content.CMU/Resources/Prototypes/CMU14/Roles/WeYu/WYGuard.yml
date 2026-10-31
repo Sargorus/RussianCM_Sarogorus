@@ -37,7 +37,7 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - CMUSquadLimaTag
+      - CMUSquadSecurityTag
 
   name: au14-job-name-wysecurityofficer
   description: au14-job-description-wysecurityofficer
@@ -116,7 +116,7 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - CMUSquadLimaTag
+      - CMUSquadSecurityTag
   - type: MarineOrders
 
   name: au14-job-name-wyguardleader
@@ -183,7 +183,7 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - CMUSquadLimaTag
+      - CMUSquadSecurityTag
 
   name: au14-job-name-wyguardmedic
   description: au14-job-description-wyguardmedic

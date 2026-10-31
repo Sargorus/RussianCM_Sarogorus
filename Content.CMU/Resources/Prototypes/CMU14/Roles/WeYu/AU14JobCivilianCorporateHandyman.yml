@@ -27,7 +27,7 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - SquadPMC
+      - CMUSquadCivilianStaffTag
 
   name: au14-job-name-corporatehandyman
   description: au14-job-description-corporatehandyman
@@ -64,6 +64,8 @@
   storage:
     back:
     - CMStampApproved
+    - ClothingHeadHatWelding
+    - RMCWeldingGoggles
 
 - type: playTimeTracker
   id: AU14JobCivilianCorporateHandyman
