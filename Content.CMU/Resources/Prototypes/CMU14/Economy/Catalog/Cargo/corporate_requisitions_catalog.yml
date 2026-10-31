@@ -48,8 +48,6 @@
         crate: RMCAttachmentS42xTelescopicMiniscope
       - cost: 300
         crate: CMUAttachmentNightVisionScope
-      - cost: 1000
-        crate: CMUCrateSentryUpgrade
     - name: WEYSEC Weapons
       entries:
       - cost: 750
