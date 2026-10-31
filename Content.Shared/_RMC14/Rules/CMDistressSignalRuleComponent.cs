@@ -17,7 +17,7 @@ public sealed partial class CMDistressSignalRuleComponent : Component
 
     // CMU14: WY overwatch squads, manual assignment only.
     [DataField]
-    public List<EntProtoId> ExtraSquadIds = new() { "SquadIntel", "SquadFORECON", "CMUSquadSecurity", "CMUSquadCivilianStaff" };
+    public List<EntProtoId> ExtraSquadIds = new() { "SquadIntel", "SquadFORECON", "CMUSquadSecurity", "CMUSquadStaff" };
 
     [DataField]
     public Dictionary<EntProtoId, EntityUid> Squads = new();

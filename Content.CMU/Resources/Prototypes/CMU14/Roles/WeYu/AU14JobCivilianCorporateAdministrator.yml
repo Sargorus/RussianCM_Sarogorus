@@ -30,7 +30,7 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - CMUSquadCivilianStaffTag
+      - SquadPMC
 
   name: cmu-job-title-corporate-administrator
   description: au14-job-description-civiliancorporateadministrator

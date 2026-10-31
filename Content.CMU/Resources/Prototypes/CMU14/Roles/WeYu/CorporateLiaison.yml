@@ -47,7 +47,7 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - CMUSquadSecurityTag
+      - CMUSquadStaffTag
 
   name: au14-job-name-civiliancorporateliaison
   description: au14-job-description-civiliancorporateliaison

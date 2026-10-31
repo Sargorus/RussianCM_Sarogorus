@@ -27,7 +27,7 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - CMUSquadCivilianStaffTag
+      - CMUSquadStaffTag
 
   name: au14-job-name-corporatehandyman
   description: au14-job-description-corporatehandyman

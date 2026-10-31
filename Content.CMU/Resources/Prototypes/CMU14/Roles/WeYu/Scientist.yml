@@ -33,7 +33,7 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - CMUSquadCivilianStaffTag
+      - CMUSquadStaffTag
 
   name: au14-job-name-civilianscientist
   description: au14-job-description-civilianscientist

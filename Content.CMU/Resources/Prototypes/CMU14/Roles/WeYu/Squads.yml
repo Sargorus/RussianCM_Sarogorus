@@ -1,13 +1,12 @@
 # CMU14: WY overwatch squads. These intentionally have no SquadPMC tag, so
 # AssignSquad never puts anyone in them automatically. Security holds the WY
-# guards, the liaison and his assistant; Civilian staff holds the scientists,
-# the handyman and the corporate administration. Membership comes from the
-# per-job AssignSquad tags below, and both squads are visible in the WeYa
-# overwatch console.
+# guards; Staff holds the liaison, his assistant, the scientists and the
+# handyman. Membership comes from the per-job AssignSquad tags below, and both
+# squads are visible in the WeYa overwatch console.
 - type: entity
   parent: SquadBase
   id: CMUSquadSecurity
-  name: Охрана
+  name: Security
   components:
   - type: SquadTeam
     color: "#FFA500"
@@ -35,8 +34,8 @@
 
 - type: entity
   parent: SquadBase
-  id: CMUSquadCivilianStaff
-  name: Гражданский персонал
+  id: CMUSquadStaff
+  name: Staff
   components:
   - type: SquadTeam
     color: "#D3D3D3"
@@ -60,10 +59,10 @@
       state: weya_scientist
   - type: Tag
     tags:
-    - CMUSquadCivilianStaffTag
+    - CMUSquadStaffTag
 
 - type: Tag
   id: CMUSquadSecurityTag
 
 - type: Tag
-  id: CMUSquadCivilianStaffTag
+  id: CMUSquadStaffTag

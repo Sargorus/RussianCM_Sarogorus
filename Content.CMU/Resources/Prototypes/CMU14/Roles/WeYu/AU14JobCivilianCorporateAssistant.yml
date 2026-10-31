@@ -24,7 +24,7 @@
   - type: AssignSquad
     whitelist:
       tags:
-      - CMUSquadSecurityTag
+      - CMUSquadStaffTag
 
   name: cmu-job-title-corporate-assistant
   playTimeTracker: AU14JobCivilianCorporateAssistant
