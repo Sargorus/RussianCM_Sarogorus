@@ -234,6 +234,7 @@
     jumpsuit: AU14WYSecurityUniformRig
     shoes: RMCBootsPMCFilled
     head: AU14CivBallCapBlack
+    eyes: CMGlassesSecurity
     gloves: CMHandsBlackInsulated
     belt: RMCBeltSecurityWeYaFilled
     back: RMCSatchelLightpackBlack
@@ -255,12 +256,13 @@
     jumpsuit: AU14WYSecurityUniformRig
     shoes: RMCBootsPMCFilled
     head: ArmorHelmetPMCCorporateLead
+    eyes: CMGlassesSecurity
     gloves: CMHandsBlackInsulated
     belt: RMCBeltSecurityWeYaFilled
     back: RMCSatchelLightpackBlack
     ears: AU14ColonyWeylandHeadset
     ears2: RMCM5CameraGear
-    suitstorage: RMCM77BeltPMCFilled
+    suitstorage: AU14WeaponRifleF44AA
   storage:
     back:
     - RMCMREWeYa
@@ -276,6 +278,7 @@
     jumpsuit: AU14WYSecurityUniformRig
     shoes: RMCBootsPMCFilled
     head: AU14CivBallCapBlack
+    eyes: CMGlassesSecurity
     gloves: CMHandsBlackInsulated
     belt: RMCBeltSecurityWeYaFilled
     back: RMCSatchelLightpackBlack
@@ -288,6 +291,7 @@
     - CMCanteen
     - CMU14TearGasGrenade
     - RMCGrenadeFlashBang
+    - AU14CMDefibrillator
 
 - type: entity
   parent: CMSpawnPointJobBase

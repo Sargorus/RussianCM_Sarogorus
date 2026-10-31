@@ -167,7 +167,7 @@
   components:
   - type: StorageFill
     contents:
-    - id: RMCSentryMiniWeYa
+    - id: AU14SentryMiniWeYu
       amount: 1
     - id: RMCSentryLaptop
       amount: 1

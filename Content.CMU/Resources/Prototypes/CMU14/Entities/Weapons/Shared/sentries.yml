@@ -22,6 +22,25 @@
     - AUWeYu
     - WeYa
 - type: entity
+  parent: RMCSentryMiniWeYa
+  id: AU14SentryMiniWeYu
+  components:
+  - type: UserIFF
+    factions:
+    - FactionWEYU
+  - type: EntityIFF
+  - type: SentryTargeting
+    lockedFriendlyFactions:
+    - AUWeYu
+    - WeYa
+    friendlyFactions:
+    - AUWeYu
+    - WeYa
+    deployedFriendlyFactions:
+    - AUWeYu
+    - WeYa
+
+- type: entity
   parent: RMCTurretAlmayer
   id: AU14TurretAlmayerWeYu
   name: WY UA-635C static gauss turret

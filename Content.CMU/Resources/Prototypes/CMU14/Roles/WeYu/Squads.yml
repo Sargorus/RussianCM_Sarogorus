@@ -1,0 +1,80 @@
+# WY PMC overwatch squads. These intentionally have no SquadPMC tag, so
+# AssignSquad never puts anyone in them automatically. They start empty and
+# only accept manual transfers from a WeYa overwatch console.
+- type: entity
+  parent: SquadBase
+  id: SquadWhiskey
+  name: Whiskey
+  components:
+  - type: SquadTeam
+    color: "#E67E22"
+    background:
+      sprite: _RMC14/Interface/cm_job_icons.rsi
+      state: empty
+    blacklistedSquadArmor:
+    - Helmet
+    - Goggles
+    - Armor
+    - Gloves
+    radio: radioWEYU
+    minimapBackground:
+      sprite: /Textures/_RMC14/Interface/map_blips.rsi
+      state: background_pmc
+    canSupplyDrop: false
+    group: WeYa
+    maxRoles: {}
+    leaderIcon:
+      sprite: _RMC14/Interface/cm_job_icons.rsi
+      state: weya_goon_lead
+
+- type: entity
+  parent: SquadBase
+  id: SquadKilo
+  name: Kilo
+  components:
+  - type: SquadTeam
+    color: "#F39C12"
+    background:
+      sprite: _RMC14/Interface/cm_job_icons.rsi
+      state: empty
+    blacklistedSquadArmor:
+    - Helmet
+    - Goggles
+    - Armor
+    - Gloves
+    radio: radioWEYU
+    minimapBackground:
+      sprite: /Textures/_RMC14/Interface/map_blips.rsi
+      state: background_pmc
+    canSupplyDrop: false
+    group: WeYa
+    maxRoles: {}
+    leaderIcon:
+      sprite: _RMC14/Interface/cm_job_icons.rsi
+      state: weya_goon_lead
+
+- type: entity
+  parent: SquadBase
+  id: SquadLima
+  name: Lima
+  components:
+  - type: SquadTeam
+    color: "#F5B041"
+    background:
+      sprite: _RMC14/Interface/cm_job_icons.rsi
+      state: empty
+    blacklistedSquadArmor:
+    - Helmet
+    - Goggles
+    - Armor
+    - Gloves
+    radio: radioWEYU
+    minimapBackground:
+      sprite: /Textures/_RMC14/Interface/map_blips.rsi
+      state: background_pmc
+    canSupplyDrop: false
+    group: WeYa
+    maxRoles: {}
+    leaderIcon:
+      sprite: _RMC14/Interface/cm_job_icons.rsi
+      state: weya_goon_lead

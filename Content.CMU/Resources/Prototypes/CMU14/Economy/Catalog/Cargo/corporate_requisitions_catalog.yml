@@ -46,25 +46,25 @@
         crate: RMCAttachmentAngledGrip
       - cost: 500
         crate: RMCAttachmentS42xTelescopicMiniscope
+      - cost: 300
+        crate: CMUAttachmentNightVisionScope
     - name: WEYSEC Weapons
       entries:
       - cost: 750
         crate: CMUCrateP90
       - cost: 800
         crate: CMUCrateM54C2
-      - cost: 750
-        crate: CMUCrateF44AA
       - cost: 500
         crate: CMUCrateNSG23
-      - cost: 2000
+      - cost: 8000
         crate: CMUCrateWYSentryOmni
-      - cost: 2500
+      - cost: 4000
         crate: CMUCrateWYSentry
     - name: WEYSEC Ammo
       entries:
       - cost: 750
         crate: CMUCrateP90Mags
-      - cost: 2250
+      - cost: 1500
         crate: CMUCrateP90APMags
       - cost: 1500
         crate: CMUCrateWYSentryAmmo
