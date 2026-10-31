@@ -32,6 +32,8 @@ au14-loadout-group-corporate-outerwear = Корпоративная верхня
 au14-loadout-group-corporate-jumpsuit = Корпоративная форма
 au14-loadout-group-corporate-footwear = Корпоративная обувь
 au14-loadout-group-corporate-headwear = Корпоративные головные уборы
+au14-loadout-group-corporate-handyman-affiliation = Приписка ID-карты
+au14-loadout-group-corporate-handyman-jumpsuit = Рабочая форма
 
 au14-loadout-group-military-hats = Военные головные уборы
 au14-loadout-group-military-jumpsuit = Военная полевая форма

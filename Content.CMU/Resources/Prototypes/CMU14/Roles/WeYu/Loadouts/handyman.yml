@@ -1,0 +1,33 @@
+- type: loadout
+  id: CorporateHandymanIDEngineerAU14
+  equipment:
+    id: AU14IDCardCorporateHandymanEngineer
+
+- type: loadout
+  id: CorporateHandymanIDCookAU14
+  equipment:
+    id: AU14IDCardCorporateHandymanCook
+
+- type: loadoutGroup
+  id: CorporateHandymanAffiliationAU14
+  name: au14-loadout-group-corporate-handyman-affiliation
+  minLimit: 1
+  maxLimit: 1
+  loadouts:
+  - CorporateHandymanIDEngineerAU14
+  - CorporateHandymanIDCookAU14
+
+- type: loadoutGroup
+  id: CorporateHandymanJumpsuitAU14
+  name: au14-loadout-group-corporate-handyman-jumpsuit
+  minLimit: 1
+  maxLimit: 1
+  loadouts:
+  - CivilianWeYuEngineerClothesAU14
+  - CivilianWorkwearYellowAU14
+  - CivilianWorkwearPinkAU14
+  - CivilianWorkwearBlueAU14
+  - CivilianWorkwearGreenAU14
+  - CivilianWorkwearGreyAU14
+  - JumpsuitCivilianAU14
+  - JumpsuitColonistAU14

@@ -31,7 +31,19 @@ ent-AU14IDCardCorporateSpy = ID-карта Лассаль БиоНационал
 ent-AU14IDCardCivilianScientist = ID-карта учёного
     .desc = {ent-AU14IDCardBaseCivilianNoIFF.desc}
 
-ent-AU14IDCardWYGuard = ID-карта охранника Ве-Ю
+ent-AU14IDCardWYGuard = ID-карта сотрудника отдела безопасности Ве-Ю
+    .desc = {ent-AU14IDCardBaseCivilianNoIFF.desc}
+
+ent-AU14IDCardWYSecurityLeader = ID-карта главы отдела безопасности Ве-Ю
+    .desc = {ent-AU14IDCardBaseCivilianNoIFF.desc}
+
+ent-AU14IDCardWYSecurityMedic = ID-карта санитара отдела безопасности Ве-Ю
+    .desc = {ent-AU14IDCardBaseCivilianNoIFF.desc}
+
+ent-AU14IDCardCorporateHandymanEngineer = ID-карта корпоративного инженера
+    .desc = {ent-AU14IDCardBaseCivilianNoIFF.desc}
+
+ent-AU14IDCardCorporateHandymanCook = ID-карта корпоративного повара
     .desc = {ent-AU14IDCardBaseCivilianNoIFF.desc}
 
 ent-CMUIDCardCivilianAtmosian = ID-карта атмосферного техника

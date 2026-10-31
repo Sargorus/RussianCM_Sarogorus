@@ -113,11 +113,14 @@
             # Corporate Colony Command (non department)
             AU14JobCivilianCorporateAdministrator: [1, 1]
             AU14JobCivilianCorporateAssistant: [1, 1]
+            AU14JobCivilianCorporateHandyman: [1, 1]
             #AU14JobCivilianCorporateLiaison: [1, 1]
             # Ambassadors
 
             AU14JobCivilianScientist: [6, 6]
-            AU14JobWYGuard: [4, 4]
+            AU14JobWYGuardLeader: [1, 1]
+            AU14JobWYGuardMedic: [1, 1]
+            AU14JobWYGuard: [2, 2]
 
             # Security/LEO
             AU14JobCivilianColonySecurityLeader : [1, 1]
