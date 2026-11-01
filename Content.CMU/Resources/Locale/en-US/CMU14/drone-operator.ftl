@@ -2,8 +2,8 @@ cmu-job-name-govfordroneoperator = Drone Operator
 cmu-job-description-govfordroneoperator = Assemble, link, and remotely pilot a drone android, gun UGV, or flamer UGV.
 cmu-job-prefix-govfordroneoperator = DRO
 
-cmu-species-name-drone-android = Drone Android
-cmu-species-drone-android-generation = drone android
+cmu-species-name-drone-android = Humanoid drone
+cmu-species-drone-android-generation = humanoid drone
 
 cmu-drone-operator-required = You are not trained to operate this drone system.
 cmu-drone-assembly-finish = You finish assembling {$drone}.
@@ -41,6 +41,8 @@ cmu-drone-tablet-bound = The tablet is already bound to another operator.
 cmu-drone-link-finish = You link the tablet to {$drone}.
 cmu-drone-tablet-must-carry = You must be carrying the tablet to control the drone.
 cmu-drone-tablet-no-link = The tablet is not linked to a drone.
+cmu-drone-unlink-verb = Unlink from current drone
+cmu-drone-unlink-finish = You unlink the tablet from {$drone}.
 cmu-drone-rename-verb = Rename Drone
 cmu-drone-rename-title = Rename Drone
 cmu-drone-rename-prompt = Enter a one-word drone name ({$max} characters max).
@@ -79,6 +81,7 @@ cmu-drone-control-ended-operator-hurt = The drone control session ends as you ar
 cmu-drone-control-ended-operator-disabled = The drone control session ends as your body is disabled.
 cmu-drone-control-ended-link-lost = The drone control session ends as the link is lost.
 cmu-drone-control-ended-leash = The drone control session ends as the drone leaves tablet range.
+cmu-drone-control-ended-unlinked = The drone control session ends as the tablet is unlinked from the drone.
 
 cmu-drone-self-repair-blocked = The drone frame cannot self-repair.
 cmu-drone-revive-already-alive = {$drone} is already active.

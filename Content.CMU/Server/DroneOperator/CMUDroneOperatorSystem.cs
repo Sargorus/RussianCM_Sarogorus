@@ -144,6 +144,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         SubscribeLocalEvent<CMUDroneFrameComponent, CMUDroneFrameActivateDoAfterEvent>(OnFrameActivateComplete);
 
         SubscribeLocalEvent<CMUDroneControlTabletComponent, UseInHandEvent>(OnTabletUseInHand);
+        SubscribeLocalEvent<CMUDroneControlTabletComponent, GetVerbsEvent<Verb>>(OnTabletGetVerbs);
         SubscribeLocalEvent<CMUDroneControlTabletComponent, GotUnequippedEvent>(OnTabletGotUnequipped);
         SubscribeLocalEvent<CMUDroneControlTabletComponent, ComponentShutdown>(OnTabletShutdown);
         SubscribeLocalEvent<CMUDroneControlTabletComponent, EntityTerminatingEvent>(OnTabletTerminating);
@@ -441,6 +442,74 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         }
 
         TryStartControl(ent, args.User);
+    }
+
+    private void OnTabletGetVerbs(Entity<CMUDroneControlTabletComponent> ent, ref GetVerbsEvent<Verb> args)
+    {
+        if (!args.CanInteract || ent.Comp.LinkedDrone == null)
+            return;
+
+        if (ent.Comp.Operator is { } tabletOperator &&
+            tabletOperator != args.User &&
+            Exists(tabletOperator))
+        {
+            return;
+        }
+
+        var user = args.User;
+        args.Verbs.Add(new Verb
+        {
+            Text = Loc.GetString("cmu-drone-unlink-verb"),
+            Priority = -3,
+            Act = () => UnlinkTablet(ent, user),
+        });
+    }
+
+    private void UnlinkTablet(Entity<CMUDroneControlTabletComponent> tablet, EntityUid user)
+    {
+        var linkedDrone = tablet.Comp.LinkedDrone;
+        var tabletOperator = tablet.Comp.Operator;
+
+        EndControlForTablet(tablet.Owner, Loc.GetString("cmu-drone-control-ended-unlinked"));
+
+        if (linkedDrone is { } drone &&
+            !TerminatingOrDeleted(drone) &&
+            TryComp<CMUDroneAndroidComponent>(drone, out var droneComp))
+        {
+            if (droneComp.Tablet == tablet.Owner ||
+                droneComp.Operator == tabletOperator)
+            {
+                droneComp.Operator = null;
+                droneComp.Tablet = null;
+            }
+        }
+
+        if (tabletOperator is { } operatorUid &&
+            !TerminatingOrDeleted(operatorUid) &&
+            TryComp<CMUDroneOperatorComponent>(operatorUid, out var operatorComp))
+        {
+            if (linkedDrone is { } linked)
+            {
+                if (operatorComp.Drone == linked)
+                    operatorComp.Drone = null;
+                if (operatorComp.ControlledDrone == linked)
+                    operatorComp.ControlledDrone = null;
+            }
+
+            if (operatorComp.Tablet == tablet.Owner)
+                operatorComp.Tablet = null;
+        }
+
+        tablet.Comp.LinkedDrone = null;
+        tablet.Comp.Operator = null;
+
+        if (linkedDrone is { } popupDrone && !TerminatingOrDeleted(popupDrone))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-drone-unlink-finish", ("drone", popupDrone)),
+                user,
+                user);
+        }
     }
 
     private void OnTabletGotUnequipped(Entity<CMUDroneControlTabletComponent> ent, ref GotUnequippedEvent args)

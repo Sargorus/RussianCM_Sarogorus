@@ -2,8 +2,8 @@ cmu-job-name-govfordroneoperator = Оператор дронов
 cmu-job-description-govfordroneoperator = Собирайте, подключайте и дистанционно управляйте андроидом-дроном, боевым НБТ или огнемётным НБТ.
 cmu-job-prefix-govfordroneoperator = DRO
 
-cmu-species-name-drone-android = Андроид-дрон
-cmu-species-drone-android-generation = андроид-дрон
+cmu-species-name-drone-android = Гуманоидный дрон
+cmu-species-drone-android-generation = гуманоидный дрон
 
 cmu-drone-operator-required = Вы не обучены работе с этой системой дронов.
 cmu-drone-assembly-finish = Вы завершаете сборку {$drone}.
@@ -41,6 +41,8 @@ cmu-drone-tablet-bound = Планшет уже привязан к другом�
 cmu-drone-link-finish = Вы связываете планшет с {$drone}.
 cmu-drone-tablet-must-carry = Для управления дроном планшет должен находиться при вас.
 cmu-drone-tablet-no-link = Планшет не связан с дроном.
+cmu-drone-unlink-verb = Отвязаться от текущего дрона
+cmu-drone-unlink-finish = Планшет отвязан от {$drone}.
 cmu-drone-rename-verb = Переименовать дрона
 cmu-drone-rename-title = Переименовать дрона
 cmu-drone-rename-prompt = Введите однословное имя дрона (не более {$max} символов).
@@ -79,6 +81,7 @@ cmu-drone-control-ended-operator-hurt = Сеанс управления дрон
 cmu-drone-control-ended-operator-disabled = Сеанс управления дроном завершается, поскольку ваше тело выведено из строя.
 cmu-drone-control-ended-link-lost = Сеанс управления дроном завершается из-за потери связи.
 cmu-drone-control-ended-leash = Сеанс управления дроном завершается, поскольку дрон выходит за пределы радиуса действия планшета.
+cmu-drone-control-ended-unlinked = Сеанс управления дроном завершается, поскольку планшет отвязан от дрона.
 
 cmu-drone-self-repair-blocked = Каркас дрона не способен к саморемонту.
 cmu-drone-revive-already-alive = {$drone} уже активен.

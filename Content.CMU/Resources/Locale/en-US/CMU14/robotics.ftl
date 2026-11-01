@@ -35,13 +35,34 @@ ent-CMUDroneAndroidCombatRepair = damaged combat drone
     .desc = A repair-order combat drone. It is missing limbs and has burn and blunt damage.
 
 ent-CMUDroneAndroidCombat = combat drone
-    .desc = A reinforced synthetic drone frame with a combat-rated control bus, weapon routines, and a layer of corporate armour.
+    .desc = A reinforced synthetic drone frame with a combat-rated control bus and weapon routines.
 
 ent-CMUDroneBodyFrameUnarmed = unarmed humanoid drone body frame
     .desc = A bare synthetic torso frame whose control bus is locked out of firearm use. Its limb ports are sealed and its activation socket is empty.
 
 ent-CMUDroneBodyFrameCombat = combat humanoid drone body frame
     .desc = A reinforced synthetic torso frame with a combat-rated control bus. Its limb ports are sealed and its activation socket is empty.
+
+ent-CMUDroneModuleCombat = drone combat module
+    .desc = A tactical combat module loaded with close-quarters and firearms routines.
+
+ent-CMUDroneModuleMedical = drone medical module
+    .desc = A medical module loaded with doctor-grade treatment and surgery routines.
+
+ent-CMUDroneModuleEngineering = drone engineering module
+    .desc = An engineering module loaded with construction, engineering, and power loader routines.
+
+ent-CMUDroneModulePolice = drone police module
+    .desc = A police module loaded with law enforcement, endurance, and melee routines. It does not grant firearm authorization.
+
+ent-CMUCrateCombatDroneFrame = combat drone body frame crate
+    .desc = A sealed crate containing one combat humanoid drone body frame. Its limb ports are sealed and its activation socket is empty.
+
+ent-CMUCrateMagazineM96S = M96S magazine crate (1x)
+    .desc = A crate containing one M96S sniper rifle magazine.
+
+ent-CMUCrateMagazineML66A = ML66A OBD drum magazine crate (1x, 10x30mm)
+    .desc = A crate containing one ML66A OBD smart gun drum magazine in 10x30mm.
 
 cmu-lathe-category-robotics-synth-limbs = Synthetic limbs
 cmu-lathe-category-robotics-working-joe-limbs = Working Joe limbs

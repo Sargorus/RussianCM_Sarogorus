@@ -77,7 +77,7 @@
     - id: CMWrench
     - id: CMWelder
     - id: CMUDroneModuleCombat
-    - id: CMUDroneModuleCare
+    - id: CMUDroneModuleMedical
 
 - type: entity
   parent: BaseItem
@@ -288,9 +288,9 @@
 
 - type: entity
   parent: CMUDroneModuleBase
-  id: CMUDroneModuleCare
-  name: drone care module
-  description: A medical care module loaded with doctor-grade treatment and surgery routines.
+  id: CMUDroneModuleMedical
+  name: drone medical module
+  description: A medical module loaded with doctor-grade treatment and surgery routines.
   components:
   - type: Sprite
     state: power_mod
@@ -298,3 +298,31 @@
     skills:
       RMCSkillMedical: 4
       RMCSkillSurgery: 4
+
+- type: entity
+  parent: CMUDroneModuleBase
+  id: CMUDroneModuleEngineering
+  name: drone engineering module
+  description: An engineering module loaded with construction, engineering, and power loader routines.
+  components:
+  - type: Sprite
+    state: std_mod
+  - type: CMUDroneModule
+    skills:
+      RMCSkillConstruction: 4
+      RMCSkillEngineer: 4
+      RMCSkillPowerLoader: 2
+
+- type: entity
+  parent: CMUDroneModuleBase
+  id: CMUDroneModulePolice
+  name: drone police module
+  description: A police module loaded with law enforcement, endurance, and melee routines. It does not grant firearm authorization.
+  components:
+  - type: Sprite
+    state: std_mod
+  - type: CMUDroneModule
+    skills:
+      RMCSkillPolice: 4
+      RMCSkillEndurance: 4
+      RMCSkillMeleeWeapons: 4

@@ -74,6 +74,10 @@
         crate: CMUCrateF44AAMags
       - cost: 500
         crate: CMUCrateNSG23APMags
+      - cost: 600
+        crate: CMUCrateMagazineM96S
+      - cost: 700
+        crate: CMUCrateMagazineML66A
     - name: Weyland-Yutani Research
       entries:
       # XRF crates are added via code
@@ -81,6 +85,12 @@
       #  crate: CMUCrateXRF
       - cost: 4000
         crate: CMUCrateRoboticsFabricator
+      - cost: 2500
+        crate: CMUCrateCombatDroneFrame
+        maxStock: 1
+        startingStock: 1
+        stockReplenishDelay: 21600
+        stockReplenishAmount: 1
       - cost: 1500
         crate: CMUCrateRoboticsOrderConsole
       - cost: 100

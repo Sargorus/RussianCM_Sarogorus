@@ -23,25 +23,19 @@
       name: cmu-robotics-target-civilian-drone
       reward: 3500
       requiredModules:
-      - CMUDroneModuleCare
-    - prototype: CMUDroneAndroidCombat
-      name: cmu-robotics-target-combat-drone
-      reward: 4500
-      requiredModules:
-      - CMUDroneModuleCombat
-      - CMUDroneModuleCare
+      - CMUDroneModuleMedical
     repairTargets:
     - prototype: CMUDroneAndroidUnarmed
       name: cmu-robotics-target-civilian-drone
       reward: 2400
       requiredModules:
-      - CMUDroneModuleCare
+      - CMUDroneModuleMedical
     - prototype: CMUDroneAndroidCombat
       name: cmu-robotics-target-combat-drone
       reward: 2500
       requiredModules:
       - CMUDroneModuleCombat
-      - CMUDroneModuleCare
+      - CMUDroneModuleMedical
     - prototype: CMUWorkingJoeRepair
       name: cmu-robotics-target-working-joe
       reward: 2050

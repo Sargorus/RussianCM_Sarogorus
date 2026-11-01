@@ -58,16 +58,6 @@
   categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
-  id: CMURoboticsFrameCombat
-  result: CMUDroneBodyFrameCombat
-  completetime: 12
-  materials:
-    CMSteel: 22500
-    CMPlasteel: 15000
-    RMCPlastic: 7500
-  categories: [ CMURoboticsComponents ]
-
-- type: latheRecipe
   id: CMURoboticsDroneHead
   result: CMUDroneHeadAssembly
   completetime: 3
@@ -152,8 +142,28 @@
   categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
-  id: CMURoboticsModuleCare
-  result: CMUDroneModuleCare
+  id: CMURoboticsModuleMedical
+  result: CMUDroneModuleMedical
+  completetime: 5
+  materials:
+    CMSteel: 3750
+    CMGlass: 1875
+    RMCPlastic: 1875
+  categories: [ CMURoboticsComponents ]
+
+- type: latheRecipe
+  id: CMURoboticsModuleEngineering
+  result: CMUDroneModuleEngineering
+  completetime: 5
+  materials:
+    CMSteel: 3750
+    CMGlass: 1875
+    RMCPlastic: 1875
+  categories: [ CMURoboticsComponents ]
+
+- type: latheRecipe
+  id: CMURoboticsModulePolice
+  result: CMUDroneModulePolice
   completetime: 5
   materials:
     CMSteel: 3750
@@ -381,7 +391,6 @@
   id: CMURoboticsFabricatorRecipes
   recipes:
   - CMURoboticsFrameUnarmed
-  - CMURoboticsFrameCombat
   - CMURoboticsDroneHead
   - CMURoboticsDroneLeftArm
   - CMURoboticsDroneRightArm
@@ -391,7 +400,9 @@
   - CMURoboticsSynthResetKey
   - CMURoboticsControlTablet
   - CMURoboticsModuleCombat
-  - CMURoboticsModuleCare
+  - CMURoboticsModuleMedical
+  - CMURoboticsModuleEngineering
+  - CMURoboticsModulePolice
   - CMURoboticsWorkingJoeLeftArm
   - CMURoboticsWorkingJoeRightArm
   - CMURoboticsWorkingJoeLeftHand

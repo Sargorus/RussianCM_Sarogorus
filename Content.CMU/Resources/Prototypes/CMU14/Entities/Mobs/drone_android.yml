@@ -67,6 +67,7 @@
     footstepSoundCollection:
       collection: FootstepBorg
   - type: Skills
+    preset: null
     skills: {}
   - type: HTN
     rootTask:
@@ -87,7 +88,7 @@
     - UNMC
 
 # Robotics fabricator variants. The unarmed frame cannot use guns even if a
-# combat module is installed; the combat frame has weapon skills and armour.
+# combat module is installed; the combat frame has weapon skills.
 - type: entity
   parent: CMUDroneAndroid
   id: CMUDroneAndroidUnarmed
@@ -104,7 +105,7 @@
   parent: CMUDroneAndroid
   id: CMUDroneAndroidCombat
   name: combat drone
-  description: A reinforced synthetic drone frame with a combat-rated control bus, weapon routines, and a layer of corporate armour.
+  description: A reinforced synthetic drone frame with a combat-rated control bus and weapon routines.
   suffix: CMU14, Combat
   components:
   - type: Synth
@@ -115,11 +116,6 @@
       RMCSkillFirearms: 4
       RMCSkillMeleeWeapons: 4
       RMCSkillSmartGun: 4
-  - type: CMArmor
-    melee: 30
-    bullet: 20
-    bio: 10
-    explosionArmor: 10
 
 # Repair-order targets. They spawn with random missing limbs and randomized
 # burn and brute damage, and no control module installed.

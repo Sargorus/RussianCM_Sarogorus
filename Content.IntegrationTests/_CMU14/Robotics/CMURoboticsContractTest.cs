@@ -5,6 +5,8 @@ using Content.IntegrationTests.Fixtures;
 using Content.Server.CMU14.Robotics;
 using Content.Server._RMC14.Requisitions;
 using Content.Shared.CMU14.ColonyEconomy;
+using Content.Shared._RMC14.Armor;
+using Content.Shared._RMC14.Marines.Skills;
 using Content.Shared._RMC14.Requisitions;
 using Content.Shared._RMC14.Requisitions.Components;
 using Content.Shared._RMC14.Synth;
@@ -16,6 +18,7 @@ using Content.Shared.CMU14.Requisitions;
 using Content.Shared.CMU14.Robotics;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Labels.EntitySystems;
+using Content.Shared.Lathe.Prototypes;
 using Content.Shared.Lock;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Paper;
@@ -561,6 +564,110 @@ public sealed class CMURoboticsContractTest : GameTest
             };
             Assert.That(system.TryAddElevatorOrders(entity, extra), Is.False);
             Assert.That(component.Orders.Count, Is.EqualTo(capacity));
+        });
+    }
+
+    [Test]
+    public async Task CivilianDroneHasNoDefaultSkills()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var civilian = SEntMan.SpawnEntity("CMUDroneAndroidUnarmed", map.GridCoords);
+            var combat = SEntMan.SpawnEntity("CMUDroneAndroidCombat", map.GridCoords);
+
+            var civilianSkills = SEntMan.GetComponent<SkillsComponent>(civilian);
+            Assert.That(civilianSkills.Skills, Is.Empty,
+                "a fresh civilian drone must not inherit Working Joe skills");
+            Assert.That(civilianSkills.Preset, Is.Null,
+                "the drone must not reapply the Working Joe skill preset");
+
+            var combatSkills = SEntMan.GetComponent<SkillsComponent>(combat);
+            Assert.That(combatSkills.Skills.Keys, Does.Contain("RMCSkillFirearms"));
+            Assert.That(combatSkills.Skills.Keys, Does.Contain("RMCSkillCqc"));
+        });
+    }
+
+    [Test]
+    public async Task CombatDroneHasNoDefaultArmor()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var combat = SEntMan.SpawnEntity("CMUDroneAndroidCombat", map.GridCoords);
+            Assert.That(SEntMan.HasComponent<CMArmorComponent>(combat), Is.False,
+                "the combat drone must not start with built-in armour");
+        });
+    }
+
+    [Test]
+    public async Task CorporateCatalogLimitsCombatFrameToOncePerShift()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var console = SEntMan.SpawnEntity("AU14CorporateASRSConsole", map.GridCoords);
+            var catalog = SEntMan.GetComponent<RequisitionsComputerComponent>(console);
+            var entries = catalog.Categories.SelectMany(category => category.Entries).ToList();
+
+            var frame = entries.SingleOrDefault(entry => entry.Crate == "CMUCrateCombatDroneFrame");
+            Assert.That(frame, Is.Not.Null, "the corporate catalog must sell a combat drone frame");
+            Assert.That(frame!.Cost, Is.EqualTo(2500));
+            Assert.That(frame.MaxStock, Is.EqualTo(1));
+            Assert.That(frame.StartingStock, Is.EqualTo(1));
+            Assert.That(frame.StockReplenishDelay, Is.GreaterThanOrEqualTo(TimeSpan.FromHours(6)),
+                "the combat frame must not restock within a normal shift");
+
+            var m96s = entries.SingleOrDefault(entry => entry.Crate == "CMUCrateMagazineM96S");
+            Assert.That(m96s, Is.Not.Null);
+            Assert.That(m96s!.Cost, Is.EqualTo(600));
+
+            var ml66a = entries.SingleOrDefault(entry => entry.Crate == "CMUCrateMagazineML66A");
+            Assert.That(ml66a, Is.Not.Null);
+            Assert.That(ml66a!.Cost, Is.EqualTo(700));
+        });
+    }
+
+    [Test]
+    public async Task RoboticsConsoleHasNoCombatBuildOrders()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
+            var comp = SEntMan.GetComponent<CMURoboticsOrderConsoleComponent>(console);
+
+            Assert.That(comp.BuildTargets.Select(target => target.Prototype.Id), Does.Not.Contain("CMUDroneAndroidCombat"),
+                "combat drones must not be offered as production orders");
+            Assert.That(comp.RepairTargets.Select(target => target.Prototype.Id), Does.Contain("CMUDroneAndroidCombat"),
+                "combat drones should still be repairable");
+        });
+    }
+
+    [Test]
+    public async Task FabricatorCanPrintAllDroneSkillBoards()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var recipes = SProtoMan.Index<LatheRecipePackPrototype>("CMURoboticsFabricatorRecipes")
+                .Recipes
+                .Select(recipe => recipe.Id)
+                .ToHashSet();
+            foreach (var recipe in new[]
+                     {
+                         "CMURoboticsModuleCombat",
+                         "CMURoboticsModuleMedical",
+                         "CMURoboticsModuleEngineering",
+                         "CMURoboticsModulePolice",
+                     })
+            {
+                Assert.That(recipes, Does.Contain(recipe),
+                    $"the robotics fabricator must print {recipe}");
+            }
+
+            Assert.That(recipes, Does.Not.Contain("CMURoboticsFrameCombat"),
+                "the combat drone frame must only be supplied through cargo");
         });
     }
 }
