@@ -1,14 +1,18 @@
 using System;
+using Content.Shared.Body.Part;
 using Content.Shared.CMU14.DroneOperator;
 using Robust.Shared.GameObjects;
 
 namespace Content.Shared.CMU14.Medical.Anatomy.BodyParts;
 
 /// <summary>
-/// Prototype-based limb compatibility used by surgery and robotics contracts.
-/// Drone android limbs are only valid on drone androids; every other body
-/// rejects them. This keeps the drone, Working Joe, synth and human limb sets
-/// separate without a runtime family component.
+/// Prototype- and component-based limb compatibility used by surgery and
+/// robotics contracts. Drone android limbs are only valid on drone androids;
+/// every other body rejects them. Fabricator-printed frame arms and legs carry
+/// both <see cref="CMUDroneAssemblyPartComponent"/> and a body part, so the
+/// same item can be installed in a frame or attached surgically. This keeps
+/// the drone, Working Joe, synth and human limb sets separate without a runtime
+/// family component.
 /// </summary>
 public static class CMULimbCompatibility
 {
@@ -18,7 +22,13 @@ public static class CMULimbCompatibility
     public static bool IsDroneLimb(IEntityManager entMan, EntityUid limb)
     {
         var id = entMan.GetComponent<MetaDataComponent>(limb).EntityPrototype?.ID;
-        return id?.StartsWith(DroneLimbPrefix, StringComparison.Ordinal) == true;
+        if (id?.StartsWith(DroneLimbPrefix, StringComparison.Ordinal) == true)
+            return true;
+
+        // The fabricator prints the frame assembly parts. Those same items are
+        // body parts, so they can repair a drone without a second limb set.
+        return entMan.HasComponent<CMUDroneAssemblyPartComponent>(limb) &&
+               entMan.HasComponent<BodyPartComponent>(limb);
     }
 
     public static bool IsWorkingJoeLimb(IEntityManager entMan, EntityUid limb)

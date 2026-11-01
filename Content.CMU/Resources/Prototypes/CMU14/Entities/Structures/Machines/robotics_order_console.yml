@@ -2,7 +2,7 @@
   parent: RMCCommunicationsConsoleBase
   id: CMURoboticsOrderConsole
   name: robotics order console
-  description: A Weyland-Yutani contract terminal for robotics work. Accept a build or repair order, receive its synthetic transport crates in cargo, attach the printed order slip to a loaded crate, then lower the platform. Orders expire after seven minutes.
+  description: A Weyland-Yutani contract terminal for robotics work. Accept a build or repair order, receive its synthetic transport crates in cargo, attach the printed order slip to a loaded crate, then lower the platform. Orders expire after fifteen minutes.
   components:
   - type: Transform
     anchored: false

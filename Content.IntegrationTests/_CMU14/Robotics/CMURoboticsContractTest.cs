@@ -6,6 +6,8 @@ using Content.Server._RMC14.Requisitions;
 using Content.Shared._RMC14.Requisitions;
 using Content.Shared._RMC14.Requisitions.Components;
 using Content.Shared._RMC14.Synth;
+using Content.Shared.Body.Part;
+using Content.Shared.CMU14.DroneOperator;
 using Content.Shared.CMU14.Medical.Anatomy.BodyParts;
 using Content.Shared.CMU14.Requisitions;
 using Content.Shared.CMU14.Robotics;
@@ -13,6 +15,7 @@ using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Labels.EntitySystems;
 using Content.Shared.Lock;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Paper;
 using Content.Shared.Storage.Components;
 using Content.Shared.Storage.EntitySystems;
 using Robust.Shared.GameObjects;
@@ -50,6 +53,32 @@ public sealed class CMURoboticsContractTest : GameTest
 
             Assert.That(CMULimbCompatibility.IsWorkingJoeLimb(SEntMan, joeArm), Is.True);
             Assert.That(CMULimbCompatibility.IsWorkingJoeLimb(SEntMan, droneArm), Is.False);
+        });
+    }
+
+    [Test]
+    public async Task DroneAssemblyPartsAreSurgicalLimbsAndOrderMetadataIsCurrent()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var drone = SEntMan.SpawnEntity("CMUDroneAndroidUnarmed", map.GridCoords);
+            var assemblyArm = SEntMan.SpawnEntity("CMUDroneLeftArmAssembly", map.GridCoords);
+            var console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
+            var slip = SEntMan.SpawnEntity("CMURoboticsOrderSlip", map.GridCoords);
+
+            Assert.That(SEntMan.HasComponent<CMUDroneAssemblyPartComponent>(assemblyArm), Is.True,
+                "the printable drone arm must still fit a drone frame");
+            Assert.That(SEntMan.HasComponent<BodyPartComponent>(assemblyArm), Is.True,
+                "the printable drone arm must also be a surgical body part");
+            Assert.That(CMULimbCompatibility.IsDroneLimb(SEntMan, assemblyArm), Is.True);
+            Assert.That(CMULimbCompatibility.CanAttach(SEntMan, drone, assemblyArm), Is.True);
+
+            Assert.That(
+                SEntMan.GetComponent<CMURoboticsOrderConsoleComponent>(console).OrderDuration,
+                Is.EqualTo(TimeSpan.FromMinutes(15)));
+            Assert.That(SEntMan.HasComponent<PaperComponent>(slip), Is.True,
+                "the order slip must use a CMU/RMC paper prototype");
         });
     }
 

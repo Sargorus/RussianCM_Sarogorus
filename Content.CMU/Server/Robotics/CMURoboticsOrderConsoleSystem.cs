@@ -50,7 +50,7 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     [Dependency] private UserInterfaceSystem _ui = default!;
     [Dependency] private LabelSystem _labels = default!;
 
-    private const int RepairRewardPerDamage = 2;
+    private const int RepairRewardPerDamage = 8;
     private const int RepairRewardPerMissingLimb = 150;
 
     private static readonly EntProtoId TransportCrate = "CMUCrateSyntheticTransport";

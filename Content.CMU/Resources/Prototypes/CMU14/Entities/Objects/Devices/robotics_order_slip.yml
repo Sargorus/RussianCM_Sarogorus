@@ -1,26 +1,7 @@
 - type: entity
-  parent: Paper
+  parent: CMUPaperResearcherWEYLAND
   id: CMURoboticsOrderSlip
   name: robotics work order
-  description: A Weyland-Yutani robotics contract slip. Place it on the corporate cargo platform together with the finished units.
+  description: A Weyland-Yutani robotics contract printed on research letterhead. Put the finished units into synthetic transport crates, attach this slip to a loaded crate, and lower the corporate cargo platform.
   components:
   - type: CMURoboticsOrderSlip
-  - type: Sprite
-    sprite: Objects/Misc/bureaucracy.rsi
-    layers:
-    - state: paper
-      color: "#9ef5ff"
-    - state: paper_words
-      map: ["enum.PaperVisualLayers.Writing"]
-      color: "#9ef5ff"
-      visible: false
-    - state: paper_stamp-generic
-      map: ["enum.PaperVisualLayers.Stamp"]
-      visible: false
-  - type: PaperVisuals
-    backgroundImagePath: "/Textures/Interface/Paper/paper_background_default.svg.96dpi.png"
-    contentImagePath: "/Textures/Interface/Paper/paper_content_lined.svg.96dpi.png"
-    backgroundModulate: "#9ef5ff"
-    contentImageModulate: "#9ef5ff"
-    backgroundPatchMargin: 16.0, 16.0, 16.0, 16.0
-    contentMargin: 16.0, 16.0, 16.0, 16.0

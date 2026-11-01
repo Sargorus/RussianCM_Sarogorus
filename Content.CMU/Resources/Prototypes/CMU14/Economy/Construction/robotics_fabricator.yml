@@ -5,10 +5,6 @@
 # opens for personnel with Research 3.
 
 - type: latheCategory
-  id: CMURoboticsDroneLimbs
-  name: cmu-lathe-category-robotics-drone-limbs
-
-- type: latheCategory
   id: CMURoboticsSynthLimbs
   name: cmu-lathe-category-robotics-synth-limbs
 
@@ -168,78 +164,6 @@
     CMGlass: 1875
     RMCPlastic: 1875
   categories: [ CMURoboticsComponents ]
-
-- type: latheRecipe
-  id: CMURoboticsLimbLeftArm
-  result: CMUPartDroneAndroidLeftArm
-  completetime: 4
-  materials:
-    CMSteel: 3750
-    CMPlasteel: 3750
-  categories: [ CMURoboticsDroneLimbs ]
-
-- type: latheRecipe
-  id: CMURoboticsLimbRightArm
-  result: CMUPartDroneAndroidRightArm
-  completetime: 4
-  materials:
-    CMSteel: 3750
-    CMPlasteel: 3750
-  categories: [ CMURoboticsDroneLimbs ]
-
-- type: latheRecipe
-  id: CMURoboticsLimbLeftHand
-  result: CMUPartDroneAndroidLeftHand
-  completetime: 2
-  materials:
-    CMSteel: 1875
-    RMCPlastic: 1875
-  categories: [ CMURoboticsDroneLimbs ]
-
-- type: latheRecipe
-  id: CMURoboticsLimbRightHand
-  result: CMUPartDroneAndroidRightHand
-  completetime: 2
-  materials:
-    CMSteel: 1875
-    RMCPlastic: 1875
-  categories: [ CMURoboticsDroneLimbs ]
-
-- type: latheRecipe
-  id: CMURoboticsLimbLeftLeg
-  result: CMUPartDroneAndroidLeftLeg
-  completetime: 4
-  materials:
-    CMSteel: 3750
-    CMPlasteel: 3750
-  categories: [ CMURoboticsDroneLimbs ]
-
-- type: latheRecipe
-  id: CMURoboticsLimbRightLeg
-  result: CMUPartDroneAndroidRightLeg
-  completetime: 4
-  materials:
-    CMSteel: 3750
-    CMPlasteel: 3750
-  categories: [ CMURoboticsDroneLimbs ]
-
-- type: latheRecipe
-  id: CMURoboticsLimbLeftFoot
-  result: CMUPartDroneAndroidLeftFoot
-  completetime: 2
-  materials:
-    CMSteel: 1875
-    RMCPlastic: 1875
-  categories: [ CMURoboticsDroneLimbs ]
-
-- type: latheRecipe
-  id: CMURoboticsLimbRightFoot
-  result: CMUPartDroneAndroidRightFoot
-  completetime: 2
-  materials:
-    CMSteel: 1875
-    RMCPlastic: 1875
-  categories: [ CMURoboticsDroneLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsWorkingJoeLeftArm
@@ -472,14 +396,6 @@
   - CMURoboticsControlTablet
   - CMURoboticsModuleCombat
   - CMURoboticsModuleCare
-  - CMURoboticsLimbLeftArm
-  - CMURoboticsLimbRightArm
-  - CMURoboticsLimbLeftHand
-  - CMURoboticsLimbRightHand
-  - CMURoboticsLimbLeftLeg
-  - CMURoboticsLimbRightLeg
-  - CMURoboticsLimbLeftFoot
-  - CMURoboticsLimbRightFoot
   - CMURoboticsWorkingJoeLeftArm
   - CMURoboticsWorkingJoeRightArm
   - CMURoboticsWorkingJoeLeftHand

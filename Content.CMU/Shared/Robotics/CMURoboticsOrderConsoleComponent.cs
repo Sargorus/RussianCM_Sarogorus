@@ -20,7 +20,7 @@ public sealed partial class CMURoboticsOrderConsoleComponent : Component
     public int MaxAvailableOrders = 3;
 
     [DataField]
-    public TimeSpan OrderDuration = TimeSpan.FromMinutes(7);
+    public TimeSpan OrderDuration = TimeSpan.FromMinutes(15);
 
     [DataField]
     public EntProtoId SlipPrototype = "CMURoboticsOrderSlip";

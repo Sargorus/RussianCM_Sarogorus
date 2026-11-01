@@ -179,46 +179,46 @@
     part: Head
 
 - type: entity
-  parent: CMUDronePartBase
+  parent: CMUPartDroneAndroidLeftArm
   id: CMUDroneLeftArmAssembly
   name: drone android left arm
-  description: A left arm assembly with exposed actuator bundles.
+  description: A left arm assembly with exposed actuator bundles. It can be fitted to a drone frame or attached as a replacement limb.
   components:
-  - type: Sprite
-    state: l_arm
+  - type: Item
+    size: Small
   - type: CMUDroneAssemblyPart
     part: LeftArm
 
 - type: entity
-  parent: CMUDronePartBase
+  parent: CMUPartDroneAndroidRightArm
   id: CMUDroneRightArmAssembly
   name: drone android right arm
-  description: A right arm assembly with exposed actuator bundles.
+  description: A right arm assembly with exposed actuator bundles. It can be fitted to a drone frame or attached as a replacement limb.
   components:
-  - type: Sprite
-    state: r_arm
+  - type: Item
+    size: Small
   - type: CMUDroneAssemblyPart
     part: RightArm
 
 - type: entity
-  parent: CMUDronePartBase
+  parent: CMUPartDroneAndroidLeftLeg
   id: CMUDroneLeftLegAssembly
   name: drone android left leg
-  description: A left leg assembly with reinforced knee servos.
+  description: A left leg assembly with reinforced knee servos. It can be fitted to a drone frame or attached as a replacement limb.
   components:
-  - type: Sprite
-    state: l_leg
+  - type: Item
+    size: Small
   - type: CMUDroneAssemblyPart
     part: LeftLeg
 
 - type: entity
-  parent: CMUDronePartBase
+  parent: CMUPartDroneAndroidRightLeg
   id: CMUDroneRightLegAssembly
   name: drone android right leg
-  description: A right leg assembly with reinforced knee servos.
+  description: A right leg assembly with reinforced knee servos. It can be fitted to a drone frame or attached as a replacement limb.
   components:
-  - type: Sprite
-    state: r_leg
+  - type: Item
+    size: Small
   - type: CMUDroneAssemblyPart
     part: RightLeg
 

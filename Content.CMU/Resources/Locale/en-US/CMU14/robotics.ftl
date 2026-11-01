@@ -13,6 +13,9 @@ ent-CMUCrateRoboticsOrderConsole = robotics order console crate
 ent-CMUCrateSyntheticTransport = synthetic transport crate
     .desc = A black lockable transport crate sized for one synthetic. Attach a robotics order slip to its label slot before lowering it with the cargo platform.
 
+ent-CMURoboticsOrderSlip = robotics work order
+    .desc = A Weyland-Yutani robotics contract printed on research letterhead. Put the finished units into synthetic transport crates, attach this slip to a loaded crate, and lower the corporate cargo platform.
+
 ent-CMUWorkingJoeRepair = damaged Working Joe
     .desc = A soulless Working Joe sent for repair. It is missing limbs and has burn and blunt damage.
 
@@ -40,7 +43,6 @@ ent-CMUDroneBodyFrameUnarmed = unarmed drone android body frame
 ent-CMUDroneBodyFrameCombat = combat drone android body frame
     .desc = A reinforced synthetic torso frame with a combat-rated control bus. Its limb ports are sealed and its activation socket is empty.
 
-cmu-lathe-category-robotics-drone-limbs = Drone limbs
 cmu-lathe-category-robotics-synth-limbs = Synthetic limbs
 cmu-lathe-category-robotics-working-joe-limbs = Working Joe limbs
 cmu-lathe-category-robotics-prosthetics = Human prosthetics
@@ -104,4 +106,4 @@ cmu-robotics-console-reason-module = the {$module} is not installed
 cmu-robotics-console-reason-no-slip = the order slip is not attached to a transport crate
 cmu-robotics-console-reason-slip-not-on-crate = the order slip must be attached to a transport crate that contains an order unit
 cmu-robotics-slip-name = robotics work order #{$id}
-cmu-robotics-slip-content = [head=2]WEYLAND-YUTANI ROBOTICS WORK ORDER #{$id}[/head]\nOrder: {$target}. Units: {$amount}. Reward: {$reward}. Deadline: {$minutes} minutes. Put the finished units into synthetic transport crates, attach this slip to a loaded crate, and lower the corporate cargo platform.
+cmu-robotics-slip-content = [head=2]WEYLAND-YUTANI ROBOTICS WORK ORDER #{$id}[/head]\nContractor: Weyland-Yutani Corporation\nTarget: {$target}\nUnits requested: {$amount}\nContract reward: {$reward}\nTime limit: {$minutes} minutes\n\nAcceptance: place each finished unit inside a synthetic transport crate, attach this work order to a loaded crate, and lower the corporate cargo platform.

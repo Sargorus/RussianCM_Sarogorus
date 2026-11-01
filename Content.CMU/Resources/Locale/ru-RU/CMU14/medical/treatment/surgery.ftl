@@ -6,3 +6,8 @@ cmu-medical-reattach-attach-failed = Не удалось присоединит�
 cmu-medical-reattach-success = Конечность успешно присоединена.
 cmu-medical-reattach-wrong-side = Эта конечность с неправильной стороны.
 cmu-medical-reattach-requires-robotic-limb = Эта конечность не подходит пациенту.
+
+cmu-medical-surgery-remove-synth-limb = Удалить конечность синтетика
+cmu-medical-step-cut-chassis-open = Вскрыть корпус
+cmu-medical-step-detach-synth-limb = Отсоединить конечность синтетика
+cmu-medical-step-weld-chassis-shut = Закрыть корпус
