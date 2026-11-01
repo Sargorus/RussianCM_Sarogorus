@@ -44,6 +44,11 @@
       time: 36000 # 10 hours
     AU14RankWYJuniorAssistant: []
   startingGear: AU14GearCivilianCorporateAssistant
+  medals:
+    Bronze: CMUNameBadgeBronze
+    Silver: CMUNameBadgeSilver
+    Gold: CMUNameBadgeGold
+    Platinum: CMUNameBadgePlatinum
   icon: "AU14JobIconCorporateAssistant"
   requireAdminNotify: false
   joinNotifyCrew: false

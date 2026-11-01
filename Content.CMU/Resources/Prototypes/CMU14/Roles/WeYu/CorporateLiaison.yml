@@ -75,6 +75,11 @@
       time: 36000 # 10 hours
     RMCRankWeYaJuniorExecutive: []
   startingGear: AU14GearCivilianCorporateLiaison
+  medals:
+    Bronze: CMUNameBadgeBronze
+    Silver: CMUNameBadgeSilver
+    Gold: CMUNameBadgeGold
+    Platinum: CMUNameBadgePlatinum
   icon: "CMJobIconLiaison"
   requireAdminNotify: false
   joinNotifyCrew: false
@@ -125,13 +130,14 @@
   - CivSatchelAU14
   - CMULiaisonBelt
   - PaperworkRMC
-  - WYCLJumpsuitAU14
-  - WYCLOuterwearAU14
-  - WYCLHeadwearAU14
-  - WYCLFootwearAU14
+  - CMULiaisonWardrobeSuitsAU14
+  - CMULiaisonWardrobeCoatsAU14
+  - CMULiaisonWardrobeHatsAU14
+  - CMULiaisonWardrobeShoesAU14
+  - CMULiaisonWardrobeGlassesAU14
+  - CMULiaisonWardrobeGlovesAU14
   - RecreationalRMC
   - CannedDrinksAU14
   - SmokablesRMC
-  - EyewearRMC
   - MasksRMC
   - HeadwearCLFAU14

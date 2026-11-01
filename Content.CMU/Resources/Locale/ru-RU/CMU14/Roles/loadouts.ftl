@@ -62,3 +62,5 @@ cmu-loadout-group-detective-hat = Головные уборы
 cmu-loadout-group-detective-glasses = Очки
 
 cmu-loadout-group-detective-satchel = Сумки
+
+cmu-loadout-group-liaison-ties = Галстуки

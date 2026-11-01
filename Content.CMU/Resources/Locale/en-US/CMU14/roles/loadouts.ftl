@@ -60,3 +60,5 @@ cmu-loadout-group-detective-coat = Coats and jackets
 cmu-loadout-group-detective-hat = Hats
 cmu-loadout-group-detective-glasses = Glasses
 cmu-loadout-group-detective-satchel = Satchels
+
+cmu-loadout-group-liaison-ties = Ties

@@ -46,11 +46,11 @@
         crate: RMCAttachmentS42xTelescopicMiniscope
     - name: WEYSEC Weapons
       entries:
-      - cost: 1250
+      - cost: 1500
         crate: CMUCrateP90
-      - cost: 1300
+      - cost: 2000
         crate: CMUCrateM54C2
-      - cost: 1000
+      - cost: 1700
         crate: CMUCrateNSG23
       - cost: 5500
         crate: CMUCrateWYSentryOmni
