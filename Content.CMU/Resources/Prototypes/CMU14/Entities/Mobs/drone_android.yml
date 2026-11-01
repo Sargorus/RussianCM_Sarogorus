@@ -86,6 +86,41 @@
     factions:
     - UNMC
 
+# Robotics fabricator variants. The unarmed frame cannot use guns even if a
+# combat module is installed; the combat frame has weapon skills and armour.
+- type: entity
+  parent: CMUDroneAndroid
+  id: CMUDroneAndroidUnarmed
+  name: unarmed drone android
+  description: A stripped-down synthetic drone frame with exposed servos. Its control bus is deliberately locked out of firearm use.
+  suffix: CMU14, Unarmed
+  components:
+  - type: Synth
+    canUseGuns: false
+  - type: CMUDroneAndroid
+    supportsCombatModule: false
+
+- type: entity
+  parent: CMUDroneAndroid
+  id: CMUDroneAndroidCombat
+  name: combat drone android
+  description: A reinforced synthetic drone frame with a combat-rated control bus, weapon routines, and a layer of corporate armour.
+  suffix: CMU14, Combat
+  components:
+  - type: Synth
+    canUseGuns: true
+  - type: Skills
+    skills:
+      RMCSkillCqc: 4
+      RMCSkillFirearms: 4
+      RMCSkillMeleeWeapons: 4
+      RMCSkillSmartGun: 4
+  - type: CMArmor
+    melee: 30
+    bullet: 20
+    bio: 10
+    explosionArmor: 10
+
 - type: entity
   parent: AppearanceDroneAndroid
   id: CMUDroneAndroidDummy

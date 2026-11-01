@@ -100,6 +100,7 @@ au14-spawn-role-name-wy-corporate-goon = Сотрудник отдела без�
 au14-spawn-role-name-wy-liaison = Связной Ве-Ю
 au14-spawn-role-name-wy-scientist = Учёный-Фармацевт Ве-Ю
 au14-spawn-role-name-wy-scientist-surgeon = Учёный-Хирург Ве-Ю
+au14-spawn-role-name-wy-scientist-roboticist = Учёный-Робототехник Ве-Ю
 cmu-colony-name-atmosian = Атмосферный техник колонии
 
 cmu-spawn-role-auxiliary-staff-opfor = Вспомогательный персонал (OPFOR)

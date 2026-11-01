@@ -1,0 +1,211 @@
+# Weyland-Yutani robotics fabricator and its drone-part recipes.
+#
+# The fabricator is sold through corporate cargo. It is movable (wrench to
+# anchor/unanchor), needs a WL-6 universal fuel cell to power its UI, and only
+# opens for personnel with Research 3.
+
+- type: entity
+  parent: CMAutolathe
+  id: CMURoboticsFabricator
+  name: robotics fabricator
+  description: A Weyland-Yutani fabricator for drone frames, limbs, control tablets, modules and tracked chassis. It needs a WL-6 universal fuel cell and a trained roboticist.
+  components:
+  - type: Transform
+    anchored: false
+  - type: Anchorable
+    flags: [Anchorable, Unanchorable]
+  - type: Lathe
+    idleState: autolathe
+    runningState: autolathe_n
+    producingSound: /Audio/_RMC14/Machines/print.ogg
+    staticPacks:
+    - CMURoboticsFabricatorRecipes
+  - type: MaterialStorage
+    storage:
+      CMSteel: 60000
+      CMGlass: 10000
+      RMCPlastic: 30000
+      CMPlasteel: 30000
+    whitelist:
+      tags:
+      - Metal
+      - RMCGlass
+      - Plastic
+  - type: CMURoboticsFabricator
+  - type: StaticPrice
+    price: 1500
+
+- type: latheRecipe
+  id: CMURoboticsFrameUnarmed
+  result: CMUDroneBodyFrameUnarmed
+  completetime: 8
+  materials:
+    CMSteel: 15000
+    CMPlasteel: 3750
+    RMCPlastic: 7500
+
+- type: latheRecipe
+  id: CMURoboticsFrameCombat
+  result: CMUDroneBodyFrameCombat
+  completetime: 12
+  materials:
+    CMSteel: 22500
+    CMPlasteel: 15000
+    RMCPlastic: 7500
+
+- type: latheRecipe
+  id: CMURoboticsDroneHead
+  result: CMUDroneHeadAssembly
+  completetime: 3
+  materials:
+    CMSteel: 3750
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsDroneLeftArm
+  result: CMUDroneLeftArmAssembly
+  completetime: 3
+  materials:
+    CMSteel: 3750
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsDroneRightArm
+  result: CMUDroneRightArmAssembly
+  completetime: 3
+  materials:
+    CMSteel: 3750
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsDroneLeftLeg
+  result: CMUDroneLeftLegAssembly
+  completetime: 3
+  materials:
+    CMSteel: 3750
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsDroneRightLeg
+  result: CMUDroneRightLegAssembly
+  completetime: 3
+  materials:
+    CMSteel: 3750
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsSynthKey
+  result: CMUDroneSynthKey
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+
+- type: latheRecipe
+  id: CMURoboticsControlTablet
+  result: CMUDroneControlTablet
+  completetime: 5
+  materials:
+    CMSteel: 7500
+    CMGlass: 3750
+    RMCPlastic: 3750
+
+- type: latheRecipe
+  id: CMURoboticsModuleCombat
+  result: CMUDroneModuleCombat
+  completetime: 5
+  materials:
+    CMSteel: 3750
+    CMGlass: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsModuleCare
+  result: CMUDroneModuleCare
+  completetime: 5
+  materials:
+    CMSteel: 3750
+    CMGlass: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsCombatDroneHull
+  result: CMUCombatDroneHull
+  completetime: 10
+  materials:
+    CMSteel: 18750
+    CMPlasteel: 7500
+    RMCPlastic: 3750
+
+- type: latheRecipe
+  id: CMURoboticsCombatDroneTurret
+  result: CMUCombatDroneTurretAssembly
+  completetime: 8
+  materials:
+    CMSteel: 11250
+    CMPlasteel: 3750
+    CMGlass: 3750
+
+- type: latheRecipe
+  id: CMURoboticsCombatDroneAmmo
+  result: CMUCombatDroneAmmoBox
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    RMCPlastic: 3750
+
+- type: latheRecipe
+  id: CMURoboticsCombatDroneAmmoAP
+  result: CMUCombatDroneAmmoBoxAP
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    RMCPlastic: 3750
+
+- type: latheRecipe
+  id: CMURoboticsFlamerDroneHull
+  result: CMUFlamerDroneHull
+  completetime: 10
+  materials:
+    CMSteel: 18750
+    CMPlasteel: 7500
+    CMGlass: 3750
+
+- type: latheRecipe
+  id: CMURoboticsFlamerDroneTurret
+  result: CMUFlamerDroneTurretAssembly
+  completetime: 8
+  materials:
+    CMSteel: 11250
+    CMPlasteel: 3750
+    CMGlass: 3750
+
+- type: latheRecipe
+  id: CMURoboticsFlamerDroneFuelTank
+  result: CMUFlamerDroneFuelTank
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    RMCPlastic: 3750
+
+- type: latheRecipePack
+  id: CMURoboticsFabricatorRecipes
+  recipes:
+  - CMURoboticsFrameUnarmed
+  - CMURoboticsFrameCombat
+  - CMURoboticsDroneHead
+  - CMURoboticsDroneLeftArm
+  - CMURoboticsDroneRightArm
+  - CMURoboticsDroneLeftLeg
+  - CMURoboticsDroneRightLeg
+  - CMURoboticsSynthKey
+  - CMURoboticsControlTablet
+  - CMURoboticsModuleCombat
+  - CMURoboticsModuleCare
+  - CMURoboticsCombatDroneHull
+  - CMURoboticsCombatDroneTurret
+  - CMURoboticsCombatDroneAmmo
+  - CMURoboticsCombatDroneAmmoAP
+  - CMURoboticsFlamerDroneHull
+  - CMURoboticsFlamerDroneTurret
+  - CMURoboticsFlamerDroneFuelTank

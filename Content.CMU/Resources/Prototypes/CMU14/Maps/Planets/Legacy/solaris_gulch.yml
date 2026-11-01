@@ -123,8 +123,9 @@
             AU14JobCivilianCorporateAssistant: [1, 1]
             AU14JobCivilianCorporateHandyman: [1, 1]
 
-            AU14JobCivilianScientist: [4, 4]
+            AU14JobCivilianScientist: [3, 3]
             AU14JobCivilianScientistSurgeon: [2, 2]
+            AU14JobCivilianScientistRoboticist: [1, 1]
             AU14JobWYGuardLeader: [1, 1]
             AU14JobWYGuard: [2, 2]
 

@@ -82,6 +82,13 @@ public sealed partial class CMUDroneAndroidComponent : Component
     [DataField]
     public bool SupportsModules = true;
 
+    /// <summary>
+    /// Whether the combat module may be installed. Unarmed drone frames keep this false
+    /// so a weapon permit board cannot be fitted at all.
+    /// </summary>
+    [DataField]
+    public bool SupportsCombatModule = true;
+
     [DataField]
     public string ModuleContainerId = "cmu-drone-module";
 

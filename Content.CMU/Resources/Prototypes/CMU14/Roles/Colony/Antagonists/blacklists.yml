@@ -19,6 +19,7 @@
     - AU14JobCivilianCorporateHandyman
     - AU14JobCivilianScientist
     - AU14JobCivilianScientistSurgeon
+    - AU14JobCivilianScientistRoboticist
     - AU14JobCorporateSynthetic
 
 - type: antagJobBlacklist

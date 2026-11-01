@@ -81,6 +81,7 @@ cmu-drone-control-ended-link-lost = The drone control session ends as the link i
 cmu-drone-control-ended-leash = The drone control session ends as the drone leaves tablet range.
 
 cmu-drone-self-repair-blocked = The drone frame cannot self-repair.
+cmu-drone-module-combat-blocked = {$drone} cannot accept a combat module.
 cmu-drone-module-tool-required = You need a suitable tool in your other hand to install {$module}.
 cmu-drone-module-install-start = You start installing {$module} into {$drone}.
 cmu-drone-module-install-finish = You install {$module} into {$drone}.

@@ -143,6 +143,10 @@ au14-job-name-civilianscientistsurgeon = Scientist-Surgeon
 au14-job-description-civilianscientistsurgeon = You're a scientist-surgeon employed by the Weyland-Yutani corporation or government institution. Perform surgery and keep the complex personnel alive.
 au14-job-prefix-civilianscientistsurgeon = SURG.
 
+au14-job-name-civilianscientistroboticist = Scientist-Roboticist
+au14-job-description-civilianscientistroboticist = You're a scientist-roboticist employed by the Weyland-Yutani corporation. Build, repair, and program drones and androids in the robotics lab. You have no medical training.
+au14-job-prefix-civilianscientistroboticist = ROBO.
+
 au14-job-name-usasfrecruiter = UA Recruiter
 au14-job-description-usasfrecruiter = You're a recruiter from the United Americas. You've been stationed on the colony to legally enlist civilians into the UA Military. (Role available on LV-624)
 au14-job-prefix-usasfrecruiter = UA RECR

@@ -81,6 +81,7 @@ cmu-drone-control-ended-link-lost = Сеанс управления дроном
 cmu-drone-control-ended-leash = Сеанс управления дроном завершается, поскольку дрон выходит за пределы радиуса действия планшета.
 
 cmu-drone-self-repair-blocked = Каркас дрона не способен к саморемонту.
+cmu-drone-module-combat-blocked = {$drone} не принимает боевой модуль.
 cmu-drone-module-tool-required = Чтобы установить {$module}, в другой руке должен находиться подходящий инструмент.
 cmu-drone-module-install-start = Вы начинаете устанавливать {$module} в {$drone}.
 cmu-drone-module-install-finish = Вы устанавливаете {$module} в {$drone}.

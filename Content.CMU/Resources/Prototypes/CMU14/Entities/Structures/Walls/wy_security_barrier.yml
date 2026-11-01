@@ -11,6 +11,7 @@
   name: WY security barrier
   description: A reinforced deployable barrier used by Weyland-Yutani security. Swipe an authorized ID card to lock or unlock it.
   components:
+  - type: CMUWYSecurityBarrier
   - type: AccessReader
     access: [["CMU14AccessWYSecurityBarrier"]]
   - type: Lock

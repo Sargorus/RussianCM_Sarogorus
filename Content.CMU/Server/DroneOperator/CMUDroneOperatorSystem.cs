@@ -17,6 +17,7 @@ using Content.Shared.CMU14.ZLevels.Core.EntitySystems;
 using Content.Shared._RMC14.Humanoid.Markings;
 using Content.Shared._RMC14.Marines.Skills;
 using Content.Shared._RMC14.Synth;
+using Content.Shared._RMC14.Tools;
 using Content.Shared._RMC14.Weapons.Ranged.IFF;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Access.Components;
@@ -475,6 +476,16 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
             return;
         }
 
+        // A multitool can also bind the tablet the operator is holding to the drone.
+        if (HasComp<MultitoolComponent>(args.Used) &&
+            TryGetHeldTablet(args.User, out var heldTablet) &&
+            TryComp<CMUDroneControlTabletComponent>(heldTablet, out var heldTabletComp))
+        {
+            args.Handled = true;
+            TryLinkTablet((heldTablet, heldTabletComp), args.User, ent.Owner);
+            return;
+        }
+
         if (TryComp<CMUDroneModuleComponent>(args.Used, out var module))
         {
             if (!ent.Comp.SupportsModules)
@@ -654,6 +665,16 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         Entity<CMUDroneModuleComponent> module,
         EntityUid user)
     {
+        if (!CanUseDroneModule(drone, module.Owner))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-drone-module-combat-blocked", ("drone", drone.Owner)),
+                user,
+                user,
+                PopupType.SmallCaution);
+            return true;
+        }
+
         if (!TryGetHeldTool(user, module.Comp.InstallTool, module.Owner, out _))
         {
             _popup.PopupEntity(
@@ -741,8 +762,15 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
     {
         return !TerminatingOrDeleted(drone.Owner) &&
                !TerminatingOrDeleted(module.Owner) &&
+               CanUseDroneModule(drone, module.Owner) &&
                _hands.IsHolding(user, module.Owner) &&
                TryGetHeldTool(user, module.Comp.InstallTool, module.Owner, out _);
+    }
+
+    private bool CanUseDroneModule(Entity<CMUDroneAndroidComponent> drone, EntityUid module)
+    {
+        return drone.Comp.SupportsCombatModule ||
+               MetaData(module).EntityPrototype?.ID != "CMUDroneModuleCombat";
     }
 
     private void InstallDroneModule(
@@ -848,6 +876,21 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         }
 
         heldTool = default;
+        return false;
+    }
+
+    private bool TryGetHeldTablet(EntityUid user, out EntityUid tablet)
+    {
+        foreach (var held in _hands.EnumerateHeld(user))
+        {
+            if (!HasComp<CMUDroneControlTabletComponent>(held))
+                continue;
+
+            tablet = held;
+            return true;
+        }
+
+        tablet = default;
         return false;
     }
 
