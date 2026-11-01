@@ -24,3 +24,4 @@ cmu-access-opfor-vehicle-crew = Экипаж техники Противобор
 cmu-access-staff-officer = Штабной офицер
 
 cmu-access-kitchen = Кухня
+cmu-access-wy-security-barrier = Барьер службы безопасности Вей-Ю

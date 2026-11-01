@@ -83,6 +83,8 @@
   accessGroups:
   - auwy
   - AUPrisonStaff
+  access:
+  - CMU14AccessWYSecurityBarrier
   roleWeight: 0.25
 
 - type: job
@@ -151,6 +153,8 @@
   accessGroups:
   - auwy
   - AUPrisonStaff
+  access:
+  - CMU14AccessWYSecurityBarrier
   roleWeight: 0.25
 
 - type: startingGear

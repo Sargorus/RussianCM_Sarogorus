@@ -161,6 +161,17 @@
       amount: 1
 
 - type: entity
+  parent: RMCCrateConstruction
+  id: CMUCrateWYSecurityBarrier
+  name: WY security barrier crate (x2)
+  description: A crate that contains two reinforced deployable Weyland-Yutani security barriers. Only corporate security and the liaison staff can lock or unlock them.
+  components:
+  - type: StorageFill
+    contents:
+    - id: CMUWYSecurityBarrier
+      amount: 2
+
+- type: entity
   parent: RMCCrateScience
   id: CMUCrateRadsuit
   name: radiation suit crate

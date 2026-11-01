@@ -92,6 +92,7 @@
   - auwy
   access:
   - AU14AccessCorporateWEYULiaison
+  - CMU14AccessWYSecurityBarrier
   roleWeight: 0.25
 
 - type: startingGear

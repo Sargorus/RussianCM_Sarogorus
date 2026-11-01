@@ -38,6 +38,8 @@
         crate: RMCCrateReplacementLights
     - name: WEYSEC Gear
       entries:
+      - cost: 1200
+        crate: CMUCrateWYSecurityBarrier
       - cost: 700
         crate: CMUCrateBiosuitWYTSSArmor
       - cost: 400
