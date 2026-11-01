@@ -23,11 +23,17 @@ public sealed partial class CMURoboticsRepairCrateSystem : EntitySystem
 
     private void OnBeforeOpened(Entity<CMURoboticsRepairCrateComponent> ent, ref StorageBeforeOpenEvent args)
     {
+        if (args.User == null)
+            return;
+
         MarkContents(ent);
     }
 
     private void OnOpened(Entity<CMURoboticsRepairCrateComponent> ent, ref StorageAfterOpenEvent args)
     {
+        if (args.User == null)
+            return;
+
         // Opening ejects the contents. Mark them by proximity as a fallback in
         // case the crate was filled while already open or the container changed.
         MarkNearby(ent);
@@ -36,6 +42,14 @@ public sealed partial class CMURoboticsRepairCrateSystem : EntitySystem
 
     private void OnTerminating(Entity<CMURoboticsRepairCrateComponent> ent, ref EntityTerminatingEvent args)
     {
+        if (!TryComp<TransformComponent>(ent.Owner, out var xform) ||
+            xform.MapUid is not { } map ||
+            TerminatingOrDeleted(map) ||
+            EntityManager.IsQueuedForDeletion(map))
+        {
+            return;
+        }
+
         MarkContents(ent);
     }
 

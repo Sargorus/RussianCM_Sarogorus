@@ -39,11 +39,7 @@
     - name: WEYSEC Gear
       entries:
       - cost: 600
-        crate: CMUCrateWYSecurityBarrier
-      - cost: 4000
-        crate: CMUCrateRoboticsFabricator
-      - cost: 1500
-        crate: CMUCrateRoboticsOrderConsole
+        crate: CMUWYSecurityBarrier
       - cost: 700
         crate: CMUCrateBiosuitWYTSSArmor
       - cost: 400
@@ -83,6 +79,10 @@
       # XRF crates are added via code
       #- cost: 1000
       #  crate: CMUCrateXRF
+      - cost: 4000
+        crate: CMUCrateRoboticsFabricator
+      - cost: 1500
+        crate: CMUCrateRoboticsOrderConsole
       - cost: 2500
         crate: CMUCrateSecureWYRandomExp
       - cost: 9500

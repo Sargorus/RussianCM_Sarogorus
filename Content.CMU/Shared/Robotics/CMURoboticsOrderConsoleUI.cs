@@ -24,6 +24,7 @@ public sealed class CMURoboticsOrderInfo
     public string? RequiredModuleName { get; }
     public int Reward { get; }
     public int Amount { get; }
+    public int SecondsRemaining { get; }
 
     public CMURoboticsOrderInfo(
         int id,
@@ -31,7 +32,8 @@ public sealed class CMURoboticsOrderInfo
         string targetName,
         string? requiredModuleName,
         int reward,
-        int amount)
+        int amount,
+        int secondsRemaining)
     {
         Id = id;
         Type = type;
@@ -39,6 +41,7 @@ public sealed class CMURoboticsOrderInfo
         RequiredModuleName = requiredModuleName;
         Reward = reward;
         Amount = amount;
+        SecondsRemaining = secondsRemaining;
     }
 }
 
@@ -68,6 +71,9 @@ public sealed class CMURoboticsAcceptOrderMessage(int id) : BoundUserInterfaceMe
 
 [Serializable, NetSerializable]
 public sealed class CMURoboticsCancelOrderMessage : BoundUserInterfaceMessage;
+
+[Serializable, NetSerializable]
+public sealed class CMURoboticsPrintSlipMessage : BoundUserInterfaceMessage;
 
 [Serializable, NetSerializable]
 public sealed class CMURoboticsRefreshOrdersMessage : BoundUserInterfaceMessage;

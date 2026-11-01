@@ -11,6 +11,7 @@ using Content.Server.Radio;
 using Content.Server.Radio.Components;
 using Content.Server.Radio.EntitySystems;
 using Content.Server._RMC14.Humanoid.Markings;
+using Content.Server.CMU14.Robotics;
 using Content.Shared.CMU14.DroneOperator;
 using Content.Shared.CMU14.Threats.Mobs.Xeno.Caste.Warlock;
 using Content.Shared.CMU14.ZLevels.Core.EntitySystems;
@@ -275,6 +276,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
     {
         EnsureFramePartsContainer(ent);
         EnsureFramePartStates(ent);
+        UpdateFrameVisuals(ent);
     }
 
     private void OnFrameInteractUsing(Entity<CMUDroneFrameComponent> ent, ref InteractUsingEvent args)
@@ -358,6 +360,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
 
         ent.Comp.PartStates[part.Part] = CMUDroneAssemblyPartState.Installed;
         ent.Comp.InstalledParts[part.Part] = partUid;
+        UpdateFrameVisuals(ent);
 
         _popup.PopupEntity(
             Loc.GetString("cmu-drone-frame-part-install-finish", ("part", partUid), ("frame", ent.Owner)),
@@ -1438,6 +1441,29 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         }
     }
 
+    private void UpdateFrameVisuals(Entity<CMUDroneFrameComponent> frame)
+    {
+        foreach (var part in frame.Comp.RequiredParts)
+        {
+            var shown = frame.Comp.PartStates.GetValueOrDefault(part) != CMUDroneAssemblyPartState.Missing;
+            if (FrameVisual(part) is { } visual)
+                _combatAppearance.SetData(frame.Owner, visual, shown);
+        }
+    }
+
+    private static CMUDroneFrameVisuals? FrameVisual(CMUDroneAssemblyPartSlot part)
+    {
+        return part switch
+        {
+            CMUDroneAssemblyPartSlot.Head => CMUDroneFrameVisuals.Head,
+            CMUDroneAssemblyPartSlot.LeftArm => CMUDroneFrameVisuals.LeftArm,
+            CMUDroneAssemblyPartSlot.RightArm => CMUDroneFrameVisuals.RightArm,
+            CMUDroneAssemblyPartSlot.LeftLeg => CMUDroneFrameVisuals.LeftLeg,
+            CMUDroneAssemblyPartSlot.RightLeg => CMUDroneFrameVisuals.RightLeg,
+            _ => null,
+        };
+    }
+
     private bool TryGetFramePartWithState(
         Entity<CMUDroneFrameComponent> frame,
         CMUDroneAssemblyPartState state,
@@ -1855,6 +1881,16 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
             return false;
         }
 
+        // Repair-order units belong to the customer until they are delivered and
+        // cannot be commandeered through a control tablet.
+        if (HasComp<CMURoboticsOrderTargetComponent>(drone))
+        {
+            if (!silent)
+                _popup.PopupEntity(Loc.GetString("cmu-drone-repair-target-locked"), user, user, PopupType.SmallCaution);
+
+            return false;
+        }
+
         if (tablet.Comp.Operator is { } tabletOperator &&
             tabletOperator != user &&
             Exists(tabletOperator))
@@ -1948,6 +1984,12 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         if (TerminatingOrDeleted(drone.Owner) || !_mobState.IsAlive(drone.Owner))
         {
             reason = Loc.GetString("cmu-drone-control-drone-dead");
+            return false;
+        }
+
+        if (HasComp<CMURoboticsOrderTargetComponent>(drone.Owner))
+        {
+            reason = Loc.GetString("cmu-drone-repair-target-locked");
             return false;
         }
 

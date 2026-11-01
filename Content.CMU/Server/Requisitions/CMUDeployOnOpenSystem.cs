@@ -1,5 +1,7 @@
 using Content.Shared.CMU14.Requisitions;
+using Content.Shared.Interaction;
 using Content.Shared.Storage.Components;
+using Content.Shared.Tools.Systems;
 
 namespace Content.Server.CMU14.Requisitions;
 
@@ -9,15 +11,34 @@ namespace Content.Server.CMU14.Requisitions;
 /// </summary>
 public sealed partial class CMUDeployOnOpenSystem : EntitySystem
 {
+    [Dependency] private SharedToolSystem _tool = default!;
+
     public override void Initialize()
     {
         base.Initialize();
         SubscribeLocalEvent<CMUDeployOnOpenComponent, StorageAfterOpenEvent>(OnStorageOpened);
+        SubscribeLocalEvent<CMUDeployOnOpenComponent, InteractUsingEvent>(OnPried);
         SubscribeLocalEvent<CMUDeployOnOpenComponent, EntityTerminatingEvent>(OnTerminating);
     }
 
     private void OnStorageOpened(Entity<CMUDeployOnOpenComponent> ent, ref StorageAfterOpenEvent args)
     {
+        // EntityStorageCloseOnMapInit opens every crate once while it is being
+        // initialized. That is not a player unpacking the crate: deploying here
+        // would spawn the payload in nullspace and delete the shipment before it
+        // ever reaches the cargo elevator.
+        if (args.User == null)
+            return;
+
+        Deploy(ent);
+    }
+
+    private void OnPried(Entity<CMUDeployOnOpenComponent> ent, ref InteractUsingEvent args)
+    {
+        if (args.Handled || !_tool.HasQuality(args.Used, "Prying"))
+            return;
+
+        args.Handled = true;
         Deploy(ent);
     }
 
@@ -32,11 +53,22 @@ public sealed partial class CMUDeployOnOpenSystem : EntitySystem
             return;
 
         ent.Comp.Deployed = true;
-        var coordinates = Transform(ent.Owner).Coordinates;
 
+        // Do not spawn products on a map that is being cleaned up, and do not
+        // materialize an off-map custom delivery crate that was cancelled.
+        if (!TryComp<TransformComponent>(ent.Owner, out var xform) ||
+            xform.MapUid is not { } map ||
+            TerminatingOrDeleted(map) ||
+            EntityManager.IsQueuedForDeletion(map))
+        {
+            return;
+        }
+
+        var coordinates = xform.Coordinates;
         foreach (var prototype in ent.Comp.Spawn)
             Spawn(prototype, coordinates);
 
-        QueueDel(ent.Owner);
+        if (!TerminatingOrDeleted(ent.Owner))
+            QueueDel(ent.Owner);
     }
 }

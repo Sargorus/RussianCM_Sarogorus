@@ -93,7 +93,45 @@
         occludes: True
   - type: Sprite
     sprite: CMU14/Mobs/DroneAndroid/parts.rsi
-    state: torso_m
+    layers:
+    - state: torso_m
+    - state: head_m
+      map: ["head"]
+      visible: false
+    - state: l_arm
+      map: ["left_arm"]
+      visible: false
+    - state: r_arm
+      map: ["right_arm"]
+      visible: false
+    - state: l_leg
+      map: ["left_leg"]
+      visible: false
+    - state: r_leg
+      map: ["right_leg"]
+      visible: false
+  - type: GenericVisualizer
+    visuals:
+      enum.CMUDroneFrameVisuals.Head:
+        head:
+          True: { visible: true }
+          False: { visible: false }
+      enum.CMUDroneFrameVisuals.LeftArm:
+        left_arm:
+          True: { visible: true }
+          False: { visible: false }
+      enum.CMUDroneFrameVisuals.RightArm:
+        right_arm:
+          True: { visible: true }
+          False: { visible: false }
+      enum.CMUDroneFrameVisuals.LeftLeg:
+        left_leg:
+          True: { visible: true }
+          False: { visible: false }
+      enum.CMUDroneFrameVisuals.RightLeg:
+        right_leg:
+          True: { visible: true }
+          False: { visible: false }
   - type: Item
     size: Normal
   - type: CMUDroneFrame

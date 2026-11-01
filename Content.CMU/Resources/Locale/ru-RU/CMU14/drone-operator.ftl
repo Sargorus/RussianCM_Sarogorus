@@ -85,6 +85,7 @@ cmu-drone-revive-already-alive = {$drone} уже активен.
 cmu-drone-revive-repair-first = Сначала отремонтируйте {$drone}, затем вставляйте ключ активации.
 cmu-drone-revive-start = Вы начинаете реактивировать {$drone} ключом синтетика.
 cmu-drone-revive-finish = {$drone} снова в строю.
+cmu-drone-repair-target-locked = Эта единица закреплена за контрактом на ремонт и не поддаётся управлению.
 cmu-drone-module-combat-blocked = {$drone} не принимает боевой модуль.
 cmu-drone-module-tool-required = Чтобы установить {$module}, в другой руке должен находиться подходящий инструмент.
 cmu-drone-module-install-start = Вы начинаете устанавливать {$module} в {$drone}.

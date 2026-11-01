@@ -6,8 +6,8 @@ namespace Content.Shared.CMU14.Robotics;
 /// <summary>
 /// A corporate cargo terminal that offers robotics work orders. Build orders
 /// ask for a specific android model; repair orders deliver a crate of damaged
-/// units to the corporate cargo elevator. Finished units are delivered by
-/// placing them on the raised cargo platform and lowering it.
+/// units to the corporate cargo elevator. Accepting an order prints a work-order
+/// slip; the finished units and that slip must be lowered on the cargo platform.
 /// </summary>
 [RegisterComponent]
 public sealed partial class CMURoboticsOrderConsoleComponent : Component
@@ -17,6 +17,12 @@ public sealed partial class CMURoboticsOrderConsoleComponent : Component
 
     [DataField]
     public int MaxAvailableOrders = 3;
+
+    [DataField]
+    public TimeSpan OrderDuration = TimeSpan.FromMinutes(7);
+
+    [DataField]
+    public EntProtoId SlipPrototype = "CMURoboticsOrderSlip";
 
     [DataField]
     public List<CMURoboticsOrderTarget> BuildTargets = new();
@@ -34,7 +40,7 @@ public sealed partial class CMURoboticsOrderConsoleComponent : Component
     public string Status = string.Empty;
 
     [ViewVariables]
-    public int NextOrderId = 1;
+    public TimeSpan NextUiUpdate;
 }
 
 [DataDefinition]
@@ -63,6 +69,7 @@ public sealed class CMURoboticsOrder
     public int Reward;
     public int Amount = 1;
     public string TargetName = string.Empty;
+    public TimeSpan Deadline;
     public EntityUid? Elevator;
     public EntityUid? RepairCrate;
 }

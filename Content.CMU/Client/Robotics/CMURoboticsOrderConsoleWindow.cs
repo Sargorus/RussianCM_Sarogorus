@@ -16,6 +16,7 @@ public sealed class CMURoboticsOrderConsoleWindow : DefaultWindow
 {
     public event Action<int>? OnAccept;
     public event Action? OnCancel;
+    public event Action? OnPrintSlip;
     public event Action? OnRefresh;
 
     private readonly CrtConsoleKit _kit = new();
@@ -77,6 +78,12 @@ public sealed class CMURoboticsOrderConsoleWindow : DefaultWindow
         }
 
         AddOrderFields(column, order);
+
+        var print = _kit.Button(
+            Loc.GetString("cmu-robotics-console-print-slip"),
+            CmuButtonStyles.Variant.Neutral);
+        print.OnPressed += _ => OnPrintSlip?.Invoke();
+        column.AddChild(print);
 
         var cancel = _kit.Button(
             Loc.GetString("cmu-robotics-console-cancel"),
@@ -157,6 +164,13 @@ public sealed class CMURoboticsOrderConsoleWindow : DefaultWindow
             column.AddChild(_kit.Field(
                 Loc.GetString("cmu-robotics-console-module"),
                 module));
+        }
+
+        if (order.SecondsRemaining > 0)
+        {
+            column.AddChild(_kit.Field(
+                Loc.GetString("cmu-robotics-console-time-left"),
+                TimeSpan.FromSeconds(order.SecondsRemaining).ToString(@"mm\:ss")));
         }
 
         column.AddChild(_kit.Field(

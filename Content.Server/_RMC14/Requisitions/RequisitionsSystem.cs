@@ -40,6 +40,7 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Physics;
 using Content.Shared.Random.Helpers;
 using Content.Shared.Stacks;
+using Content.Shared.Storage.Components;
 using Content.Shared.UserInterface;
 using Robust.Server.Audio;
 using Robust.Server.GameObjects;
@@ -370,6 +371,7 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
         var account = GetAccount("corporate");
         account.Comp.Balance += amount;
         Dirty(account, account.Comp);
+        SendUIStateAll();
     }
 
     private Entity<RequisitionsAccountComponent> GetAccount(string? faction = null)
@@ -572,7 +574,12 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
         var comp = elevator.Comp;
         if (comp.Mode == Raised)
         {
-            var delivery = Comp<RequisitionsDeliveryComponent>(elevator);
+            if (!TryComp<RequisitionsDeliveryComponent>(elevator, out var delivery))
+            {
+                Log.Error($"[Requisitions] Raised elevator {ToPrettyString(elevator)} had no prepared delivery; spawning orders directly.");
+                delivery = EnsureComp<RequisitionsDeliveryComponent>(elevator);
+            }
+
             var coordinates = _transform.GetMoverCoordinates(elevator);
             var xOffset = comp.Radius;
             var yOffset = comp.Radius;
@@ -580,8 +587,36 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
             for (var orderIndex = 0; orderIndex < comp.Orders.Count; orderIndex++)
             {
                 var order = comp.Orders[orderIndex];
-                var crate = delivery.Roots[orderIndex];
-                _transform.SetCoordinates(crate, coordinates.Offset(new Vector2(xOffset, yOffset)));
+                var target = coordinates.Offset(new Vector2(xOffset, yOffset));
+                EntityUid crate;
+                var hasPreparedRoot = orderIndex < delivery.Roots.Count &&
+                                      Exists(delivery.Roots[orderIndex]) &&
+                                      !TerminatingOrDeleted(delivery.Roots[orderIndex]);
+                if (hasPreparedRoot)
+                {
+                    crate = delivery.Roots[orderIndex];
+                }
+                else
+                {
+                    // A missing prepared root must never turn a paid order into
+                    // an empty platform. Spawn the product directly at the lift.
+                    crate = Spawn(order.Crate, target);
+                    if (order.Entities.Count > 0 &&
+                        TryComp<EntityStorageComponent>(crate, out var storage))
+                    {
+                        foreach (var prototype in order.Entities)
+                        {
+                            var contained = Spawn(prototype, target);
+                            if (!_entityStorage.Insert(contained, crate, storage))
+                                _transform.SetParent(contained, crate);
+                        }
+                    }
+
+                    delivery.Roots.Add(crate);
+                    Log.Error($"[Requisitions] Missing prepared root for order {orderIndex} on {ToPrettyString(elevator)}; spawned {order.Crate} directly.");
+                }
+
+                _transform.SetCoordinates(crate, target);
                 remainingDeliveries--;
                 // cmu edit start: lets the colony firearm registry log the guns in it
                 var delivered = new Content.Server.CMU14.Requisitions.CMURequisitionsCrateDeliveredEvent(elevator, orderIndex, crate,

@@ -85,6 +85,7 @@ cmu-drone-revive-already-alive = {$drone} is already active.
 cmu-drone-revive-repair-first = Repair {$drone} before inserting an activation key.
 cmu-drone-revive-start = You start reactivating {$drone} with the synth key.
 cmu-drone-revive-finish = {$drone} comes back online.
+cmu-drone-repair-target-locked = This customer unit is locked to its repair contract and cannot be controlled.
 cmu-drone-module-combat-blocked = {$drone} cannot accept a combat module.
 cmu-drone-module-tool-required = You need a suitable tool in your other hand to install {$module}.
 cmu-drone-module-install-start = You start installing {$module} into {$drone}.

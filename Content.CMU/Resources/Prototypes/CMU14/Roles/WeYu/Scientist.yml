@@ -220,7 +220,6 @@
   storage:
     back:
     - AU14StampWYSci
-    - CMSurgicalCaseFilled
 
 - type: entity
   parent: CMSpawnPointJobBase
