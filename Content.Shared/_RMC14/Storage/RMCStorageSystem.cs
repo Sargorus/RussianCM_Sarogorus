@@ -589,8 +589,15 @@ public sealed partial class RMCStorageSystem : EntitySystem
             {
                 foreach (var toClose in _toClose)
                 {
-                    if (TerminatingOrDeleted(toClose) || !HasComp<EntityStorageComponent>(toClose))
+                    // CMU14: a prototype may remove EntityStorageCloseOnMapInit
+                    // (for example the synthetic transport crate); skip queued
+                    // entries whose component was removed before this update.
+                    if (TerminatingOrDeleted(toClose) ||
+                        !HasComp<EntityStorageComponent>(toClose) ||
+                        !HasComp<EntityStorageCloseOnMapInitComponent>(toClose))
+                    {
                         continue;
+                    }
 
                     var locked = _lock.IsLocked(toClose);
                     if (locked)

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic; // CMU14: elevator queue insertion helper
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -374,6 +375,30 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
         SendUIStateAll();
     }
 
+    // CMU14 method: robotics contracts add their transport crates to the same
+    // order queue as normal cargo purchases.
+    public int GetElevatorRemainingOrderSlots(Entity<RequisitionsElevatorComponent> elevator)
+    {
+        return Math.Max(0, GetElevatorCapacity(elevator) - elevator.Comp.Orders.Count);
+    }
+
+    // CMU14 method: all-or-nothing queue insertion used by robotics contracts.
+    public bool TryAddElevatorOrders(
+        Entity<RequisitionsElevatorComponent> elevator,
+        List<RequisitionsEntry> orders)
+    {
+        if (orders.Count == 0)
+            return true;
+
+        if (orders.Count > GetElevatorRemainingOrderSlots(elevator))
+            return false;
+
+        elevator.Comp.Orders.AddRange(orders);
+        Dirty(elevator);
+        SendUIStateAll();
+        return true;
+    }
+
     private Entity<RequisitionsAccountComponent> GetAccount(string? faction = null)
     {
         var factionKey = string.IsNullOrEmpty(faction) || faction == "none"
@@ -624,15 +649,20 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
                 RaiseLocalEvent(ref delivered);
                 // cmu edit end
 
-                // If this order came from a department console, attach a department note
-                // instead of the generic invoice so it shows on the crate label.
-                if (order.DeptName != null)
+                // CMU14: robotics transport crates must keep their label slot for
+                // the player's robotics order slip instead of a cargo invoice.
+                if (!HasComp<CMURoboticsTransportCrateComponent>(crate))
                 {
-                    ApplyDepartmentCrateMetadata(crate, coordinates, order);
-                }
-                else
-                {
-                    PrintInvoice(crate, coordinates, PaperRequisitionInvoice, order.PackedWeight);
+                    // If this order came from a department console, attach a department note
+                    // instead of the generic invoice so it shows on the crate label.
+                    if (order.DeptName != null)
+                    {
+                        ApplyDepartmentCrateMetadata(crate, coordinates, order);
+                    }
+                    else
+                    {
+                        PrintInvoice(crate, coordinates, PaperRequisitionInvoice, order.PackedWeight);
+                    }
                 }
 
                 yOffset--;

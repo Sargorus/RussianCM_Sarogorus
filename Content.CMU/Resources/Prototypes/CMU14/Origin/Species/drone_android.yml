@@ -26,14 +26,14 @@
     organs:
       Torso: CMUPartDroneAndroidTorso
       Head: CMUPartDroneAndroidHead
-      ArmLeft: CMUPartRoboticLeftArm
-      ArmRight: CMUPartRoboticRightArm
-      HandLeft: CMUPartRoboticLeftHand
-      HandRight: CMUPartRoboticRightHand
-      LegLeft: CMUPartRoboticLeftLeg
-      LegRight: CMUPartRoboticRightLeg
-      FootLeft: CMUPartRoboticLeftFoot
-      FootRight: CMUPartRoboticRightFoot
+      ArmLeft: CMUPartDroneAndroidLeftArm
+      ArmRight: CMUPartDroneAndroidRightArm
+      HandLeft: CMUPartDroneAndroidLeftHand
+      HandRight: CMUPartDroneAndroidRightHand
+      LegLeft: CMUPartDroneAndroidLeftLeg
+      LegRight: CMUPartDroneAndroidRightLeg
+      FootLeft: CMUPartDroneAndroidLeftFoot
+      FootRight: CMUPartDroneAndroidRightFoot
       Brain: CMUOrganHumanBrain
       Eyes: CMUOrganHumanEyes
       Lungs: CMUOrganHumanLungs
@@ -57,6 +57,8 @@
   - type: VisualOrganMarkings
     markingData:
       group: DroneAndroid
+  - type: CMULimbFamily
+    family: DroneAndroid
 
 - type: entity
   parent: [ CMUPartDroneAndroidVisual, CMUPartHumanTorso ]

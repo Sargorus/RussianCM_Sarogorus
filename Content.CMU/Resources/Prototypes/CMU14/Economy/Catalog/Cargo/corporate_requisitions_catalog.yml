@@ -83,6 +83,8 @@
         crate: CMUCrateRoboticsFabricator
       - cost: 1500
         crate: CMUCrateRoboticsOrderConsole
+      - cost: 100
+        crate: CMUCrateSyntheticTransport
       - cost: 2500
         crate: CMUCrateSecureWYRandomExp
       - cost: 9500

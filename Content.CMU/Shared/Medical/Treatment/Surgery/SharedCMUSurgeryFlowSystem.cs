@@ -53,6 +53,7 @@ public abstract partial class SharedCMUSurgeryFlowSystem : EntitySystem
     [Dependency] protected IPrototypeManager Prototypes = default!;
     [Dependency] protected IGameTiming Timing = default!;
     [Dependency] protected SharedBodySystem Body = default!;
+    [Dependency] protected SharedCMULimbFamilySystem LimbFamilies = default!;
     [Dependency] protected CMUMedicalBodyIndexSystem MedicalIndex = default!;
     [Dependency] protected CMUMedicalSchedulerSystem MedicalScheduler = default!;
     [Dependency] protected SharedDoAfterSystem DoAfter = default!;
@@ -2010,8 +2011,7 @@ public abstract partial class SharedCMUSurgeryFlowSystem : EntitySystem
 
     public bool CanPatientAcceptLimb(EntityUid patient, EntityUid heldLimb)
     {
-        return !HasComp<CMUDroneAndroidComponent>(patient) ||
-               HasComp<CMURoboticLimbComponent>(heldLimb);
+        return LimbFamilies.CanAcceptLimb(patient, heldLimb);
     }
 
     public bool ToolMatchesCategory(EntityUid tool, string? category)

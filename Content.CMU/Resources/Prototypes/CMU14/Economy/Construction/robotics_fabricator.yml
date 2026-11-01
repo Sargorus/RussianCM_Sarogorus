@@ -130,7 +130,7 @@
 
 - type: latheRecipe
   id: CMURoboticsLimbLeftArm
-  result: CMUPartRoboticLeftArm
+  result: CMUPartDroneAndroidLeftArm
   completetime: 4
   materials:
     CMSteel: 3750
@@ -138,15 +138,31 @@
 
 - type: latheRecipe
   id: CMURoboticsLimbRightArm
-  result: CMUPartRoboticRightArm
+  result: CMUPartDroneAndroidRightArm
   completetime: 4
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
 
 - type: latheRecipe
+  id: CMURoboticsLimbLeftHand
+  result: CMUPartDroneAndroidLeftHand
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsLimbRightHand
+  result: CMUPartDroneAndroidRightHand
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
   id: CMURoboticsLimbLeftLeg
-  result: CMUPartRoboticLeftLeg
+  result: CMUPartDroneAndroidLeftLeg
   completetime: 4
   materials:
     CMSteel: 3750
@@ -154,11 +170,155 @@
 
 - type: latheRecipe
   id: CMURoboticsLimbRightLeg
-  result: CMUPartRoboticRightLeg
+  result: CMUPartDroneAndroidRightLeg
   completetime: 4
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+
+- type: latheRecipe
+  id: CMURoboticsLimbLeftFoot
+  result: CMUPartDroneAndroidLeftFoot
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsLimbRightFoot
+  result: CMUPartDroneAndroidRightFoot
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsWorkingJoeLeftArm
+  result: CMUPartWorkingJoeLeftArm
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+
+- type: latheRecipe
+  id: CMURoboticsWorkingJoeRightArm
+  result: CMUPartWorkingJoeRightArm
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+
+- type: latheRecipe
+  id: CMURoboticsWorkingJoeLeftHand
+  result: CMUPartWorkingJoeLeftHand
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsWorkingJoeRightHand
+  result: CMUPartWorkingJoeRightHand
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsWorkingJoeLeftLeg
+  result: CMUPartWorkingJoeLeftLeg
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+
+- type: latheRecipe
+  id: CMURoboticsWorkingJoeRightLeg
+  result: CMUPartWorkingJoeRightLeg
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+
+- type: latheRecipe
+  id: CMURoboticsWorkingJoeLeftFoot
+  result: CMUPartWorkingJoeLeftFoot
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsWorkingJoeRightFoot
+  result: CMUPartWorkingJoeRightFoot
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsSynthLeftArm
+  result: CMUPartSynthLeftArm
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+
+- type: latheRecipe
+  id: CMURoboticsSynthRightArm
+  result: CMUPartSynthRightArm
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+
+- type: latheRecipe
+  id: CMURoboticsSynthLeftHand
+  result: CMUPartSynthLeftHand
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsSynthRightHand
+  result: CMUPartSynthRightHand
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsSynthLeftLeg
+  result: CMUPartSynthLeftLeg
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+
+- type: latheRecipe
+  id: CMURoboticsSynthRightLeg
+  result: CMUPartSynthRightLeg
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+
+- type: latheRecipe
+  id: CMURoboticsSynthLeftFoot
+  result: CMUPartSynthLeftFoot
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+
+- type: latheRecipe
+  id: CMURoboticsSynthRightFoot
+  result: CMUPartSynthRightFoot
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
 
 - type: latheRecipePack
   id: CMURoboticsFabricatorRecipes
@@ -176,5 +336,25 @@
   - CMURoboticsModuleCare
   - CMURoboticsLimbLeftArm
   - CMURoboticsLimbRightArm
+  - CMURoboticsLimbLeftHand
+  - CMURoboticsLimbRightHand
   - CMURoboticsLimbLeftLeg
   - CMURoboticsLimbRightLeg
+  - CMURoboticsLimbLeftFoot
+  - CMURoboticsLimbRightFoot
+  - CMURoboticsWorkingJoeLeftArm
+  - CMURoboticsWorkingJoeRightArm
+  - CMURoboticsWorkingJoeLeftHand
+  - CMURoboticsWorkingJoeRightHand
+  - CMURoboticsWorkingJoeLeftLeg
+  - CMURoboticsWorkingJoeRightLeg
+  - CMURoboticsWorkingJoeLeftFoot
+  - CMURoboticsWorkingJoeRightFoot
+  - CMURoboticsSynthLeftArm
+  - CMURoboticsSynthRightArm
+  - CMURoboticsSynthLeftHand
+  - CMURoboticsSynthRightHand
+  - CMURoboticsSynthLeftLeg
+  - CMURoboticsSynthRightLeg
+  - CMURoboticsSynthLeftFoot
+  - CMURoboticsSynthRightFoot

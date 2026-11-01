@@ -25,14 +25,14 @@
     organs:
       Torso: CMUPartDroneAndroidTorso
       Head: CMUPartDroneAndroidHead
-      ArmLeft: CMUPartRoboticLeftArm
-      ArmRight: CMUPartRoboticRightArm
-      HandLeft: CMUPartRoboticLeftHand
-      HandRight: CMUPartRoboticRightHand
-      LegLeft: CMUPartRoboticLeftLeg
-      LegRight: CMUPartRoboticRightLeg
-      FootLeft: CMUPartRoboticLeftFoot
-      FootRight: CMUPartRoboticRightFoot
+      ArmLeft: CMUPartDroneAndroidLeftArm
+      ArmRight: CMUPartDroneAndroidRightArm
+      HandLeft: CMUPartDroneAndroidLeftHand
+      HandRight: CMUPartDroneAndroidRightHand
+      LegLeft: CMUPartDroneAndroidLeftLeg
+      LegRight: CMUPartDroneAndroidRightLeg
+      FootLeft: CMUPartDroneAndroidLeftFoot
+      FootRight: CMUPartDroneAndroidRightFoot
       Brain: CMUOrganHumanBrain
       Eyes: CMUOrganHumanEyes
       Lungs: CMUOrganHumanLungs
@@ -121,8 +121,8 @@
     bio: 10
     explosionArmor: 10
 
-# Repair-order targets. They spawn missing one arm and one leg, with burn and
-# brute damage, and no control module installed.
+# Repair-order targets. They spawn with random missing limbs and randomized
+# burn and brute damage, and no control module installed.
 - type: entity
   parent: CMUDroneAndroidUnarmed
   id: CMUDroneAndroidUnarmedRepair

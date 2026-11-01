@@ -1,28 +1,38 @@
 using System.Collections.Generic;
 using Content.Shared.Body.Part;
-using Content.Shared.FixedPoint;
-using Robust.Shared.Prototypes;
 
 namespace Content.Shared.CMU14.Robotics;
 
 /// <summary>
-/// Spawns an android in a repair-order state: some limbs are missing and the
-/// frame has both brute damage and burn damage. The roboticist must attach new
-/// limbs and repair the damage before the unit can be delivered.
+/// Spawns an android in a repair-order state: a random number of limbs are
+/// missing and the frame has randomized brute and burn damage. The roboticist
+/// must attach matching limbs and repair the damage before delivery.
 /// </summary>
 [RegisterComponent]
 public sealed partial class CMURoboticsDamagedBodyComponent : Component
 {
     [DataField]
-    public List<BodyPartType> SeverParts = new()
+    public int MinSeveredLimbs = 1;
+
+    [DataField]
+    public int MaxSeveredLimbs = 3;
+
+    [DataField]
+    public List<BodyPartType> SeverableParts = new()
     {
         BodyPartType.Arm,
         BodyPartType.Leg,
     };
 
     [DataField]
-    public FixedPoint2 BurnDamage = FixedPoint2.New(45);
+    public int MinBurnDamage = 20;
 
     [DataField]
-    public FixedPoint2 BruteDamage = FixedPoint2.New(25);
+    public int MaxBurnDamage = 40;
+
+    [DataField]
+    public int MinBruteDamage = 10;
+
+    [DataField]
+    public int MaxBruteDamage = 25;
 }
