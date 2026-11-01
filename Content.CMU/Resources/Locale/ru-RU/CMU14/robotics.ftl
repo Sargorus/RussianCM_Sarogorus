@@ -2,7 +2,7 @@ ent-CMURoboticsFabricator = робототехнический фабрикат�
     .desc = Фабрикатор «Вейланд-Ютани» для рам андройдов, конечностей, планшетов управления, модулей и ключей активации. Требует универсальную топливную ячейку WL-6 и обученного робототехника.
 
 ent-CMUCrateRoboticsFabricator = ящик робототехнического фабрикатора
-    .desc = Запечатанный ящик с одним робототехническим фабрикатором «Вейланд-Ютани» и установленной универсальной топливной ячейкой WL-6. Вскройте его ломом.
+    .desc = Запечатанный ящик с одним робототехническим фабрикатором «Вейланд-Ютани». Топливная ячейка не входит в комплект — установите универсальную топливную ячейку WL-6 для питания. Вскройте его ломом.
 
 ent-CMURoboticsOrderConsole = консоль робототехнических заказов
     .desc = Контрактный терминал «Вейланд-Ютани» для робототехнических работ. Возьмите заказ на создание или починку, получите транспортные ящики в карго, затем прикрепите листок заказа к загруженному ящику и опустите платформу. Консоль можно прикрепить, передвинуть и повернуть.
@@ -25,16 +25,16 @@ ent-CMUCombatDrone = гусеничный боевой дрон
 ent-CMUFlamerDrone = гусеничный огнемётный дрон
     .desc = Дистанционно управляемый гусеничный дрон с двумя огнемётными соплами на клешнях.
 
-ent-CMUDroneAndroidUnarmed = безоружный дроид-андройд
+ent-CMUDroneAndroidUnarmed = гражданский дрон
     .desc = Урезанная синтетическая рама дрона с открытыми сервоприводами. Её шина управления намеренно заблокирована от использования огнестрельного оружия.
 
-ent-CMUDroneAndroidUnarmedRepair = повреждённый безоружный дроид-андройд
-    .desc = Дроид-андройд для заказа на починку. У него отсутствуют конечности и есть ожоговые и тупые повреждения.
+ent-CMUDroneAndroidUnarmedRepair = повреждённый гражданский дрон
+    .desc = Гражданский дрон для заказа на починку. У него отсутствуют конечности и есть ожоговые и тупые повреждения.
 
-ent-CMUDroneAndroidCombatRepair = повреждённый боевой дроид-андройд
-    .desc = Боевой дроид-андройд для заказа на починку. У него отсутствуют конечности и есть ожоговые и тупые повреждения.
+ent-CMUDroneAndroidCombatRepair = повреждённый боевой дрон
+    .desc = Боевой дрон для заказа на починку. У него отсутствуют конечности и есть ожоговые и тупые повреждения.
 
-ent-CMUDroneAndroidCombat = боевой дроид-андройд
+ent-CMUDroneAndroidCombat = боевой дрон
     .desc = Усиленная синтетическая рама дрона с боевой шиной управления, оружейными процедурами и слоем корпоративной брони.
 
 ent-CMUDroneBodyFrameUnarmed = рама безоружного дрона-гуманоида
@@ -74,14 +74,14 @@ cmu-robotics-console-accepted-build = Заказ принят: {$target}. В о�
 cmu-robotics-console-no-queue-space = Заказ нельзя взять: в очереди карго недостаточно места (нужно {$needed}, свободно {$free}).
 cmu-robotics-console-no-platform = Не найдена корпоративная грузовая платформа.
 cmu-robotics-console-rejected = Заказчик не доволен результатом: {$reason}. Деньги не выплачены.
-cmu-robotics-console-delivered = Заказ успешно сдан: {$target}. {$reward} переведены на счёт бюджетной консоли связного.
+cmu-robotics-console-delivered = Заказ успешно сдан: {$target}. {$reward} переведены на счёт консоли корпоративных дел.
 cmu-robotics-console-cancelled = Заказ отменён.
 cmu-robotics-console-print-slip = Напечатать листок заказа
 cmu-robotics-console-slip-printed = Листок заказа напечатан.
 cmu-robotics-slip-attach = Прикрепить листок заказа
 cmu-robotics-slip-remove = Снять листок заказа
 cmu-robotics-console-time-left = Осталось времени
-cmu-robotics-console-failed-timeout = Срок заказа истёк. На счёт бюджетной консоли связного наложен штраф {$reward}.
+cmu-robotics-console-failed-timeout = Срок заказа истёк. На счёт консоли корпоративных дел наложен штраф {$fine} (25% от вознаграждения).
 cmu-robotics-console-refresh-active = Нельзя обновить список, пока активен заказ.
 cmu-robotics-console-refreshed = Список заказов обновлён.
 cmu-robotics-console-type = Тип
@@ -108,8 +108,8 @@ cmu-robotics-console-reason-tablet = в ящике нет пульта упра�
 cmu-robotics-console-reason-no-slip = листок заказа не прикреплён к транспортному ящику
 cmu-robotics-console-reason-slip-not-on-crate = листок заказа должен быть прикреплён к транспортному ящику с единицей заказа
 cmu-robotics-slip-name = робототехнический заказ №{$id}
-cmu-robotics-target-civilian-drone = гражданский дрон
-cmu-robotics-target-combat-drone = боевой дрон
+cmu-robotics-target-civilian-drone = Гражданский дрон
+cmu-robotics-target-combat-drone = Боевой дрон
 cmu-robotics-target-working-joe = Рабочий Джо
 cmu-robotics-slip-module-none = не требуется
 cmu-robotics-slip-package-build = готовая единица + пульт управления дроном

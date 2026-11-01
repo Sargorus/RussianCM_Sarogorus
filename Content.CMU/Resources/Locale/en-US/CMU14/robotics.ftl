@@ -2,7 +2,7 @@ ent-CMURoboticsFabricator = robotics fabricator
     .desc = A Weyland-Yutani fabricator for android frames, limbs, control tablets, modules and activation keys. It needs a WL-6 universal fuel cell and a trained roboticist.
 
 ent-CMUCrateRoboticsFabricator = robotics fabricator crate
-    .desc = A sealed crate containing one Weyland-Yutani robotics fabricator with its WL-6 universal fuel cell installed. Pry it open with a crowbar.
+    .desc = A sealed crate containing one Weyland-Yutani robotics fabricator. The fuel cell is not included; install a WL-6 universal fuel cell to power it. Pry it open with a crowbar.
 
 ent-CMURoboticsOrderConsole = robotics order console
     .desc = A Weyland-Yutani contract terminal for robotics work. Accept a build or repair order, receive its synthetic transport crates in cargo, then attach the order slip to a loaded crate and lower the platform. It can be anchored, moved and rotated.
@@ -25,16 +25,16 @@ ent-CMUCombatDrone = gun UGV
 ent-CMUFlamerDrone = flamer UGV
     .desc = A remotely operated tracked UGV with twin claw-mounted flame nozzles.
 
-ent-CMUDroneAndroidUnarmed = unarmed drone android
+ent-CMUDroneAndroidUnarmed = civilian drone
     .desc = A stripped-down synthetic drone frame with exposed servos. Its control bus is deliberately locked out of firearm use.
 
-ent-CMUDroneAndroidUnarmedRepair = damaged unarmed drone android
-    .desc = A repair-order drone android. It is missing limbs and has burn and blunt damage.
+ent-CMUDroneAndroidUnarmedRepair = damaged civilian drone
+    .desc = A repair-order civilian drone. It is missing limbs and has burn and blunt damage.
 
-ent-CMUDroneAndroidCombatRepair = damaged combat drone android
-    .desc = A repair-order combat drone android. It is missing limbs and has burn and blunt damage.
+ent-CMUDroneAndroidCombatRepair = damaged combat drone
+    .desc = A repair-order combat drone. It is missing limbs and has burn and blunt damage.
 
-ent-CMUDroneAndroidCombat = combat drone android
+ent-CMUDroneAndroidCombat = combat drone
     .desc = A reinforced synthetic drone frame with a combat-rated control bus, weapon routines, and a layer of corporate armour.
 
 ent-CMUDroneBodyFrameUnarmed = unarmed humanoid drone body frame
@@ -74,14 +74,14 @@ cmu-robotics-console-accepted-build = Order accepted: {$target}. {$crates} empty
 cmu-robotics-console-no-queue-space = The order cannot be accepted: the cargo queue does not have enough space (needs {$needed}, {$free} free).
 cmu-robotics-console-no-platform = No corporate cargo platform was found.
 cmu-robotics-console-rejected = The customer is not satisfied: {$reason}. No payment was made.
-cmu-robotics-console-delivered = Order successfully delivered: {$target}. {$reward} was transferred to the liaison's budget console account.
+cmu-robotics-console-delivered = Order successfully delivered: {$target}. {$reward} was transferred to the corporate affairs console account.
 cmu-robotics-console-cancelled = Order cancelled.
 cmu-robotics-console-print-slip = Print order slip
 cmu-robotics-console-slip-printed = Order slip printed.
 cmu-robotics-slip-attach = Attach order slip
 cmu-robotics-slip-remove = Remove order slip
 cmu-robotics-console-time-left = Time left
-cmu-robotics-console-failed-timeout = The order deadline expired. A fine of {$reward} was charged to the liaison's budget console account.
+cmu-robotics-console-failed-timeout = The order deadline expired. A fine of {$fine} (25% of the reward) was charged to the corporate affairs console account.
 cmu-robotics-console-refresh-active = You cannot refresh the list while an order is active.
 cmu-robotics-console-refreshed = Order list refreshed.
 cmu-robotics-console-type = Type
@@ -108,8 +108,8 @@ cmu-robotics-console-reason-tablet = the crate does not contain a drone control 
 cmu-robotics-console-reason-no-slip = the order slip is not attached to a transport crate
 cmu-robotics-console-reason-slip-not-on-crate = the order slip must be attached to a transport crate that contains an order unit
 cmu-robotics-slip-name = robotics work order #{$id}
-cmu-robotics-target-civilian-drone = civilian drone
-cmu-robotics-target-combat-drone = combat drone
+cmu-robotics-target-civilian-drone = Civilian drone
+cmu-robotics-target-combat-drone = Combat drone
 cmu-robotics-target-working-joe = Working Joe
 cmu-robotics-slip-module-none = not required
 cmu-robotics-slip-package-build = finished unit + drone control tablet

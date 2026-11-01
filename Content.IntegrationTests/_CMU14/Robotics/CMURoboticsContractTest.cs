@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Content.IntegrationTests.Fixtures;
-using Content.Server.CMU14.ColonyEconomy;
 using Content.Server.CMU14.Robotics;
 using Content.Server._RMC14.Requisitions;
+using Content.Shared.CMU14.ColonyEconomy;
 using Content.Shared._RMC14.Requisitions;
 using Content.Shared._RMC14.Requisitions.Components;
 using Content.Shared._RMC14.Synth;
-using Content.Shared._RMC14.Power;
 using Content.Shared._RMC14.Crate;
 using Content.Shared.Body.Part;
 using Content.Shared.CMU14.DroneOperator;
@@ -20,6 +19,7 @@ using Content.Shared.Labels.EntitySystems;
 using Content.Shared.Lock;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Paper;
+using Content.Shared.Materials;
 using Content.Shared.Storage.Components;
 using Content.Shared.Storage.EntitySystems;
 using Robust.Shared.GameObjects;
@@ -228,6 +228,38 @@ public sealed class CMURoboticsContractTest : GameTest
     }
 
     [Test]
+    public async Task ExpiredOrderChargesQuarterOfRewardAsFine()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            SEntMan.SpawnEntity("AU14CorporateConsole", map.GridCoords);
+            var console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
+            var consoleComp = SEntMan.GetComponent<CMURoboticsOrderConsoleComponent>(console);
+            var timing = Server.ResolveDependency<IGameTiming>();
+
+            consoleComp.ActiveOrder = new CMURoboticsOrder
+            {
+                Id = 5150,
+                Type = CMURoboticsOrderType.Build,
+                Target = "CMUDroneAndroidUnarmed",
+                Amount = 1,
+                TargetName = "test drone",
+                Reward = 4000,
+                Deadline = timing.CurTime - TimeSpan.FromSeconds(1),
+            };
+
+            Server.System<CMURoboticsOrderConsoleSystem>().Update(0f);
+
+            var corporate = SEntMan.EntityQueryEnumerator<CorporateConsoleComponent>();
+            Assert.That(corporate.MoveNext(out _, out var budget), Is.True);
+            Assert.That(budget.CorporateBudget, Is.EqualTo(-1000),
+                "an expired order must charge 25% of its reward");
+            Assert.That(consoleComp.ActiveOrder, Is.Null);
+        });
+    }
+
+    [Test]
     public async Task PrintedOrderSlipUsesRealLineBreaks()
     {
         var map = await Pair.CreateTestMap();
@@ -417,21 +449,22 @@ public sealed class CMURoboticsContractTest : GameTest
                 Elevator = elevator,
             };
 
-            var budget = Server.System<ColonyBudgetSystem>();
-            var before = budget.GetBudget();
+            var budget = SEntMan.GetComponent<CorporateConsoleComponent>(
+                SEntMan.SpawnEntity("AU14CorporateConsole", map.GridCoords));
+            var before = budget.CorporateBudget;
             var attempt = new CMURequisitionsElevatorLoweringAttemptEvent(elevator);
             SEntMan.EventBus.RaiseLocalEvent(elevator, ref attempt);
 
             Assert.That(consoleComp.ActiveOrder, Is.Null);
             Assert.That(SEntMan.EntityExists(drone), Is.True,
                 "submitting a contract must not delete the repaired unit");
-            Assert.That(budget.GetBudget(), Is.EqualTo(before + 1000),
-                "a valid submission must pay the liaison budget console account");
+            Assert.That(budget.CorporateBudget, Is.EqualTo(before + 1000),
+                "a valid submission must pay the corporate affairs console account");
         });
     }
 
     [Test]
-    public async Task BuildOrderRequiresControlTabletAndPaysLiaisonBudget()
+    public async Task BuildOrderRequiresControlTabletAndPaysCorporateConsole()
     {
         var map = await Pair.CreateTestMap();
         await Server.WaitAssertion(() =>
@@ -463,19 +496,20 @@ public sealed class CMURoboticsContractTest : GameTest
                 Elevator = elevator,
             };
 
-            var budget = Server.System<ColonyBudgetSystem>();
-            var before = budget.GetBudget();
+            var budget = SEntMan.GetComponent<CorporateConsoleComponent>(
+                SEntMan.SpawnEntity("AU14CorporateConsole", map.GridCoords));
+            var before = budget.CorporateBudget;
             var attempt = new CMURequisitionsElevatorLoweringAttemptEvent(elevator);
             SEntMan.EventBus.RaiseLocalEvent(elevator, ref attempt);
 
             Assert.That(consoleComp.ActiveOrder, Is.Null);
             Assert.That(SEntMan.EntityExists(drone), Is.True);
-            Assert.That(budget.GetBudget(), Is.EqualTo(before + 3500));
+            Assert.That(budget.CorporateBudget, Is.EqualTo(before + 3500));
         });
     }
 
     [Test]
-    public async Task FabricatorCrateIsSealedCaseWithInstalledCell()
+    public async Task FabricatorCrateIsSealedCaseWithoutCell()
     {
         var map = await Pair.CreateTestMap();
         await Server.WaitAssertion(() =>
@@ -486,14 +520,17 @@ public sealed class CMURoboticsContractTest : GameTest
             Assert.That(SEntMan.HasComponent<EntityStorageComponent>(crate), Is.False,
                 "the fabricator must arrive in a sealed case, not a container crate");
 
-            var fabricator = SEntMan.SpawnEntity("CMURoboticsFabricatorFilled", map.GridCoords);
+            var fabricator = SEntMan.SpawnEntity("CMURoboticsFabricator", map.GridCoords);
+            var material = SEntMan.GetComponent<MaterialStorageComponent>(fabricator);
+            Assert.That(material.Storage, Is.Empty,
+                "the cargo fabricator must arrive with no materials loaded");
+
             var containers = Server.System<SharedContainerSystem>();
             Assert.That(
                 containers.TryGetContainer(fabricator, "cmu_robotics_fabricator_cell", out var cell),
                 Is.True);
-            Assert.That(cell!.ContainedEntities.Count, Is.EqualTo(1),
-                "the cargo fabricator must arrive with its fuel cell installed");
-            Assert.That(SEntMan.HasComponent<RMCFusionCellComponent>(cell.ContainedEntities[0]), Is.True);
+            Assert.That(cell!.ContainedEntities.Count, Is.EqualTo(0),
+                "the cargo fabricator must arrive without a fuel cell");
         });
     }
 

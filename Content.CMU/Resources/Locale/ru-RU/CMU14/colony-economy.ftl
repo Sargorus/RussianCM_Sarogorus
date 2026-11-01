@@ -106,3 +106,37 @@ admin-console-trade-tax-section = -- Налог на продажу посыло
 admin-console-current-trade-tax = Текущий налог на продажу посылок: { $percent }%
 admin-console-trade-tax-description = Берётся из суммы, которую дрон платит за посылку, проданную на торговой платформе. Эта доля уходит в бюджет колонии, остальное получает продавец.
 admin-console-trade-tax-announcement = Налог колонии на продажу посылок установлен в { $percent }%. Эта доля от каждой посылки, проданной на торговой платформе, уходит колонии.
+
+# Консоль корпоративных дел
+ent-AU14CorporateConsole = консоль корпоративных дел
+    .desc = Терминал корпоративных дел «Вейланд-Ютани». Позволяет управлять транзитными тарифами, корпоративными средствами и поддержкой третьих сторон. Все изменения тарифа объявляются по всей колонии.
+
+corporate-console-title = Консоль корпоративных дел
+corporate-console-budget = Корпоративный бюджет: ${ $amount }
+corporate-console-withdraw-section = -- Снять наличные --
+corporate-console-transit-tariff-section = -- Транзитный тариф --
+corporate-console-current-transit-tariff = Текущий транзитный тариф: { $percent }%
+corporate-console-transit-tariff-description = Процент от всех выплат за сдачу ресурсов, который уходит в корпоративный бюджет вместо бюджета колонии.
+corporate-console-new-tariff = Новый тариф (0–50%):
+corporate-console-tariff-placeholder = напр. 15
+corporate-console-withdraw-tax-note = Примечание: с снятия удерживается подоходный налог { $percent }%.
+corporate-console-withdraw-no-tax = Снятие не облагается подоходным налогом.
+corporate-console-announcement-sender = Корпоративные дела
+corporate-console-tariff-announcement = Корпоративный транзитный тариф установлен на { $percent }%. Выплаты колонии за сдачу скорректированы.
+
+cmu-corporate-heading = КОРПОРАТИВНЫЕ ДЕЛА
+cmu-corporate-subheading = ОФИС КОЛОНИАЛЬНОГО СВЯЗНОГО // ТРАНЗИТ И ПОДДЕРЖКА
+cmu-corporate-treasury = Корпоративная казна
+cmu-corporate-withdraw-tax = При снятии удерживается подоходный налог колонии { $percent }%.
+cmu-corporate-withdraw-no-tax = Снятие сейчас не облагается налогом.
+cmu-corporate-tariff = Транзитный тариф
+cmu-corporate-current-tariff = Текущая ставка
+cmu-corporate-exact = ТОЧНАЯ СТАВКА (0–{ $max }%)
+cmu-corporate-apply = ПРИМЕНИТЬ
+cmu-corporate-tariff-announced = Каждое изменение тарифа объявляется по всей колонии.
+cmu-corporate-support = Корпоративная поддержка
+cmu-corporate-support-hint = Вызовите корпоративную охрану, синтетиков или подрядчиков за счёт корпоративного бюджета.
+cmu-corporate-footer = Тарифные поступления идут в корпоративный бюджет с каждой сдачей.
+cmu-ambassador-withdraw = СНЯТЬ ${ $amount }
+cmu-ambassador-economy = Экономика колонии
+cmu-ambassador-open-third-party = ОТКРЫТЬ МЕНЮ ПОДДЕРЖКИ

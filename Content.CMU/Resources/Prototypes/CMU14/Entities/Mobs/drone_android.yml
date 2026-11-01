@@ -91,7 +91,7 @@
 - type: entity
   parent: CMUDroneAndroid
   id: CMUDroneAndroidUnarmed
-  name: unarmed drone android
+  name: civilian drone
   description: A stripped-down synthetic drone frame with exposed servos. Its control bus is deliberately locked out of firearm use.
   suffix: CMU14, Unarmed
   components:
@@ -103,7 +103,7 @@
 - type: entity
   parent: CMUDroneAndroid
   id: CMUDroneAndroidCombat
-  name: combat drone android
+  name: combat drone
   description: A reinforced synthetic drone frame with a combat-rated control bus, weapon routines, and a layer of corporate armour.
   suffix: CMU14, Combat
   components:
@@ -126,7 +126,7 @@
 - type: entity
   parent: CMUDroneAndroidUnarmed
   id: CMUDroneAndroidUnarmedRepair
-  name: damaged unarmed drone android
+  name: damaged civilian drone
   suffix: CMU14, Repair target
   components:
   - type: CMUHumanMedical
@@ -135,7 +135,7 @@
 - type: entity
   parent: CMUDroneAndroidCombat
   id: CMUDroneAndroidCombatRepair
-  name: damaged combat drone android
+  name: damaged combat drone
   suffix: CMU14, Repair target
   components:
   - type: CMUHumanMedical

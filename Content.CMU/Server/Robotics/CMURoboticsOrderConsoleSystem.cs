@@ -43,8 +43,7 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     [Dependency] private IPrototypeManager _prototypes = default!;
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private RequisitionsSystem _requisitions = default!;
-    [Dependency] private ColonyBudgetSystem _colonyBudget = default!;
-    [Dependency] private BudgetConsoleSystem _budgetConsole = default!;
+    [Dependency] private CorporateConsoleSystem _corporateConsole = default!;
     [Dependency] private CMURoboticsDamagedBodySystem _damagedBody = default!;
     [Dependency] private SharedBodySystem _body = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
@@ -55,8 +54,9 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     [Dependency] private UserInterfaceSystem _ui = default!;
     [Dependency] private LabelSystem _labels = default!;
 
-    private const int RepairRewardPerDamage = 8;
-    private const int RepairRewardPerMissingLimb = 150;
+    private const int RepairRewardPerDamage = 1;
+    private const int RepairRewardPerMissingLimb = 20;
+    private const float RepairFailureFineMultiplier = 0.25f;
 
     private static readonly EntProtoId TransportCrate = "CMUCrateSyntheticTransport";
 
@@ -605,17 +605,18 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         bool fine,
         string? reason)
     {
+        var fineAmount = 0;
         if (fine)
         {
-            _colonyBudget.AddToBudget(-order.Reward);
-            _budgetConsole.UpdateAllUi();
+            fineAmount = (int) Math.Ceiling(order.Reward * RepairFailureFineMultiplier);
+            _corporateConsole.AddToCorporateBudget(-fineAmount);
         }
 
         // A failed or expired contract does not delete its customer units.
         DeleteOrderSlips(order.Id);
         console.Comp.ActiveOrder = null;
         console.Comp.Status = reason == null
-            ? Loc.GetString("cmu-robotics-console-failed-timeout", ("reward", order.Reward))
+            ? Loc.GetString("cmu-robotics-console-failed-timeout", ("fine", fineAmount))
             : Loc.GetString("cmu-robotics-console-rejected", ("reason", reason));
         FillOrders(console);
         UpdateUi(console);
@@ -707,8 +708,7 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
 
     private void PayLiaison(int amount)
     {
-        _colonyBudget.AddToBudget(amount);
-        _budgetConsole.UpdateAllUi();
+        _corporateConsole.AddToCorporateBudget(amount);
     }
 
     private void UpdateUi(Entity<CMURoboticsOrderConsoleComponent> ent)

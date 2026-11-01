@@ -37,11 +37,7 @@
     staticPacks:
     - CMURoboticsFabricatorRecipes
   - type: MaterialStorage
-    storage:
-      CMSteel: 60000
-      CMGlass: 10000
-      RMCPlastic: 30000
-      CMPlasteel: 30000
+    storage: {}
     whitelist:
       tags:
       - Metal
@@ -50,22 +46,6 @@
   - type: CMURoboticsFabricator
   - type: StaticPrice
     price: 1500
-
-# The cargo version arrives with its fuel cell already installed. Right-click
-# the fabricator to take the cell out; the empty version above is for maps and
-# admin spawning.
-- type: entity
-  parent: CMURoboticsFabricator
-  id: CMURoboticsFabricatorFilled
-  categories: [ HideSpawnMenu ]
-  components:
-  - type: ContainerContainer
-    containers:
-      cmu_robotics_fabricator_cell: !type:ContainerSlot {}
-  - type: ContainerFill
-    containers:
-      cmu_robotics_fabricator_cell:
-      - RMCGeneratorFusionCell
 
 - type: latheRecipe
   id: CMURoboticsFrameUnarmed
