@@ -2,7 +2,7 @@
   parent: RMCCommunicationsConsoleBase
   id: CMURoboticsOrderConsole
   name: robotics order console
-  description: A Weyland-Yutani contract terminal for robotics work. Accept a build or repair order, then place the finished drone next to the console and submit it.
+  description: A Weyland-Yutani contract terminal for robotics work. Accept a build or repair order, then place the finished units on the corporate cargo platform and lower it.
   components:
   - type: Sprite
     sprite: _RMC14/Structures/Machines/computer.rsi
@@ -11,27 +11,26 @@
   - type: CMURoboticsOrderConsole
     buildTargets:
     - prototype: CMUDroneAndroidUnarmed
-      reward: 500
+      reward: 2500
       requiredModules:
       - CMUDroneModuleCare
     - prototype: CMUDroneAndroidCombat
-      reward: 800
+      reward: 3200
       requiredModules:
       - CMUDroneModuleCombat
       - CMUDroneModuleCare
-    - prototype: CMUCombatDrone
-      reward: 700
-    - prototype: CMUFlamerDrone
-      reward: 700
     repairTargets:
     - prototype: CMUDroneAndroidUnarmed
-      reward: 250
+      reward: 1000
+      requiredModules:
+      - CMUDroneModuleCare
     - prototype: CMUDroneAndroidCombat
-      reward: 400
-    - prototype: CMUCombatDrone
-      reward: 350
-    - prototype: CMUFlamerDrone
-      reward: 350
+      reward: 1200
+      requiredModules:
+      - CMUDroneModuleCombat
+      - CMUDroneModuleCare
+    - prototype: CMUWorkingJoeRepair
+      reward: 1100
   - type: ActivatableUI
     key: enum.CMURoboticsOrderConsoleUiKey.Key
   - type: ActivatableUIRequiresAccess

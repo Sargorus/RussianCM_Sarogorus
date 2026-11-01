@@ -17,7 +17,6 @@ public sealed class CMURoboticsOrderConsoleBoundUserInterface : BoundUserInterfa
 
         _window = this.CreateWindow<CMURoboticsOrderConsoleWindow>();
         _window.OnAccept += id => SendMessage(new CMURoboticsAcceptOrderMessage(id));
-        _window.OnSubmit += () => SendMessage(new CMURoboticsSubmitOrderMessage());
         _window.OnCancel += () => SendMessage(new CMURoboticsCancelOrderMessage());
         _window.OnRefresh += () => SendMessage(new CMURoboticsRefreshOrdersMessage());
     }

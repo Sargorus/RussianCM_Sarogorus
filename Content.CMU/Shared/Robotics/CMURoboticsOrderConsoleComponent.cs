@@ -5,9 +5,9 @@ namespace Content.Shared.CMU14.Robotics;
 
 /// <summary>
 /// A corporate cargo terminal that offers robotics work orders. Build orders
-/// ask for a specific drone or android model; repair orders spawn a damaged
-/// unit next to the console. The finished unit is delivered by placing it near
-/// the console and pressing the delivery button in the UI.
+/// ask for a specific android model; repair orders deliver a crate of damaged
+/// units to the corporate cargo elevator. Finished units are delivered by
+/// placing them on the raised cargo platform and lowering it.
 /// </summary>
 [RegisterComponent]
 public sealed partial class CMURoboticsOrderConsoleComponent : Component
@@ -61,6 +61,8 @@ public sealed class CMURoboticsOrder
     public EntProtoId Target = string.Empty;
     public EntProtoId? RequiredModule;
     public int Reward;
+    public int Amount = 1;
     public string TargetName = string.Empty;
-    public EntityUid? RepairEntity;
+    public EntityUid? Elevator;
+    public EntityUid? RepairCrate;
 }

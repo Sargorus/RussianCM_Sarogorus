@@ -8,7 +8,7 @@
   parent: CMAutolathe
   id: CMURoboticsFabricator
   name: robotics fabricator
-  description: A Weyland-Yutani fabricator for drone frames, limbs, control tablets, modules and tracked chassis. It needs a WL-6 universal fuel cell and a trained roboticist.
+  description: A Weyland-Yutani fabricator for android frames, limbs, control tablets, modules and activation keys. It needs a WL-6 universal fuel cell and a trained roboticist.
   components:
   - type: Transform
     anchored: false
@@ -129,64 +129,36 @@
     RMCPlastic: 1875
 
 - type: latheRecipe
-  id: CMURoboticsCombatDroneHull
-  result: CMUCombatDroneHull
-  completetime: 10
+  id: CMURoboticsLimbLeftArm
+  result: CMUPartRoboticLeftArm
+  completetime: 4
   materials:
-    CMSteel: 18750
-    CMPlasteel: 7500
-    RMCPlastic: 3750
-
-- type: latheRecipe
-  id: CMURoboticsCombatDroneTurret
-  result: CMUCombatDroneTurretAssembly
-  completetime: 8
-  materials:
-    CMSteel: 11250
+    CMSteel: 3750
     CMPlasteel: 3750
-    CMGlass: 3750
 
 - type: latheRecipe
-  id: CMURoboticsCombatDroneAmmo
-  result: CMUCombatDroneAmmoBox
+  id: CMURoboticsLimbRightArm
+  result: CMUPartRoboticRightArm
   completetime: 4
   materials:
     CMSteel: 3750
-    RMCPlastic: 3750
-
-- type: latheRecipe
-  id: CMURoboticsCombatDroneAmmoAP
-  result: CMUCombatDroneAmmoBoxAP
-  completetime: 4
-  materials:
-    CMSteel: 3750
-    RMCPlastic: 3750
-
-- type: latheRecipe
-  id: CMURoboticsFlamerDroneHull
-  result: CMUFlamerDroneHull
-  completetime: 10
-  materials:
-    CMSteel: 18750
-    CMPlasteel: 7500
-    CMGlass: 3750
-
-- type: latheRecipe
-  id: CMURoboticsFlamerDroneTurret
-  result: CMUFlamerDroneTurretAssembly
-  completetime: 8
-  materials:
-    CMSteel: 11250
     CMPlasteel: 3750
-    CMGlass: 3750
 
 - type: latheRecipe
-  id: CMURoboticsFlamerDroneFuelTank
-  result: CMUFlamerDroneFuelTank
+  id: CMURoboticsLimbLeftLeg
+  result: CMUPartRoboticLeftLeg
   completetime: 4
   materials:
     CMSteel: 3750
-    RMCPlastic: 3750
+    CMPlasteel: 3750
+
+- type: latheRecipe
+  id: CMURoboticsLimbRightLeg
+  result: CMUPartRoboticRightLeg
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
 
 - type: latheRecipePack
   id: CMURoboticsFabricatorRecipes
@@ -202,10 +174,7 @@
   - CMURoboticsControlTablet
   - CMURoboticsModuleCombat
   - CMURoboticsModuleCare
-  - CMURoboticsCombatDroneHull
-  - CMURoboticsCombatDroneTurret
-  - CMURoboticsCombatDroneAmmo
-  - CMURoboticsCombatDroneAmmoAP
-  - CMURoboticsFlamerDroneHull
-  - CMURoboticsFlamerDroneTurret
-  - CMURoboticsFlamerDroneFuelTank
+  - CMURoboticsLimbLeftArm
+  - CMURoboticsLimbRightArm
+  - CMURoboticsLimbLeftLeg
+  - CMURoboticsLimbRightLeg

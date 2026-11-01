@@ -166,7 +166,6 @@
   name: WY security barrier crate
   description: A crate that contains one reinforced deployable Weyland-Yutani security barrier. Only corporate security and the liaison staff can lock or unlock it.
   components:
-  - type: CMUKeepCrateOnDelivery
   - type: CMUDeployOnOpen
     spawn:
     - CMUWYSecurityBarrier
@@ -177,7 +176,6 @@
   name: robotics fabricator crate
   description: A crate containing one Weyland-Yutani robotics fabricator and a WL-6 universal fuel cell to power it.
   components:
-  - type: CMUKeepCrateOnDelivery
   - type: CMUDeployOnOpen
     spawn:
     - CMURoboticsFabricator
@@ -189,7 +187,6 @@
   name: robotics order console crate
   description: A crate containing one Weyland-Yutani robotics order console.
   components:
-  - type: CMUKeepCrateOnDelivery
   - type: CMUDeployOnOpen
     spawn:
     - CMURoboticsOrderConsole

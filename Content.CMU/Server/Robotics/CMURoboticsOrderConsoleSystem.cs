@@ -1,24 +1,29 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
-using Content.Shared.Access.Systems;
+using Content.Server._RMC14.Requisitions;
+using Content.Shared._RMC14.Requisitions.Components;
+using Content.Shared.Body;
+using Content.Shared.Body.Part;
+using Content.Shared.Body.Systems;
 using Content.Shared.CMU14.DroneOperator;
+using Content.Shared.CMU14.Requisitions;
 using Content.Shared.CMU14.Robotics;
-using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
-using Content.Shared.Damage.Prototypes;
 using Content.Shared.Damage.Systems;
 using Content.Shared.FixedPoint;
 using Content.Shared.Mobs.Systems;
 using Robust.Server.GameObjects;
 using Robust.Shared.GameObjects;
+using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Server.CMU14.Robotics;
 
 /// <summary>
-/// Generates robotics work orders, spawns damaged units for repair jobs, and
-/// validates and pays out delivered drones.
+/// Generates robotics work orders, delivers damaged android batches to cargo,
+/// and validates/pays repair and build contracts when the cargo platform is lowered.
 /// </summary>
 public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
 {
@@ -27,21 +32,10 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     [Dependency] private MobStateSystem _mobState = default!;
     [Dependency] private IPrototypeManager _prototypes = default!;
     [Dependency] private IRobustRandom _random = default!;
-    [Dependency] private SharedIdCardSystem _idCard = default!;
+    [Dependency] private RequisitionsSystem _requisitions = default!;
+    [Dependency] private SharedBodySystem _body = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private UserInterfaceSystem _ui = default!;
-
-    private static readonly Vector2[] SpawnOffsets =
-    {
-        new(0, -1),
-        new(1, 0),
-        new(-1, 0),
-        new(0, 1),
-        new(1, -1),
-        new(-1, -1),
-        new(1, 1),
-        new(-1, 1),
-    };
 
     public override void Initialize()
     {
@@ -49,11 +43,12 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
 
         SubscribeLocalEvent<CMURoboticsOrderConsoleComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<CMURoboticsOrderConsoleComponent, BoundUIOpenedEvent>(OnUiOpened);
+        SubscribeLocalEvent<RequisitionsElevatorComponent, CMURequisitionsElevatorLoweringAttemptEvent>(
+            OnElevatorLoweringAttempt);
 
         Subs.BuiEvents<CMURoboticsOrderConsoleComponent>(CMURoboticsOrderConsoleUiKey.Key, subs =>
         {
             subs.Event<CMURoboticsAcceptOrderMessage>(OnAcceptOrder);
-            subs.Event<CMURoboticsSubmitOrderMessage>(OnSubmitOrder);
             subs.Event<CMURoboticsCancelOrderMessage>(OnCancelOrder);
             subs.Event<CMURoboticsRefreshOrdersMessage>(OnRefreshOrders);
         });
@@ -84,7 +79,17 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         if (order == null)
             return;
 
-        if (order.Type == CMURoboticsOrderType.Repair && !TrySpawnRepairUnit(ent, order))
+        var elevator = FindCorporateElevator(ent.Owner);
+        if (elevator == null)
+        {
+            ent.Comp.Status = Loc.GetString("cmu-robotics-console-no-platform");
+            UpdateUi(ent);
+            return;
+        }
+
+        order.Elevator = elevator;
+
+        if (order.Type == CMURoboticsOrderType.Repair && !TrySpawnRepairCrate(order))
         {
             ent.Comp.Status = Loc.GetString("cmu-robotics-console-repair-spawn-failed");
             UpdateUi(ent);
@@ -94,63 +99,93 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         ent.Comp.AvailableOrders.Remove(order);
         ent.Comp.ActiveOrder = order;
         ent.Comp.Status = Loc.GetString(
-            "cmu-robotics-console-accepted",
+            order.Type == CMURoboticsOrderType.Repair
+                ? "cmu-robotics-console-accepted-repair"
+                : "cmu-robotics-console-accepted-build",
             ("target", order.TargetName),
+            ("amount", order.Amount),
             ("reward", order.Reward));
         UpdateUi(ent);
     }
 
-    private void OnSubmitOrder(Entity<CMURoboticsOrderConsoleComponent> ent, ref CMURoboticsSubmitOrderMessage args)
+    private void OnElevatorLoweringAttempt(
+        Entity<RequisitionsElevatorComponent> ent,
+        ref CMURequisitionsElevatorLoweringAttemptEvent args)
     {
-        if (ent.Comp.ActiveOrder is not { } order)
-        {
-            ent.Comp.Status = Loc.GetString("cmu-robotics-console-no-active");
-            UpdateUi(ent);
-            return;
-        }
+        var completions = new List<(Entity<CMURoboticsOrderConsoleComponent> Console, CMURoboticsOrder Order)>();
 
-        var drone = FindDeliveryCandidate(ent, order);
-        if (drone == null)
+        var query = EntityQueryEnumerator<CMURoboticsOrderConsoleComponent>();
+        while (query.MoveNext(out var consoleUid, out var console))
         {
-            ent.Comp.Status = HasAnyDroneNearby(ent)
-                ? Loc.GetString(
+            if (console.ActiveOrder is not { } order || order.Elevator != ent.Owner)
+                continue;
+
+            if (!ValidateOnPlatform(ent.Owner, order, out var reason))
+            {
+                console.Status = Loc.GetString(
                     "cmu-robotics-console-rejected",
-                    ("reason", Loc.GetString("cmu-robotics-console-reason-wrong")))
-                : Loc.GetString(
-                    order.Type == CMURoboticsOrderType.Repair
-                        ? "cmu-robotics-console-no-repair-target"
-                        : "cmu-robotics-console-no-build-target");
-            UpdateUi(ent);
-            return;
+                    ("reason", reason));
+                UpdateUi((consoleUid, console));
+                args.Cancelled = true;
+                return;
+            }
+
+            completions.Add(((consoleUid, console), order));
         }
 
-        if (!ValidateDelivery(drone.Value, order, out var reason))
+        foreach (var (console, order) in completions)
         {
-            ent.Comp.Status = Loc.GetString(
-                "cmu-robotics-console-rejected",
-                ("reason", reason));
-            UpdateUi(ent);
-            return;
+            PayCorporate(order.Reward);
+            console.Comp.ActiveOrder = null;
+            console.Comp.Status = Loc.GetString(
+                "cmu-robotics-console-delivered",
+                ("target", order.TargetName),
+                ("reward", order.Reward));
+            FillOrders(console);
+            UpdateUi(console);
         }
+    }
 
-        if (!_idCard.TryFindIdCard(args.Actor, out var idCard))
+    private bool ValidateOnPlatform(EntityUid elevator, CMURoboticsOrder order, out string reason)
+    {
+        var entities = _lookup.GetEntitiesIntersecting(elevator);
+
+        if (order.Type == CMURoboticsOrderType.Repair)
         {
-            ent.Comp.Status = Loc.GetString("cmu-robotics-console-no-id");
-            UpdateUi(ent);
-            return;
+            var targets = entities
+                .Where(entity =>
+                    TryComp<CMURoboticsOrderTargetComponent>(entity, out var marker) &&
+                    marker.OrderId == order.Id)
+                .ToList();
+
+            if (targets.Count < order.Amount)
+            {
+                reason = Loc.GetString(
+                    "cmu-robotics-console-reason-missing-units",
+                    ("amount", order.Amount));
+                return false;
+            }
+
+            foreach (var target in targets.Take(order.Amount))
+            {
+                if (!ValidateDelivery(target, order, out reason))
+                    return false;
+            }
+
+            reason = string.Empty;
+            return true;
         }
 
-        idCard.Comp.AccountBalance += order.Reward;
-        Dirty(idCard, idCard.Comp);
+        var built = entities.FirstOrDefault(entity =>
+            HasComp<CMUDroneAndroidComponent>(entity) &&
+            MetaData(entity).EntityPrototype?.ID == order.Target.Id);
+        if (built == default)
+        {
+            reason = Loc.GetString("cmu-robotics-console-reason-wrong");
+            return false;
+        }
 
-        QueueDel(drone.Value);
-        ent.Comp.ActiveOrder = null;
-        ent.Comp.Status = Loc.GetString(
-            "cmu-robotics-console-delivered",
-            ("target", order.TargetName),
-            ("reward", order.Reward));
-        FillOrders(ent);
-        UpdateUi(ent);
+        return ValidateDelivery(built, order, out reason);
     }
 
     private void OnCancelOrder(Entity<CMURoboticsOrderConsoleComponent> ent, ref CMURoboticsCancelOrderMessage args)
@@ -158,8 +193,7 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         if (ent.Comp.ActiveOrder is not { } order)
             return;
 
-        if (order.RepairEntity is { } repairEntity && !TerminatingOrDeleted(repairEntity))
-            QueueDel(repairEntity);
+        CancelOrderTargets(order);
 
         ent.Comp.ActiveOrder = null;
         ent.Comp.Status = Loc.GetString("cmu-robotics-console-cancelled");
@@ -200,7 +234,7 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
 
             var target = _random.Pick(pool);
             EntProtoId? requiredModule = null;
-            if (target.RequiredModules.Count > 0 && _random.Prob(0.5f))
+            if (target.RequiredModules.Count > 0 && (!build || _random.Prob(0.5f)))
                 requiredModule = _random.Pick(target.RequiredModules);
 
             var order = new CMURoboticsOrder
@@ -210,6 +244,7 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
                 Target = target.Prototype,
                 RequiredModule = requiredModule,
                 Reward = target.Reward + (requiredModule != null ? 150 : 0) + _random.Next(0, 101),
+                Amount = build ? 1 : 3,
                 TargetName = GetPrototypeName(target.Prototype),
             };
 
@@ -217,80 +252,63 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         }
     }
 
-    private bool TrySpawnRepairUnit(Entity<CMURoboticsOrderConsoleComponent> ent, CMURoboticsOrder order)
+    private bool TrySpawnRepairCrate(CMURoboticsOrder order)
     {
-        var coordinates = Transform(ent).Coordinates;
-        EntityUid? spawned = null;
-
-        foreach (var offset in SpawnOffsets)
+        var prototype = order.Target.Id switch
         {
-            spawned = Spawn(order.Target, coordinates.Offset(offset));
-            break;
-        }
+            "CMUDroneAndroidCombat" => "CMURoboticsRepairCrateCombat",
+            "CMUWorkingJoeRepair" => "CMURoboticsRepairCrateWorkingJoe",
+            _ => "CMURoboticsRepairCrateUnarmed",
+        };
 
-        if (spawned is not { } unit)
+        if (!_prototypes.HasIndex<EntityPrototype>(prototype))
             return false;
 
-        var marker = EnsureComp<CMURoboticsOrderTargetComponent>(unit);
-        marker.OrderId = order.Id;
-        order.RepairEntity = unit;
-
-        if (TryComp<DamageableComponent>(unit, out _))
-        {
-            var blunt = _prototypes.Index<DamageTypePrototype>("Blunt");
-            _damageable.TryChangeDamage(
-                unit,
-                new DamageSpecifier(blunt, FixedPoint2.New(40)),
-                ignoreResistances: true);
-        }
-
+        var crate = Spawn(prototype, MapCoordinates.Nullspace);
+        var crateComp = EnsureComp<CMURoboticsRepairCrateComponent>(crate);
+        crateComp.OrderId = order.Id;
+        order.RepairCrate = crate;
         return true;
     }
 
-    private EntityUid? FindDeliveryCandidate(Entity<CMURoboticsOrderConsoleComponent> ent, CMURoboticsOrder order)
+    private EntityUid? FindCorporateElevator(EntityUid console)
     {
-        var origin = _transform.GetWorldPosition(ent.Owner);
+        var map = _transform.GetMapId(console);
+        var origin = _transform.GetWorldPosition(console);
         EntityUid? closest = null;
         var closestDistance = float.MaxValue;
 
-        foreach (var candidate in _lookup.GetEntitiesInRange(Transform(ent).Coordinates, ent.Comp.DeliveryRadius))
+        var query = EntityQueryEnumerator<RequisitionsElevatorComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out var elevator, out var xform))
         {
-            if (!HasComp<CMUDroneAndroidComponent>(candidate))
-                continue;
-
-            if (order.Type == CMURoboticsOrderType.Repair)
-            {
-                if (!TryComp<CMURoboticsOrderTargetComponent>(candidate, out var marker) ||
-                    marker.OrderId != order.Id)
-                {
-                    continue;
-                }
-            }
-            else if (MetaData(candidate).EntityPrototype?.ID != order.Target.Id)
+            if (xform.MapID != map ||
+                !string.Equals(elevator.Faction, "corporate", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
 
-            var distance = (origin - _transform.GetWorldPosition(candidate)).LengthSquared();
+            var distance = (origin - _transform.GetWorldPosition(uid)).LengthSquared();
             if (distance >= closestDistance)
                 continue;
 
+            closest = uid;
             closestDistance = distance;
-            closest = candidate;
         }
 
         return closest;
     }
 
-    private bool HasAnyDroneNearby(Entity<CMURoboticsOrderConsoleComponent> ent)
+    private void CancelOrderTargets(CMURoboticsOrder order)
     {
-        foreach (var candidate in _lookup.GetEntitiesInRange(Transform(ent).Coordinates, ent.Comp.DeliveryRadius))
-        {
-            if (HasComp<CMUDroneAndroidComponent>(candidate))
-                return true;
-        }
+        if (order.RepairCrate is { } crate && !TerminatingOrDeleted(crate))
+            QueueDel(crate);
 
-        return false;
+        var query = EntityQueryEnumerator<CMURoboticsOrderTargetComponent>();
+        while (query.MoveNext(out var uid, out var marker))
+        {
+            if (marker.OrderId == order.Id && !TerminatingOrDeleted(uid))
+                QueueDel(uid);
+        }
     }
 
     private bool ValidateDelivery(EntityUid drone, CMURoboticsOrder order, out string reason)
@@ -301,12 +319,20 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             return false;
         }
 
-        if (order.Type == CMURoboticsOrderType.Repair &&
-            (!HasComp<DamageableComponent>(drone) ||
-             _damageable.GetTotalDamage(drone) > FixedPoint2.New(5)))
+        if (order.Type == CMURoboticsOrderType.Repair)
         {
-            reason = Loc.GetString("cmu-robotics-console-reason-not-repaired");
-            return false;
+            if (!HasComp<DamageableComponent>(drone) ||
+                _damageable.GetTotalDamage(drone) > FixedPoint2.New(5))
+            {
+                reason = Loc.GetString("cmu-robotics-console-reason-not-repaired");
+                return false;
+            }
+
+            if (!HasAllLimbs(drone))
+            {
+                reason = Loc.GetString("cmu-robotics-console-reason-limbs");
+                return false;
+            }
         }
 
         if (order.RequiredModule is { } required)
@@ -324,6 +350,21 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
 
         reason = string.Empty;
         return true;
+    }
+
+    private bool HasAllLimbs(EntityUid drone)
+    {
+        if (!TryComp<BodyComponent>(drone, out var body))
+            return false;
+
+        var arms = _body.GetBodyChildrenOfType(drone, BodyPartType.Arm, body).Count();
+        var legs = _body.GetBodyChildrenOfType(drone, BodyPartType.Leg, body).Count();
+        return arms >= 2 && legs >= 2;
+    }
+
+    private void PayCorporate(int amount)
+    {
+        _requisitions.AddCorporateFunds(amount);
     }
 
     private void UpdateUi(Entity<CMURoboticsOrderConsoleComponent> ent)
@@ -347,7 +388,8 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             order.Type,
             order.TargetName,
             order.RequiredModule is { } module ? GetPrototypeName(module) : null,
-            order.Reward);
+            order.Reward,
+            order.Amount);
     }
 
     private string GetPrototypeName(EntProtoId prototype)

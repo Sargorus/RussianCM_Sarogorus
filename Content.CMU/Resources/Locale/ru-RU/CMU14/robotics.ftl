@@ -1,5 +1,5 @@
 ent-CMURoboticsFabricator = робототехнический фабрикатор
-    .desc = Фабрикатор «Вейланд-Ютани» для рам, конечностей, планшетов управления, модулей и гусеничных шасси дронов. Требует универсальную топливную ячейку WL-6 и обученного робототехника.
+    .desc = Фабрикатор «Вейланд-Ютани» для рам андройдов, конечностей, планшетов управления, модулей и ключей активации. Требует универсальную топливную ячейку WL-6 и обученного робототехника.
 
 ent-CMUCrateRoboticsFabricator = ящик робототехнического фабрикатора
     .desc = Ящик с одним робототехническим фабрикатором «Вейланд-Ютани» и универсальной топливной ячейкой WL-6 для питания.
@@ -10,6 +10,18 @@ ent-CMURoboticsOrderConsole = консоль робототехнических 
 ent-CMUCrateRoboticsOrderConsole = ящик консоли робототехнических заказов
     .desc = Ящик с одной консолью робототехнических заказов «Вейланд-Ютани».
 
+ent-CMURoboticsRepairCrateUnarmed = ящик повреждённых андройдов
+    .desc = Грузовой ящик по контракту на ремонт робототехники. Внутри три повреждённых безоружных андройда.
+
+ent-CMURoboticsRepairCrateCombat = ящик повреждённых боевых андройдов
+    .desc = Грузовой ящик по контракту на ремонт робототехники. Внутри три повреждённых боевых андройда.
+
+ent-CMUWorkingJoeRepair = повреждённый Рабочий Джо
+    .desc = Бездушный Рабочий Джо, отправленный на ремонт. У него отсутствует конечность и есть ожоговые повреждения.
+
+ent-CMURoboticsRepairCrateWorkingJoe = ящик повреждённых Рабочих Джо
+    .desc = Грузовой ящик по контракту на ремонт робототехники. Внутри три повреждённых бездушных Рабочих Джо.
+
 ent-CMUCombatDrone = гусеничный боевой дрон
     .desc = Дистанционно управляемый гусеничный дрон с импульсной пушкой и сектором обстрела 180 градусов.
 
@@ -18,6 +30,12 @@ ent-CMUFlamerDrone = гусеничный огнемётный дрон
 
 ent-CMUDroneAndroidUnarmed = безоружный дроид-андройд
     .desc = Урезанная синтетическая рама дрона с открытыми сервоприводами. Её шина управления намеренно заблокирована от использования огнестрельного оружия.
+
+ent-CMUDroneAndroidUnarmedRepair = повреждённый безоружный дроид-андройд
+    .desc = Дроид-андройд для заказа на починку. У него отсутствует конечность и есть ожоговые повреждения.
+
+ent-CMUDroneAndroidCombatRepair = повреждённый боевой дроид-андройд
+    .desc = Боевой дроид-андройд для заказа на починку. У него отсутствует конечность и есть ожоговые повреждения.
 
 ent-CMUDroneAndroidCombat = боевой дроид-андройд
     .desc = Усиленная синтетическая рама дрона с боевой шиной управления, оружейными процедурами и слоем корпоративной брони.
@@ -48,29 +66,31 @@ cmu-robotics-console-available = Доступные заказы
 cmu-robotics-console-no-active = Заказ не взят.
 cmu-robotics-console-no-orders = Нет доступных заказов.
 cmu-robotics-console-active-exists = Сначала сдайте или отмените текущий заказ.
-cmu-robotics-console-accepted = Заказ принят: {$target}. Оплата: {$reward}.
-cmu-robotics-console-repair-spawn-failed = Не удалось выдать повреждённый дрон.
-cmu-robotics-console-no-repair-target = Рядом с консолью нет повреждённого дрона по этому заказу.
-cmu-robotics-console-no-build-target = Рядом с консолью нет дрона нужной модели.
+cmu-robotics-console-accepted-repair = Заказ принят: {$target}. {$amount} повреждённых единиц отправлены в карго. Поднимите платформу, распакуйте ящик, отремонтируйте их и опустите платформу. Оплата: {$reward}.
+cmu-robotics-console-accepted-build = Заказ принят: {$target}. Оплата: {$reward}.
+cmu-robotics-console-repair-spawn-failed = Не удалось отправить партию повреждённых андройдов.
+cmu-robotics-console-no-platform = Не найдена корпоративная грузовая платформа.
 cmu-robotics-console-rejected = Заказчик не доволен результатом: {$reason}. Деньги не выплачены.
-cmu-robotics-console-no-id = Не найдена ID-карта для получения оплаты.
-cmu-robotics-console-delivered = Заказ успешно сдан: {$target}. Заказчик оплатил {$reward}.
+cmu-robotics-console-delivered = Заказ успешно сдан: {$target}. {$reward} переведены на счет «Вейланд-Ютани».
 cmu-robotics-console-cancelled = Заказ отменён.
 cmu-robotics-console-refresh-active = Нельзя обновить список, пока активен заказ.
 cmu-robotics-console-refreshed = Список заказов обновлён.
 cmu-robotics-console-type = Тип
 cmu-robotics-console-target = Цель
 cmu-robotics-console-module = Требуемый модуль
+cmu-robotics-console-amount = Количество
 cmu-robotics-console-reward = Оплата
 cmu-robotics-console-type-build = Создание
 cmu-robotics-console-type-repair = Починка
 cmu-robotics-console-order-heading = {$type}: {$target}
 cmu-robotics-console-accept = Взять заказ
-cmu-robotics-console-submit = Сдать заказ
 cmu-robotics-console-cancel = Отменить
 cmu-robotics-console-refresh = Обновить список
-cmu-robotics-console-delivery-hint = Поставьте готового дрона рядом с консолью (в радиусе 2 метров) и нажмите «Сдать заказ».
-cmu-robotics-console-reason-wrong = это не тот дрон, который заказывали
-cmu-robotics-console-reason-broken = дрон сломан
-cmu-robotics-console-reason-not-repaired = дрон не отремонтирован
+cmu-robotics-console-delivery-hint-repair = Поставьте {$amount} отремонтированных единиц на грузовую платформу и опустите её.
+cmu-robotics-console-delivery-hint-build = Поставьте готового андройда на грузовую платформу и опустите её.
+cmu-robotics-console-reason-wrong = это не тот андройд, который заказывали
+cmu-robotics-console-reason-broken = андройд сломан
+cmu-robotics-console-reason-not-repaired = андройд не отремонтирован
+cmu-robotics-console-reason-missing-units = на платформе не все {$amount} единицы заказа
+cmu-robotics-console-reason-limbs = у андройда всё ещё отсутствуют конечности
 cmu-robotics-console-reason-module = не установлен модуль {$module}

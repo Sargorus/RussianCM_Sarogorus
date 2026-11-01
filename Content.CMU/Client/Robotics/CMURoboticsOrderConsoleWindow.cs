@@ -15,7 +15,6 @@ namespace Content.Client.CMU14.Robotics;
 public sealed class CMURoboticsOrderConsoleWindow : DefaultWindow
 {
     public event Action<int>? OnAccept;
-    public event Action? OnSubmit;
     public event Action? OnCancel;
     public event Action? OnRefresh;
 
@@ -79,23 +78,18 @@ public sealed class CMURoboticsOrderConsoleWindow : DefaultWindow
 
         AddOrderFields(column, order);
 
-        var buttons = CrtConsoleKit.Row();
-        var submit = _kit.Button(
-            Loc.GetString("cmu-robotics-console-submit"),
-            CmuButtonStyles.Variant.Affirm);
-        submit.OnPressed += _ => OnSubmit?.Invoke();
-        buttons.AddChild(submit);
-
         var cancel = _kit.Button(
             Loc.GetString("cmu-robotics-console-cancel"),
             CmuButtonStyles.Variant.Caution);
         cancel.OnPressed += _ => OnCancel?.Invoke();
-        buttons.AddChild(cancel);
-        column.AddChild(buttons);
+        column.AddChild(cancel);
 
-        column.AddChild(CrtConsoleKit.Wrapping(
-            Loc.GetString("cmu-robotics-console-delivery-hint"),
-            CrtTerminalPalette.TextDim));
+        var hint = order.Type == CMURoboticsOrderType.Repair
+            ? Loc.GetString(
+                "cmu-robotics-console-delivery-hint-repair",
+                ("amount", order.Amount))
+            : Loc.GetString("cmu-robotics-console-delivery-hint-build");
+        column.AddChild(CrtConsoleKit.Wrapping(hint, CrtTerminalPalette.TextDim));
         _body.AddChild(section);
     }
 
@@ -153,6 +147,10 @@ public sealed class CMURoboticsOrderConsoleWindow : DefaultWindow
         column.AddChild(_kit.Field(
             Loc.GetString("cmu-robotics-console-target"),
             order.TargetName));
+
+        column.AddChild(_kit.Field(
+            Loc.GetString("cmu-robotics-console-amount"),
+            order.Amount.ToString()));
 
         if (order.RequiredModuleName is { } module)
         {

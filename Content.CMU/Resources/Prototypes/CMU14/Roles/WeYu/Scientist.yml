@@ -134,6 +134,7 @@
       RMCSkillEngineer: 3
       RMCSkillConstruction: 3
       RMCSkillResearch: 3
+      RMCSkillSurgery: 3
       RMCSkillOverwatch: 2
       RMCSkillFirearms: 1
   - type: JobPrefix
@@ -219,6 +220,7 @@
   storage:
     back:
     - AU14StampWYSci
+    - CMSurgicalCaseFilled
 
 - type: entity
   parent: CMSpawnPointJobBase

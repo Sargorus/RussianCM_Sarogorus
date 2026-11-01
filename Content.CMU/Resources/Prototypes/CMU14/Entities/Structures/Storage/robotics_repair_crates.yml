@@ -1,0 +1,43 @@
+# Delivery crates for robotics repair orders. They are spawned off-map by the
+# order console and teleported to the corporate cargo elevator on the next raise.
+- type: entity
+  parent: RMCCrateConstruction
+  id: CMURoboticsRepairCrateUnarmed
+  name: damaged android delivery crate
+  description: A cargo crate from a robotics repair contract. It contains three damaged unarmed android drones.
+  components:
+  - type: CMURoboticsRepairCrate
+  - type: RequisitionsCustomDelivery
+    faction: corporate
+  - type: StorageFill
+    contents:
+    - id: CMUDroneAndroidUnarmedRepair
+      amount: 3
+
+- type: entity
+  parent: RMCCrateConstruction
+  id: CMURoboticsRepairCrateCombat
+  name: damaged combat android delivery crate
+  description: A cargo crate from a robotics repair contract. It contains three damaged combat android drones.
+  components:
+  - type: CMURoboticsRepairCrate
+  - type: RequisitionsCustomDelivery
+    faction: corporate
+  - type: StorageFill
+    contents:
+    - id: CMUDroneAndroidCombatRepair
+      amount: 3
+
+- type: entity
+  parent: RMCCrateConstruction
+  id: CMURoboticsRepairCrateWorkingJoe
+  name: damaged Working Joe delivery crate
+  description: A cargo crate from a robotics repair contract. It contains three damaged, soulless Working Joes.
+  components:
+  - type: CMURoboticsRepairCrate
+  - type: RequisitionsCustomDelivery
+    faction: corporate
+  - type: StorageFill
+    contents:
+    - id: CMUWorkingJoeRepair
+      amount: 3

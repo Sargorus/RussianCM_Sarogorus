@@ -4,7 +4,6 @@ using Content.Shared._RMC14.Crate;
 using Content.Shared._RMC14.Projectiles;
 using Content.Shared._RMC14.Requisitions;
 using Content.Shared._RMC14.Requisitions.Components;
-using Content.Shared.CMU14.Requisitions;
 using Content.Shared.Containers;
 using Content.Shared.Database;
 using Content.Shared.EntityTable;
@@ -127,17 +126,6 @@ public sealed partial class RequisitionsSystem
             return true;
         }
         // CMU14 end
-
-        // CMU14: delivery crates such as the robotics fabricator contain
-        // non-item machines in their StorageFill. Keep the crate itself in the
-        // manifest so it arrives with its contents instead of being expanded.
-        if (cratePrototype.TryComp<CMUKeepCrateOnDeliveryComponent>(
-                CompName.Get<CMUKeepCrateOnDeliveryComponent>(componentFactory), out _))
-        {
-            AddManifestItem(manifest, entry.Crate, 1);
-            return true;
-        }
-
         // Keep deployment crates intact when their contents cannot be carried as items.
         // Spawning the machine directly can leave it anchored on the delivery pad.
         if (cratePrototype.TryComp<SpawnOnTerminateComponent>(

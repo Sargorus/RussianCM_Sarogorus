@@ -28,6 +28,8 @@ using Content.Shared._RMC14.Weapons.Ranged.IFF;
 using Content.Shared._RMC14.Xenonids;
 using Content.Shared.CMU14.CCVar;
 using Content.Shared.CMU14.ColonyEconomy;
+using Content.Shared.CMU14.DroneOperator;
+using Content.Shared.CMU14.Robotics;
 using Content.Shared.CMU14.util;
 using Content.Shared.Cargo.Components;
 using Content.Shared.Chasm;
@@ -329,9 +331,22 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
             var mask = (int)(CollisionGroup.MobLayer | CollisionGroup.MobMask);
             foreach (var entity in _physics.GetEntitiesIntersectingBody(elevator, mask, false))
             {
-                if (HasComp<MobStateComponent>(entity))
+                // Drones are allowed on the platform: they are either an active
+                // robotics order or cargo the player deliberately lowered.
+                if (HasComp<MobStateComponent>(entity) &&
+                    !HasComp<CMUDroneAndroidComponent>(entity) &&
+                    !HasComp<CMURoboticsDamagedBodyComponent>(entity))
+                {
                     return;
+                }
             }
+
+            // Robotics repair/build orders are validated and paid when the
+            // platform is lowered with the target drones on it.
+            var orderAttempt = new CMURequisitionsElevatorLoweringAttemptEvent(elevator.Owner);
+            RaiseLocalEvent(elevator.Owner, ref orderAttempt);
+            if (orderAttempt.Cancelled)
+                return;
         }
 
         comp.ToggledAt = _timing.CurTime;
@@ -347,6 +362,16 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
 
     // Returns the first existing account matching faction, or creates a new one.
     // The original (no faction param) used a single global account, we replicate this.
+    /// <summary>
+    /// CMU14: credit a completed robotics contract to the corporate account.
+    /// </summary>
+    public void AddCorporateFunds(int amount)
+    {
+        var account = GetAccount("corporate");
+        account.Comp.Balance += amount;
+        Dirty(account, account.Comp);
+    }
+
     private Entity<RequisitionsAccountComponent> GetAccount(string? faction = null)
     {
         var factionKey = string.IsNullOrEmpty(faction) || faction == "none"

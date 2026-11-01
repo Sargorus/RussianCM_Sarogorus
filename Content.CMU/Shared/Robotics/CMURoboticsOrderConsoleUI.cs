@@ -23,19 +23,22 @@ public sealed class CMURoboticsOrderInfo
     public string TargetName { get; }
     public string? RequiredModuleName { get; }
     public int Reward { get; }
+    public int Amount { get; }
 
     public CMURoboticsOrderInfo(
         int id,
         CMURoboticsOrderType type,
         string targetName,
         string? requiredModuleName,
-        int reward)
+        int reward,
+        int amount)
     {
         Id = id;
         Type = type;
         TargetName = targetName;
         RequiredModuleName = requiredModuleName;
         Reward = reward;
+        Amount = amount;
     }
 }
 
@@ -62,9 +65,6 @@ public sealed class CMURoboticsAcceptOrderMessage(int id) : BoundUserInterfaceMe
 {
     public int Id { get; } = id;
 }
-
-[Serializable, NetSerializable]
-public sealed class CMURoboticsSubmitOrderMessage : BoundUserInterfaceMessage;
 
 [Serializable, NetSerializable]
 public sealed class CMURoboticsCancelOrderMessage : BoundUserInterfaceMessage;

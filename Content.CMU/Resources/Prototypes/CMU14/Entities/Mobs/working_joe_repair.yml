@@ -1,0 +1,10 @@
+# Soulless colony Working Joe sent as a repair-order target. It intentionally
+# uses the base mob instead of AU14MobWorkingJoeColony so no ghost role exists.
+- type: entity
+  parent: AU14MobWorkingJoe
+  id: CMUWorkingJoeRepair
+  name: damaged Working Joe
+  suffix: CMU14, Repair target
+  components:
+  - type: CMUHumanMedical
+  - type: CMURoboticsDamagedBody

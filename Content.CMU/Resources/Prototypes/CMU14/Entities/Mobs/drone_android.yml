@@ -121,6 +121,26 @@
     bio: 10
     explosionArmor: 10
 
+# Repair-order targets. They spawn missing one arm and one leg, with burn and
+# brute damage, and no control module installed.
+- type: entity
+  parent: CMUDroneAndroidUnarmed
+  id: CMUDroneAndroidUnarmedRepair
+  name: damaged unarmed drone android
+  suffix: CMU14, Repair target
+  components:
+  - type: CMUHumanMedical
+  - type: CMURoboticsDamagedBody
+
+- type: entity
+  parent: CMUDroneAndroidCombat
+  id: CMUDroneAndroidCombatRepair
+  name: damaged combat drone android
+  suffix: CMU14, Repair target
+  components:
+  - type: CMUHumanMedical
+  - type: CMURoboticsDamagedBody
+
 - type: entity
   parent: AppearanceDroneAndroid
   id: CMUDroneAndroidDummy
