@@ -174,22 +174,22 @@
   parent: RMCCrateConstruction
   id: CMUCrateRoboticsFabricator
   name: robotics fabricator crate
-  description: A crate containing one Weyland-Yutani robotics fabricator and a WL-6 universal fuel cell to power it.
+  description: A sealed crate containing one Weyland-Yutani robotics fabricator and a WL-6 universal fuel cell to power it. Pry it open with a crowbar.
   components:
-  - type: CMUDeployOnOpen
+  - type: CrateOpenable
     spawn:
-    - CMURoboticsFabricator
-    - RMCGeneratorFusionCell
+    - id: CMURoboticsFabricator
+    - id: RMCGeneratorFusionCell
 
 - type: entity
   parent: RMCCrateConstruction
   id: CMUCrateRoboticsOrderConsole
   name: robotics order console crate
-  description: A crate containing one Weyland-Yutani robotics order console.
+  description: A sealed crate containing one Weyland-Yutani robotics order console. Pry it open with a crowbar.
   components:
-  - type: CMUDeployOnOpen
+  - type: CrateOpenable
     spawn:
-    - CMURoboticsOrderConsole
+    - id: CMURoboticsOrderConsole
 
 - type: entity
   parent: RMCCrateScience

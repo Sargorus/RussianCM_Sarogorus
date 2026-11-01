@@ -57,8 +57,6 @@
   - type: VisualOrganMarkings
     markingData:
       group: WorkingJoe
-  - type: CMULimbFamily
-    family: WorkingJoe
 
 - type: entity
   parent: [ CMUPartWorkingJoeVisual, CMUPartHumanTorso ]

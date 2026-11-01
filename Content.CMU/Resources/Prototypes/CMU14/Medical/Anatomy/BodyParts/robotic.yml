@@ -13,8 +13,6 @@
   - type: VisualOrganMarkings
     markingData:
       group: DroneAndroid
-  - type: CMULimbFamily
-    family: Prosthetic
 
 - type: entity
   parent: [ OrganBaseArmLeft, PartSilicon, CMUPartProstheticVisual ]

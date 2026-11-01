@@ -28,7 +28,6 @@ public sealed partial class CMUSurgerySystem : SharedCMUSurgerySystem
 {
     [Dependency] private IConfigurationManager _cfg = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
-    [Dependency] private SharedCMULimbFamilySystem _limbFamilies = default!;
     [Dependency] private SharedBodyPartHealthSystem _partHealth = default!;
     [Dependency] private IPrototypeManager _prototypes = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
@@ -330,7 +329,7 @@ public sealed partial class CMUSurgerySystem : SharedCMUSurgerySystem
 
     private bool CanPatientAcceptLimb(EntityUid body, EntityUid limb)
     {
-        return _limbFamilies.CanAcceptLimb(body, limb);
+        return CMULimbCompatibility.CanAttach(EntityManager, body, limb);
     }
 
     private static bool TryGetInitialBodyCategory(

@@ -4,6 +4,26 @@
 # anchor/unanchor), needs a WL-6 universal fuel cell to power its UI, and only
 # opens for personnel with Research 3.
 
+- type: latheCategory
+  id: CMURoboticsDroneLimbs
+  name: cmu-lathe-category-robotics-drone-limbs
+
+- type: latheCategory
+  id: CMURoboticsSynthLimbs
+  name: cmu-lathe-category-robotics-synth-limbs
+
+- type: latheCategory
+  id: CMURoboticsWorkingJoeLimbs
+  name: cmu-lathe-category-robotics-working-joe-limbs
+
+- type: latheCategory
+  id: CMURoboticsProsthetics
+  name: cmu-lathe-category-robotics-prosthetics
+
+- type: latheCategory
+  id: CMURoboticsComponents
+  name: cmu-lathe-category-robotics-components
+
 - type: entity
   parent: CMAutolathe
   id: CMURoboticsFabricator
@@ -43,6 +63,7 @@
     CMSteel: 15000
     CMPlasteel: 3750
     RMCPlastic: 7500
+  categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
   id: CMURoboticsFrameCombat
@@ -52,6 +73,7 @@
     CMSteel: 22500
     CMPlasteel: 15000
     RMCPlastic: 7500
+  categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
   id: CMURoboticsDroneHead
@@ -60,6 +82,7 @@
   materials:
     CMSteel: 3750
     RMCPlastic: 1875
+  categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
   id: CMURoboticsDroneLeftArm
@@ -68,6 +91,7 @@
   materials:
     CMSteel: 3750
     RMCPlastic: 1875
+  categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
   id: CMURoboticsDroneRightArm
@@ -76,6 +100,7 @@
   materials:
     CMSteel: 3750
     RMCPlastic: 1875
+  categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
   id: CMURoboticsDroneLeftLeg
@@ -84,6 +109,7 @@
   materials:
     CMSteel: 3750
     RMCPlastic: 1875
+  categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
   id: CMURoboticsDroneRightLeg
@@ -92,6 +118,7 @@
   materials:
     CMSteel: 3750
     RMCPlastic: 1875
+  categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
   id: CMURoboticsSynthKey
@@ -100,6 +127,17 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsComponents ]
+
+- type: latheRecipe
+  id: CMURoboticsSynthResetKey
+  result: RMCSynthResetKey
+  completetime: 5
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+    CMGlass: 1875
+  categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
   id: CMURoboticsControlTablet
@@ -109,6 +147,7 @@
     CMSteel: 7500
     CMGlass: 3750
     RMCPlastic: 3750
+  categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
   id: CMURoboticsModuleCombat
@@ -118,6 +157,7 @@
     CMSteel: 3750
     CMGlass: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
   id: CMURoboticsModuleCare
@@ -127,6 +167,7 @@
     CMSteel: 3750
     CMGlass: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
   id: CMURoboticsLimbLeftArm
@@ -135,6 +176,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsDroneLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsLimbRightArm
@@ -143,6 +185,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsDroneLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsLimbLeftHand
@@ -151,6 +194,7 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsDroneLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsLimbRightHand
@@ -159,6 +203,7 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsDroneLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsLimbLeftLeg
@@ -167,6 +212,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsDroneLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsLimbRightLeg
@@ -175,6 +221,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsDroneLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsLimbLeftFoot
@@ -183,6 +230,7 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsDroneLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsLimbRightFoot
@@ -191,6 +239,7 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsDroneLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsWorkingJoeLeftArm
@@ -199,6 +248,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsWorkingJoeLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsWorkingJoeRightArm
@@ -207,6 +257,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsWorkingJoeLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsWorkingJoeLeftHand
@@ -215,6 +266,7 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsWorkingJoeLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsWorkingJoeRightHand
@@ -223,6 +275,7 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsWorkingJoeLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsWorkingJoeLeftLeg
@@ -231,6 +284,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsWorkingJoeLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsWorkingJoeRightLeg
@@ -239,6 +293,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsWorkingJoeLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsWorkingJoeLeftFoot
@@ -247,6 +302,7 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsWorkingJoeLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsWorkingJoeRightFoot
@@ -255,6 +311,7 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsWorkingJoeLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsSynthLeftArm
@@ -263,6 +320,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsSynthLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsSynthRightArm
@@ -271,6 +329,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsSynthLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsSynthLeftHand
@@ -279,6 +338,7 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsSynthLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsSynthRightHand
@@ -287,6 +347,7 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsSynthLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsSynthLeftLeg
@@ -295,6 +356,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsSynthLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsSynthRightLeg
@@ -303,6 +365,7 @@
   materials:
     CMSteel: 3750
     CMPlasteel: 3750
+  categories: [ CMURoboticsSynthLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsSynthLeftFoot
@@ -311,6 +374,7 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsSynthLimbs ]
 
 - type: latheRecipe
   id: CMURoboticsSynthRightFoot
@@ -319,6 +383,79 @@
   materials:
     CMSteel: 1875
     RMCPlastic: 1875
+  categories: [ CMURoboticsSynthLimbs ]
+
+- type: latheRecipe
+  id: CMURoboticsProstheticLeftArm
+  result: CMUPartRoboticLeftArm
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+  categories: [ CMURoboticsProsthetics ]
+
+- type: latheRecipe
+  id: CMURoboticsProstheticRightArm
+  result: CMUPartRoboticRightArm
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+  categories: [ CMURoboticsProsthetics ]
+
+- type: latheRecipe
+  id: CMURoboticsProstheticLeftHand
+  result: CMUPartRoboticLeftHand
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+  categories: [ CMURoboticsProsthetics ]
+
+- type: latheRecipe
+  id: CMURoboticsProstheticRightHand
+  result: CMUPartRoboticRightHand
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+  categories: [ CMURoboticsProsthetics ]
+
+- type: latheRecipe
+  id: CMURoboticsProstheticLeftLeg
+  result: CMUPartRoboticLeftLeg
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+  categories: [ CMURoboticsProsthetics ]
+
+- type: latheRecipe
+  id: CMURoboticsProstheticRightLeg
+  result: CMUPartRoboticRightLeg
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+  categories: [ CMURoboticsProsthetics ]
+
+- type: latheRecipe
+  id: CMURoboticsProstheticLeftFoot
+  result: CMUPartRoboticLeftFoot
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+  categories: [ CMURoboticsProsthetics ]
+
+- type: latheRecipe
+  id: CMURoboticsProstheticRightFoot
+  result: CMUPartRoboticRightFoot
+  completetime: 2
+  materials:
+    CMSteel: 1875
+    RMCPlastic: 1875
+  categories: [ CMURoboticsProsthetics ]
 
 - type: latheRecipePack
   id: CMURoboticsFabricatorRecipes
@@ -331,6 +468,7 @@
   - CMURoboticsDroneLeftLeg
   - CMURoboticsDroneRightLeg
   - CMURoboticsSynthKey
+  - CMURoboticsSynthResetKey
   - CMURoboticsControlTablet
   - CMURoboticsModuleCombat
   - CMURoboticsModuleCare
@@ -358,3 +496,11 @@
   - CMURoboticsSynthRightLeg
   - CMURoboticsSynthLeftFoot
   - CMURoboticsSynthRightFoot
+  - CMURoboticsProstheticLeftArm
+  - CMURoboticsProstheticRightArm
+  - CMURoboticsProstheticLeftHand
+  - CMURoboticsProstheticRightHand
+  - CMURoboticsProstheticLeftLeg
+  - CMURoboticsProstheticRightLeg
+  - CMURoboticsProstheticLeftFoot
+  - CMURoboticsProstheticRightFoot

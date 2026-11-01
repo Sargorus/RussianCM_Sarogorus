@@ -5,11 +5,14 @@ using Content.Server.CMU14.Robotics;
 using Content.Server._RMC14.Requisitions;
 using Content.Shared._RMC14.Requisitions;
 using Content.Shared._RMC14.Requisitions.Components;
+using Content.Shared._RMC14.Synth;
 using Content.Shared.CMU14.Medical.Anatomy.BodyParts;
 using Content.Shared.CMU14.Requisitions;
 using Content.Shared.CMU14.Robotics;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Labels.EntitySystems;
+using Content.Shared.Lock;
+using Content.Shared.Mobs.Components;
 using Content.Shared.Storage.Components;
 using Content.Shared.Storage.EntitySystems;
 using Robust.Shared.GameObjects;
@@ -19,12 +22,12 @@ using Robust.Shared.Timing;
 namespace Content.IntegrationTests.CMU14.Robotics;
 
 [TestFixture]
-public sealed class CMURoboticsLimbFamilyTest : GameTest
+public sealed class CMURoboticsContractTest : GameTest
 {
     public override PoolSettings PoolSettings => new() { Connected = false, Dirty = true };
 
     [Test]
-    public async Task DroneAndWorkingJoeOnlyAcceptTheirOwnLimbs()
+    public async Task DroneOnlyAcceptsDroneAndroidLimbs()
     {
         var map = await Pair.CreateTestMap();
         await Server.WaitAssertion(() =>
@@ -36,16 +39,17 @@ public sealed class CMURoboticsLimbFamilyTest : GameTest
             var prostheticArm = SEntMan.SpawnEntity("CMUPartRoboticLeftArm", map.GridCoords);
             var joe = SEntMan.SpawnEntity("CMUWorkingJoeRepair", map.GridCoords);
 
-            var families = Server.System<SharedCMULimbFamilySystem>();
-            Assert.That(families.CanAcceptLimb(drone, droneArm), Is.True);
-            Assert.That(families.CanAcceptLimb(drone, joeArm), Is.False);
-            Assert.That(families.CanAcceptLimb(drone, synthArm), Is.False);
-            Assert.That(families.CanAcceptLimb(drone, prostheticArm), Is.False);
+            Assert.That(CMULimbCompatibility.CanAttach(SEntMan, drone, droneArm), Is.True);
+            Assert.That(CMULimbCompatibility.CanAttach(SEntMan, drone, joeArm), Is.False);
+            Assert.That(CMULimbCompatibility.CanAttach(SEntMan, drone, synthArm), Is.False);
+            Assert.That(CMULimbCompatibility.CanAttach(SEntMan, drone, prostheticArm), Is.False);
 
-            Assert.That(families.CanAcceptLimb(joe, joeArm), Is.True);
-            Assert.That(families.CanAcceptLimb(joe, droneArm), Is.False);
-            Assert.That(families.CanAcceptLimb(joe, synthArm), Is.False);
-            Assert.That(families.CanAcceptLimb(joe, prostheticArm), Is.False);
+            Assert.That(CMULimbCompatibility.CanAttach(SEntMan, joe, joeArm), Is.True);
+            Assert.That(CMULimbCompatibility.CanAttach(SEntMan, joe, synthArm), Is.True);
+            Assert.That(CMULimbCompatibility.CanAttach(SEntMan, joe, droneArm), Is.False);
+
+            Assert.That(CMULimbCompatibility.IsWorkingJoeLimb(SEntMan, joeArm), Is.True);
+            Assert.That(CMULimbCompatibility.IsWorkingJoeLimb(SEntMan, droneArm), Is.False);
         });
     }
 
@@ -61,6 +65,42 @@ public sealed class CMURoboticsLimbFamilyTest : GameTest
             var storage = SEntMan.GetComponent<EntityStorageComponent>(crate);
             Assert.That(storage.Capacity, Is.EqualTo(1));
             Assert.That(storage.MaxSize, Is.GreaterThanOrEqualTo(1f));
+
+            var system = Server.System<CMURoboticsTransportCrateSystem>();
+            var drone = SEntMan.SpawnEntity("CMUDroneAndroidUnarmed", map.GridCoords);
+            Assert.That(SEntMan.HasComponent<SynthComponent>(drone), Is.True, "drone must have Synth");
+            Assert.That(storage.Open, Is.False, "transport crate must start closed");
+            Assert.That(storage.Contents.ContainedEntities.Count, Is.EqualTo(0), "crate must start empty");
+            Assert.That(SEntMan.GetComponent<LockComponent>(crate).Locked, Is.False, "crate must start unlocked");
+            Assert.That(SEntMan.HasComponent<MobStateComponent>(drone), Is.True, "drone must have MobState");
+            Assert.That(storage.Blacklist, Is.Null, "crate storage must not have a blacklist");
+            var droneAabb = Server.System<EntityLookupSystem>().GetAABBNoContainer(drone, default, 0);
+            Assert.That(droneAabb.Size.X, Is.LessThanOrEqualTo(storage.MaxSize),
+                $"drone AABB width {droneAabb.Size.X} must fit max size {storage.MaxSize}");
+            Assert.That(droneAabb.Size.Y, Is.LessThanOrEqualTo(storage.MaxSize),
+                $"drone AABB height {droneAabb.Size.Y} must fit max size {storage.MaxSize}");
+            var insertAttempt = new InsertIntoEntityStorageAttemptEvent(storage.Contents, drone);
+            SEntMan.EventBus.RaiseLocalEvent(drone, ref insertAttempt);
+            Assert.That(insertAttempt.Cancelled, Is.False, "InsertIntoEntityStorageAttemptEvent must not cancel");
+            var crateAttempt = new EntityStorageInsertedIntoAttemptEvent(storage.Contents, drone);
+            SEntMan.EventBus.RaiseLocalEvent(crate, ref crateAttempt);
+            Assert.That(crateAttempt.Cancelled, Is.False, "EntityStorageInsertedIntoAttemptEvent must not cancel");
+            Assert.That(
+                Server.System<SharedEntityStorageSystem>().CanInsert(drone, crate, storage),
+                Is.True,
+                "EntityStorage must accept the drone");
+            Assert.That(system.CanStoreSynthetic(crate, drone), Is.True, "crate system must accept the drone");
+            Assert.That(
+                system.TryStoreSynthetic(crate, EntityUid.Invalid, drone),
+                Is.True,
+                "a drone must be draggable into the transport crate");
+            Assert.That(storage.Contents.Contains(drone), Is.True);
+
+            var second = SEntMan.SpawnEntity("CMUDroneAndroidUnarmed", map.GridCoords);
+            Assert.That(
+                system.TryStoreSynthetic(crate, EntityUid.Invalid, second),
+                Is.False,
+                "the transport crate must not exceed its one-unit capacity");
 
             var slip = SEntMan.SpawnEntity("CMURoboticsOrderSlip", map.GridCoords);
             SEntMan.GetComponent<CMURoboticsOrderSlipComponent>(slip).OrderId = 42;

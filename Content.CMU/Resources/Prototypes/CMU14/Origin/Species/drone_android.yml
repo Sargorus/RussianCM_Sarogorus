@@ -57,8 +57,6 @@
   - type: VisualOrganMarkings
     markingData:
       group: DroneAndroid
-  - type: CMULimbFamily
-    family: DroneAndroid
 
 - type: entity
   parent: [ CMUPartDroneAndroidVisual, CMUPartHumanTorso ]

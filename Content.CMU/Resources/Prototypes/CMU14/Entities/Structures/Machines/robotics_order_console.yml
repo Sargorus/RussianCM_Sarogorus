@@ -4,6 +4,15 @@
   name: robotics order console
   description: A Weyland-Yutani contract terminal for robotics work. Accept a build or repair order, receive its synthetic transport crates in cargo, attach the printed order slip to a loaded crate, then lower the platform. Orders expire after seven minutes.
   components:
+  - type: Transform
+    anchored: false
+    noRot: false
+  - type: Anchorable
+    flags: [Anchorable, Unanchorable]
+  - type: Rotatable
+  - type: RemoveComponents
+    components:
+    - type: WallMount
   - type: Sprite
     sprite: _RMC14/Structures/Machines/computer.rsi
     state: terminal1_old

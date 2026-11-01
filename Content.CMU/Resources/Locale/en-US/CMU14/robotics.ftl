@@ -2,13 +2,13 @@ ent-CMURoboticsFabricator = robotics fabricator
     .desc = A Weyland-Yutani fabricator for android frames, limbs, control tablets, modules and activation keys. It needs a WL-6 universal fuel cell and a trained roboticist.
 
 ent-CMUCrateRoboticsFabricator = robotics fabricator crate
-    .desc = A crate containing one Weyland-Yutani robotics fabricator and a WL-6 universal fuel cell to power it.
+    .desc = A sealed crate containing one Weyland-Yutani robotics fabricator and a WL-6 universal fuel cell to power it. Pry it open with a crowbar.
 
 ent-CMURoboticsOrderConsole = robotics order console
-    .desc = A Weyland-Yutani contract terminal for robotics work. Accept a build or repair order, receive its synthetic transport crates in cargo, then attach the order slip to a loaded crate and lower the platform.
+    .desc = A Weyland-Yutani contract terminal for robotics work. Accept a build or repair order, receive its synthetic transport crates in cargo, then attach the order slip to a loaded crate and lower the platform. It can be anchored, moved and rotated.
 
 ent-CMUCrateRoboticsOrderConsole = robotics order console crate
-    .desc = A crate containing one Weyland-Yutani robotics order console.
+    .desc = A sealed crate containing one Weyland-Yutani robotics order console. Pry it open with a crowbar.
 
 ent-CMUCrateSyntheticTransport = synthetic transport crate
     .desc = A black lockable transport crate sized for one synthetic. Attach a robotics order slip to its label slot before lowering it with the cargo platform.
@@ -39,6 +39,12 @@ ent-CMUDroneBodyFrameUnarmed = unarmed drone android body frame
 
 ent-CMUDroneBodyFrameCombat = combat drone android body frame
     .desc = A reinforced synthetic torso frame with a combat-rated control bus. Its limb ports are sealed and its activation socket is empty.
+
+cmu-lathe-category-robotics-drone-limbs = Drone limbs
+cmu-lathe-category-robotics-synth-limbs = Synthetic limbs
+cmu-lathe-category-robotics-working-joe-limbs = Working Joe limbs
+cmu-lathe-category-robotics-prosthetics = Human prosthetics
+cmu-lathe-category-robotics-components = Components
 
 cmu-robotics-fabricator-cell-already = The fabricator already has a fuel cell.
 cmu-robotics-fabricator-cell-insert-start = You start inserting the fuel cell into the fabricator.
@@ -93,7 +99,7 @@ cmu-robotics-console-reason-broken = the unit is broken or damaged
 cmu-robotics-console-reason-not-repaired = the unit is not repaired
 cmu-robotics-console-reason-missing-units = not all {$amount} order units are inside transport crates on the platform
 cmu-robotics-console-reason-limbs = the unit is still missing limbs or extremities
-cmu-robotics-console-reason-wrong-limb = the unit has a limb from the wrong species
+cmu-robotics-console-reason-wrong-limb = the unit has a limb from the wrong robotics limb set
 cmu-robotics-console-reason-module = the {$module} is not installed
 cmu-robotics-console-reason-no-slip = the order slip is not attached to a transport crate
 cmu-robotics-console-reason-slip-not-on-crate = the order slip must be attached to a transport crate that contains an order unit

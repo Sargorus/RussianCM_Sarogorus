@@ -8,3 +8,9 @@
   components:
   - type: CMUHumanMedical
   - type: CMURoboticsDamagedBody
+    minSeveredLimbs: 2
+    maxSeveredLimbs: 4
+    minBurnDamage: 150
+    maxBurnDamage: 280
+    minBruteDamage: 100
+    maxBruteDamage: 200

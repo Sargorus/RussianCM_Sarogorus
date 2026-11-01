@@ -13,8 +13,6 @@
   - type: VisualOrganMarkings
     markingData:
       group: Human
-  - type: CMULimbFamily
-    family: Synth
 
 - type: entity
   parent: [ CMUPartSynthVisual, CMUPartHumanLeftArm ]

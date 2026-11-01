@@ -49,7 +49,9 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     [Dependency] private PaperSystem _paper = default!;
     [Dependency] private UserInterfaceSystem _ui = default!;
     [Dependency] private LabelSystem _labels = default!;
-    [Dependency] private SharedCMULimbFamilySystem _limbFamilies = default!;
+
+    private const int RepairRewardPerDamage = 2;
+    private const int RepairRewardPerMissingLimb = 150;
 
     private static readonly EntProtoId TransportCrate = "CMUCrateSyntheticTransport";
 
@@ -212,7 +214,7 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     private void OnCrateDelivered(ref CMURequisitionsCrateDeliveredEvent args)
     {
         var query = EntityQueryEnumerator<CMURoboticsOrderConsoleComponent>();
-        while (query.MoveNext(out _, out var console))
+        while (query.MoveNext(out var consoleUid, out var console))
         {
             if (console.ActiveOrder is not { } order ||
                 order.Elevator != args.Elevator.Owner ||
@@ -222,28 +224,89 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
                 continue;
             }
 
-            MarkDeliveredCrate(args.Crate, order.Id);
+            MarkDeliveredCrate((consoleUid, console), order, args.Crate);
         }
     }
 
-    private void MarkDeliveredCrate(EntityUid crate, int orderId)
+    private void MarkDeliveredCrate(
+        Entity<CMURoboticsOrderConsoleComponent> console,
+        CMURoboticsOrder order,
+        EntityUid crate)
     {
         if (!HasComp<CMURoboticsTransportCrateComponent>(crate))
             return;
 
         var crateComp = EnsureComp<CMURoboticsTransportCrateComponent>(crate);
-        crateComp.OrderId = orderId;
+        crateComp.OrderId = order.Id;
 
         if (!TryComp<EntityStorageComponent>(crate, out var storage))
             return;
 
+        var rewardChanged = false;
         foreach (var contained in storage.Contents.ContainedEntities)
         {
             if (!HasComp<CMURoboticsDamagedBodyComponent>(contained))
                 continue;
 
             var marker = EnsureComp<CMURoboticsOrderTargetComponent>(contained);
-            marker.OrderId = orderId;
+            marker.OrderId = order.Id;
+
+            if (order.Type != CMURoboticsOrderType.Repair)
+                continue;
+
+            marker.InitialDamage = _damageable.GetTotalDamage(contained);
+            marker.InitialMissingLimbs = CountMissingExternalLimbs(contained);
+
+            var bonus = (int) Math.Ceiling(marker.InitialDamage.Double() * RepairRewardPerDamage) +
+                        marker.InitialMissingLimbs * RepairRewardPerMissingLimb;
+            order.Reward += bonus;
+            rewardChanged = true;
+        }
+
+        if (!rewardChanged)
+            return;
+
+        RefreshOrderSlips(console, order);
+        console.Comp.NextUiUpdate = _timing.CurTime;
+    }
+
+    private int CountMissingExternalLimbs(EntityUid unit)
+    {
+        if (!TryComp<BodyComponent>(unit, out var body))
+            return 0;
+
+        var missing = 0;
+        foreach (var type in ExternalLimbTypes)
+        {
+            var count = 0;
+            foreach (var _ in _body.GetBodyChildrenOfType(unit, type, body))
+                count++;
+
+            missing += Math.Max(0, 2 - count);
+        }
+
+        return missing;
+    }
+
+    private void RefreshOrderSlips(Entity<CMURoboticsOrderConsoleComponent> console, CMURoboticsOrder order)
+    {
+        var query = EntityQueryEnumerator<CMURoboticsOrderSlipComponent>();
+        while (query.MoveNext(out var uid, out var slip))
+        {
+            if (slip.OrderId != order.Id)
+                continue;
+
+            slip.Reward = order.Reward;
+            if (!TryComp<PaperComponent>(uid, out var paper))
+                continue;
+
+            _paper.SetContent((uid, paper), Loc.GetString(
+                "cmu-robotics-slip-content",
+                ("id", order.Id),
+                ("target", order.TargetName),
+                ("amount", order.Amount),
+                ("reward", order.Reward),
+                ("minutes", (int) console.Comp.OrderDuration.TotalMinutes)));
         }
     }
 
@@ -587,14 +650,17 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             return false;
         }
 
-        var expected = GetExpectedLimbFamily(order);
+        var workingJoe = order.Target.Id.StartsWith("CMUWorkingJoe", StringComparison.Ordinal);
         foreach (var type in ExternalLimbTypes)
         {
             var count = 0;
             foreach (var part in _body.GetBodyChildrenOfType(unit, type, body))
             {
                 count++;
-                if (_limbFamilies.GetLimbFamily(part.Id) != expected)
+                var valid = workingJoe
+                    ? CMULimbCompatibility.IsWorkingJoeLimb(EntityManager, part.Id)
+                    : CMULimbCompatibility.IsDroneLimb(EntityManager, part.Id);
+                if (!valid)
                 {
                     reason = Loc.GetString("cmu-robotics-console-reason-wrong-limb");
                     return false;
@@ -610,13 +676,6 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
 
         reason = string.Empty;
         return true;
-    }
-
-    private static CMULimbFamily GetExpectedLimbFamily(CMURoboticsOrder order)
-    {
-        return order.Target.Id.StartsWith("CMUWorkingJoe", StringComparison.Ordinal)
-            ? CMULimbFamily.WorkingJoe
-            : CMULimbFamily.DroneAndroid;
     }
 
     private void PayCorporate(int amount)

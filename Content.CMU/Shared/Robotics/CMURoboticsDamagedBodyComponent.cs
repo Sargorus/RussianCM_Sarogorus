@@ -25,14 +25,14 @@ public sealed partial class CMURoboticsDamagedBodyComponent : Component
     };
 
     [DataField]
-    public int MinBurnDamage = 20;
+    public int MinBurnDamage = 40;
 
     [DataField]
-    public int MaxBurnDamage = 40;
+    public int MaxBurnDamage = 90;
 
     [DataField]
-    public int MinBruteDamage = 10;
+    public int MinBruteDamage = 30;
 
     [DataField]
-    public int MaxBruteDamage = 25;
+    public int MaxBruteDamage = 70;
 }
