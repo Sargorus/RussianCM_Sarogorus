@@ -213,6 +213,7 @@
     ears2: RMCM5CameraGear
     outerClothing: RMCLabcoatOpened
     belt: AU14BeltUtilityFilled
+    gloves: RMCHandsVeteranInsulated
     eyes: RMCWeldingGoggles
     head: ClothingHeadHatWelding
   storage:

@@ -164,39 +164,35 @@
   parent: RMCCrateConstruction
   id: CMUCrateWYSecurityBarrier
   name: WY security barrier crate
-  description: A crate that contains one reinforced deployable Weyland-Yutani security barrier. Only corporate security and the liaison staff can lock or unlock it. Pry it open to deploy the barrier.
+  description: A crate that contains one reinforced deployable Weyland-Yutani security barrier. Only corporate security and the liaison staff can lock or unlock it.
   components:
-  - type: SpawnOnTerminate
-    spawn: CMUWYSecurityBarrier
-    adjustSpawn: true
-  - type: CrateOpenable
-    spawn: []
+  - type: CMUKeepCrateOnDelivery
+  - type: CMUDeployOnOpen
+    spawn:
+    - CMUWYSecurityBarrier
 
 - type: entity
   parent: RMCCrateConstruction
   id: CMUCrateRoboticsFabricator
   name: robotics fabricator crate
-  description: A crate containing one Weyland-Yutani robotics fabricator and a WL-6 universal fuel cell to power it. Pry it open to deploy the fabricator.
+  description: A crate containing one Weyland-Yutani robotics fabricator and a WL-6 universal fuel cell to power it.
   components:
-  - type: SpawnOnTerminate
-    spawn: CMURoboticsFabricator
-    adjustSpawn: true
-  - type: CrateOpenable
+  - type: CMUKeepCrateOnDelivery
+  - type: CMUDeployOnOpen
     spawn:
-    - id: RMCGeneratorFusionCell
-      amount: 1
+    - CMURoboticsFabricator
+    - RMCGeneratorFusionCell
 
 - type: entity
   parent: RMCCrateConstruction
   id: CMUCrateRoboticsOrderConsole
   name: robotics order console crate
-  description: A crate containing one Weyland-Yutani robotics order console. Pry it open to deploy the console.
+  description: A crate containing one Weyland-Yutani robotics order console.
   components:
-  - type: SpawnOnTerminate
-    spawn: CMURoboticsOrderConsole
-    adjustSpawn: true
-  - type: CrateOpenable
-    spawn: []
+  - type: CMUKeepCrateOnDelivery
+  - type: CMUDeployOnOpen
+    spawn:
+    - CMURoboticsOrderConsole
 
 - type: entity
   parent: RMCCrateScience

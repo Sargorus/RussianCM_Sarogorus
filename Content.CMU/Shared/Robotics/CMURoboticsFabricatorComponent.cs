@@ -1,6 +1,8 @@
+using System;
 using Content.Shared._RMC14.Marines.Skills;
 using Content.Shared.DoAfter;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization;
 
 namespace Content.Shared.CMU14.Robotics;
 
@@ -28,6 +30,8 @@ public sealed partial class CMURoboticsFabricatorComponent : Component
     public TimeSpan RemoveDelay = TimeSpan.FromSeconds(2);
 }
 
+[Serializable, NetSerializable]
 public sealed partial class CMURoboticsFabricatorInsertCellDoAfterEvent : SimpleDoAfterEvent;
 
+[Serializable, NetSerializable]
 public sealed partial class CMURoboticsFabricatorRemoveCellDoAfterEvent : SimpleDoAfterEvent;
