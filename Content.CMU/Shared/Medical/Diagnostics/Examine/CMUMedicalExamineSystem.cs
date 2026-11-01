@@ -362,7 +362,10 @@ public sealed partial class CMUMedicalExamineSystem : EntitySystem
         if (!TryComp<CMURoboticLimbComponent>(part, out var robotic))
             return;
 
-        sections.Add(Color(Loc.GetString("cmu-robotic-limb-detailed-state"), RoboticLimbColor));
+        var stateKey = robotic.Prosthetic
+            ? "cmu-robotic-limb-detailed-state"
+            : "cmu-robotic-limb-detailed-native";
+        sections.Add(Color(Loc.GetString(stateKey), RoboticLimbColor));
 
         if (robotic.BruteDamage > FixedPoint2.Zero)
             sections.Add(Color(Loc.GetString("cmu-robotic-limb-detailed-brute"), RoboticDamageColor));
@@ -401,9 +404,12 @@ public sealed partial class CMUMedicalExamineSystem : EntitySystem
 
     private List<string> GetRoboticDetails(CMURoboticLimbComponent robotic)
     {
+        var stateKey = robotic.Prosthetic
+            ? "cmu-robotic-limb-examine-state"
+            : "cmu-robotic-limb-examine-native";
         var details = new List<string>
         {
-            Color(Loc.GetString("cmu-robotic-limb-examine-state"), RoboticLimbColor),
+            Color(Loc.GetString(stateKey), RoboticLimbColor),
         };
 
         AddRoboticDamageDetails(robotic, details, true);

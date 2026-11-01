@@ -20,26 +20,26 @@
   - type: CMURoboticsOrderConsole
     buildTargets:
     - prototype: CMUDroneAndroidUnarmed
-      reward: 2500
+      reward: 3500
       requiredModules:
       - CMUDroneModuleCare
     - prototype: CMUDroneAndroidCombat
-      reward: 3200
+      reward: 4500
       requiredModules:
       - CMUDroneModuleCombat
       - CMUDroneModuleCare
     repairTargets:
     - prototype: CMUDroneAndroidUnarmed
-      reward: 1000
+      reward: 2500
       requiredModules:
       - CMUDroneModuleCare
     - prototype: CMUDroneAndroidCombat
-      reward: 1200
+      reward: 3000
       requiredModules:
       - CMUDroneModuleCombat
       - CMUDroneModuleCare
     - prototype: CMUWorkingJoeRepair
-      reward: 1100
+      reward: 2500
   - type: ActivatableUI
     key: enum.CMURoboticsOrderConsoleUiKey.Key
   - type: ActivatableUIRequiresAccess

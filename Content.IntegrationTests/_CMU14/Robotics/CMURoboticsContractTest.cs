@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Content.IntegrationTests.Fixtures;
+using Content.Server.CMU14.ColonyEconomy;
 using Content.Server.CMU14.Robotics;
 using Content.Server._RMC14.Requisitions;
 using Content.Shared._RMC14.Requisitions;
@@ -92,7 +93,7 @@ public sealed class CMURoboticsContractTest : GameTest
             Assert.That(SEntMan.HasComponent<CMURoboticsTransportCrateComponent>(crate), Is.True);
 
             var storage = SEntMan.GetComponent<EntityStorageComponent>(crate);
-            Assert.That(storage.Capacity, Is.EqualTo(1));
+            Assert.That(storage.Capacity, Is.EqualTo(2));
             Assert.That(storage.MaxSize, Is.GreaterThanOrEqualTo(1f));
 
             var system = Server.System<CMURoboticsTransportCrateSystem>();
@@ -129,7 +130,11 @@ public sealed class CMURoboticsContractTest : GameTest
             Assert.That(
                 system.TryStoreSynthetic(crate, EntityUid.Invalid, second),
                 Is.False,
-                "the transport crate must not exceed its one-unit capacity");
+                "the transport crate must hold only one synthetic");
+
+            var tablet = SEntMan.SpawnEntity("CMUDroneControlTablet", map.GridCoords);
+            Assert.That(Server.System<SharedEntityStorageSystem>().Insert(tablet, crate), Is.True,
+                "the second crate slot must accept a drone control tablet");
 
             var slip = SEntMan.SpawnEntity("CMURoboticsOrderSlip", map.GridCoords);
             SEntMan.GetComponent<CMURoboticsOrderSlipComponent>(slip).OrderId = 42;
@@ -252,25 +257,60 @@ public sealed class CMURoboticsContractTest : GameTest
                 Elevator = elevator,
             };
 
+            var budget = Server.System<ColonyBudgetSystem>();
+            var before = budget.GetBudget();
             var attempt = new CMURequisitionsElevatorLoweringAttemptEvent(elevator);
             SEntMan.EventBus.RaiseLocalEvent(elevator, ref attempt);
 
             Assert.That(consoleComp.ActiveOrder, Is.Null);
             Assert.That(SEntMan.EntityExists(drone), Is.True,
                 "submitting a contract must not delete the repaired unit");
+            Assert.That(budget.GetBudget(), Is.EqualTo(before + 1000),
+                "a valid submission must pay the liaison budget console account");
+        });
+    }
 
-            var accounts = SEntMan.EntityQueryEnumerator<RequisitionsAccountComponent>();
-            var paid = false;
-            while (accounts.MoveNext(out _, out var account))
+    [Test]
+    public async Task BuildOrderRequiresControlTabletAndPaysLiaisonBudget()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var elevator = SEntMan.SpawnEntity("AU14CorporateASRSElevator", map.GridCoords);
+            var console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
+            var crate = SEntMan.SpawnEntity("CMUCrateSyntheticTransport", map.GridCoords);
+            var drone = SEntMan.SpawnEntity("CMUDroneAndroidUnarmed", map.GridCoords);
+            var tablet = SEntMan.SpawnEntity("CMUDroneControlTablet", map.GridCoords);
+
+            var storage = Server.System<SharedEntityStorageSystem>();
+            Assert.That(storage.Insert(drone, crate), Is.True);
+            Assert.That(storage.Insert(tablet, crate), Is.True);
+
+            var slip = SEntMan.SpawnEntity("CMURoboticsOrderSlip", map.GridCoords);
+            SEntMan.GetComponent<CMURoboticsOrderSlipComponent>(slip).OrderId = 777;
+            var slots = Server.System<ItemSlotsSystem>();
+            Assert.That(slots.TryInsert(crate, "paper_label", slip, null), Is.True);
+
+            var consoleComp = SEntMan.GetComponent<CMURoboticsOrderConsoleComponent>(console);
+            consoleComp.ActiveOrder = new CMURoboticsOrder
             {
-                if (string.Equals(account.Faction, "corporate", StringComparison.OrdinalIgnoreCase) &&
-                    account.Balance >= 1000)
-                {
-                    paid = true;
-                }
-            }
+                Id = 777,
+                Type = CMURoboticsOrderType.Build,
+                Target = "CMUDroneAndroidUnarmed",
+                Amount = 1,
+                TargetName = "test drone",
+                Reward = 3500,
+                Elevator = elevator,
+            };
 
-            Assert.That(paid, Is.True, "a valid submission must pay the corporate account");
+            var budget = Server.System<ColonyBudgetSystem>();
+            var before = budget.GetBudget();
+            var attempt = new CMURequisitionsElevatorLoweringAttemptEvent(elevator);
+            SEntMan.EventBus.RaiseLocalEvent(elevator, ref attempt);
+
+            Assert.That(consoleComp.ActiveOrder, Is.Null);
+            Assert.That(SEntMan.EntityExists(drone), Is.True);
+            Assert.That(budget.GetBudget(), Is.EqualTo(before + 3500));
         });
     }
 

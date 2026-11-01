@@ -1,7 +1,10 @@
 - type: entity
-  parent: CMUPaperResearcherWEYLAND
+  parent: CMUPaperRequisitionSlip
   id: CMURoboticsOrderSlip
-  name: robotics work order
-  description: A Weyland-Yutani robotics contract printed on research letterhead. Put the finished units into synthetic transport crates, attach this slip to a loaded crate, and lower the corporate cargo platform.
+  name: robotics supply order
+  description: A supply order form for a Weyland-Yutani robotics contract. The order details are printed on the sheet.
   components:
   - type: CMURoboticsOrderSlip
+  - type: RemoveComponents
+    components:
+    - type: CMURequisitionSlip

@@ -82,7 +82,7 @@
 - type: entity
   parent: BaseItem
   id: CMUDroneBodyFrame
-  name: drone android body frame
+  name: humanoid drone body frame
   description: A bare synthetic torso frame with sealed limb ports and an empty activation socket.
   components:
   - type: ContainerContainer
@@ -98,17 +98,29 @@
     - state: head_m
       map: ["head"]
       visible: false
+    - state: r_arm
+      map: ["right_arm"]
+      visible: false
     - state: l_arm
       map: ["left_arm"]
       visible: false
-    - state: r_arm
-      map: ["right_arm"]
+    - state: r_leg
+      map: ["right_leg"]
       visible: false
     - state: l_leg
       map: ["left_leg"]
       visible: false
-    - state: r_leg
-      map: ["right_leg"]
+    - state: l_foot
+      map: ["left_foot"]
+      visible: false
+    - state: r_foot
+      map: ["right_foot"]
+      visible: false
+    - state: l_hand
+      map: ["left_hand"]
+      visible: false
+    - state: r_hand
+      map: ["right_hand"]
       visible: false
   - type: GenericVisualizer
     visuals:
@@ -120,16 +132,28 @@
         left_arm:
           True: { visible: true }
           False: { visible: false }
+        left_hand:
+          True: { visible: true }
+          False: { visible: false }
       enum.CMUDroneFrameVisuals.RightArm:
         right_arm:
+          True: { visible: true }
+          False: { visible: false }
+        right_hand:
           True: { visible: true }
           False: { visible: false }
       enum.CMUDroneFrameVisuals.LeftLeg:
         left_leg:
           True: { visible: true }
           False: { visible: false }
+        left_foot:
+          True: { visible: true }
+          False: { visible: false }
       enum.CMUDroneFrameVisuals.RightLeg:
         right_leg:
+          True: { visible: true }
+          False: { visible: false }
+        right_foot:
           True: { visible: true }
           False: { visible: false }
   - type: Item
@@ -140,7 +164,7 @@
 - type: entity
   parent: CMUDroneBodyFrame
   id: CMUDroneBodyFrameUnarmed
-  name: unarmed drone android body frame
+  name: unarmed humanoid drone body frame
   description: A bare synthetic torso frame whose control bus is locked out of firearm use. Its limb ports are sealed and its activation socket is empty.
   components:
   - type: CMUDroneFrame
@@ -149,7 +173,7 @@
 - type: entity
   parent: CMUDroneBodyFrame
   id: CMUDroneBodyFrameCombat
-  name: combat drone android body frame
+  name: combat humanoid drone body frame
   description: A reinforced synthetic torso frame with a combat-rated control bus. Its limb ports are sealed and its activation socket is empty.
   components:
   - type: CMUDroneFrame

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Content.Server.CMU14.ColonyEconomy;
 using Content.Server.CMU14.Requisitions;
 using Content.Server._RMC14.Requisitions;
 using Content.Shared._RMC14.Requisitions;
@@ -41,6 +42,8 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     [Dependency] private IPrototypeManager _prototypes = default!;
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private RequisitionsSystem _requisitions = default!;
+    [Dependency] private ColonyBudgetSystem _colonyBudget = default!;
+    [Dependency] private BudgetConsoleSystem _budgetConsole = default!;
     [Dependency] private SharedBodySystem _body = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
@@ -297,17 +300,36 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
                 continue;
 
             slip.Reward = order.Reward;
+            slip.Content = BuildSlipContent(order, (int) console.Comp.OrderDuration.TotalMinutes);
             if (!TryComp<PaperComponent>(uid, out var paper))
                 continue;
 
-            _paper.SetContent((uid, paper), Loc.GetString(
-                "cmu-robotics-slip-content",
-                ("id", order.Id),
-                ("target", order.TargetName),
-                ("amount", order.Amount),
-                ("reward", order.Reward),
-                ("minutes", (int) console.Comp.OrderDuration.TotalMinutes)));
+            _paper.SetContent((uid, paper), slip.Content);
         }
+    }
+
+    private string BuildSlipContent(CMURoboticsOrder order, int minutes)
+    {
+        var type = Loc.GetString(order.Type == CMURoboticsOrderType.Build
+            ? "cmu-robotics-console-type-build"
+            : "cmu-robotics-console-type-repair");
+        var module = order.RequiredModule is { } required
+            ? GetPrototypeName(required)
+            : Loc.GetString("cmu-robotics-slip-module-none");
+        var package = Loc.GetString(order.Type == CMURoboticsOrderType.Build
+            ? "cmu-robotics-slip-package-build"
+            : "cmu-robotics-slip-package-repair");
+
+        return Loc.GetString(
+            "cmu-robotics-slip-content",
+            ("id", order.Id),
+            ("type", type),
+            ("target", order.TargetName),
+            ("module", module),
+            ("amount", order.Amount),
+            ("package", package),
+            ("reward", order.Reward),
+            ("minutes", minutes));
     }
 
     private void OnElevatorLoweringAttempt(
@@ -331,7 +353,7 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
                 continue;
             }
 
-            PayCorporate(order.Reward);
+            PayLiaison(order.Reward);
             DeleteOrderSlips(order.Id);
             console.ActiveOrder = null;
             console.Status = Loc.GetString(
@@ -382,6 +404,13 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             return false;
         }
 
+        if (order.Type == CMURoboticsOrderType.Build &&
+            crates.Any(crate => crate.Units.Count > 0 && !crate.HasControlTablet))
+        {
+            reason = Loc.GetString("cmu-robotics-console-reason-tablet");
+            return false;
+        }
+
         foreach (var crate in crates)
         {
             foreach (var unit in crate.Units)
@@ -406,16 +435,20 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
                            label.Value.Comp.OrderId == order.Id;
 
             var units = new List<EntityUid>();
+            var hasControlTablet = false;
             if (TryComp<EntityStorageComponent>(entity, out var storage))
             {
                 foreach (var contained in storage.Contents.ContainedEntities)
                 {
+                    if (HasComp<CMUDroneControlTabletComponent>(contained))
+                        hasControlTablet = true;
+
                     if (IsOrderUnit(contained, order))
                         units.Add(contained);
                 }
             }
 
-            result.Add(new OrderCrateInfo(entity, units, hasLabel));
+            result.Add(new OrderCrateInfo(entity, units, hasLabel, hasControlTablet));
         }
 
         return result;
@@ -480,17 +513,12 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         slipComp.TargetName = order.TargetName;
         slipComp.Amount = order.Amount;
         slipComp.Reward = order.Reward;
+        slipComp.Content = BuildSlipContent(order, (int) ent.Comp.OrderDuration.TotalMinutes);
 
         if (TryComp<PaperComponent>(slip, out var paper))
         {
             _meta.SetEntityName(slip, Loc.GetString("cmu-robotics-slip-name", ("id", order.Id)));
-            _paper.SetContent((slip, paper), Loc.GetString(
-                "cmu-robotics-slip-content",
-                ("id", order.Id),
-                ("target", order.TargetName),
-                ("amount", order.Amount),
-                ("reward", order.Reward),
-                ("minutes", (int) ent.Comp.OrderDuration.TotalMinutes)));
+            _paper.SetContent((slip, paper), slipComp.Content);
         }
 
         if (actor is { } user && !TerminatingOrDeleted(user))
@@ -582,7 +610,10 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         string? reason)
     {
         if (fine)
-            _requisitions.AddCorporateFunds(-order.Reward);
+        {
+            _colonyBudget.AddToBudget(-order.Reward);
+            _budgetConsole.UpdateAllUi();
+        }
 
         // A failed or expired contract does not delete its customer units.
         DeleteOrderSlips(order.Id);
@@ -678,9 +709,10 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         return true;
     }
 
-    private void PayCorporate(int amount)
+    private void PayLiaison(int amount)
     {
-        _requisitions.AddCorporateFunds(amount);
+        _colonyBudget.AddToBudget(amount);
+        _budgetConsole.UpdateAllUi();
     }
 
     private void UpdateUi(Entity<CMURoboticsOrderConsoleComponent> ent)
@@ -725,5 +757,6 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     private readonly record struct OrderCrateInfo(
         EntityUid Crate,
         List<EntityUid> Units,
-        bool HasOrderLabel);
+        bool HasOrderLabel,
+        bool HasControlTablet);
 }

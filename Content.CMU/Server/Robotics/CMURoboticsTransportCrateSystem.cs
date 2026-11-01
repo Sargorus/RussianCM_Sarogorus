@@ -12,8 +12,9 @@ namespace Content.Server.CMU14.Robotics;
 /// <summary>
 /// Lets players drag a synthetic or drone into a synthetic transport crate.
 /// Entity storage only pulls nearby mobs in when it closes, so a dragged unit
-/// needs an explicit insertion path. The crate still enforces its one-unit
-/// capacity, size limit, lock and synthetic-only whitelist.
+/// needs an explicit insertion path. The crate still enforces its
+/// one-synthetic limit (plus a control tablet), size limit, lock and
+/// synthetic-only whitelist.
 /// </summary>
 public sealed partial class CMURoboticsTransportCrateSystem : EntitySystem
 {
@@ -24,6 +25,31 @@ public sealed partial class CMURoboticsTransportCrateSystem : EntitySystem
     {
         base.Initialize();
         SubscribeLocalEvent<CMURoboticsTransportCrateComponent, DragDropTargetEvent>(OnDragDropTarget);
+        SubscribeLocalEvent<CMURoboticsTransportCrateComponent, EntityStorageInsertedIntoAttemptEvent>(
+            OnStorageInsertAttempt);
+    }
+
+    private void OnStorageInsertAttempt(
+        Entity<CMURoboticsTransportCrateComponent> ent,
+        ref EntityStorageInsertedIntoAttemptEvent args)
+    {
+        if (!IsSyntheticOrDrone(args.ItemToInsert) ||
+            !TryComp<EntityStorageComponent>(ent, out var storage))
+        {
+            return;
+        }
+
+        if (storage.Contents.Contains(args.ItemToInsert))
+            return;
+
+        foreach (var contained in storage.Contents.ContainedEntities)
+        {
+            if (IsSyntheticOrDrone(contained))
+            {
+                args.Cancelled = true;
+                return;
+            }
+        }
     }
 
     private void OnDragDropTarget(Entity<CMURoboticsTransportCrateComponent> ent, ref DragDropTargetEvent args)
@@ -47,6 +73,12 @@ public sealed partial class CMURoboticsTransportCrateSystem : EntitySystem
 
         if (storage.Contents.Contains(dragged))
             return true;
+
+        foreach (var contained in storage.Contents.ContainedEntities)
+        {
+            if (IsSyntheticOrDrone(contained))
+                return false;
+        }
 
         if (storage.Contents.ContainedEntities.Count >= storage.Capacity)
             return false;

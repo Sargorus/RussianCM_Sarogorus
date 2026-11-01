@@ -13,9 +13,11 @@ cmu-medical-detailed-examine-window-bleeding = Кровотечение: { $tier
 
 cmu-robotic-limb-material-synthetic = синтетический
 cmu-robotic-limb-examine-state = протез
+cmu-robotic-limb-examine-native = штатная синтетическая конечность
 cmu-robotic-limb-examine-brute = вмятины на обшивке
 cmu-robotic-limb-examine-burn = обгоревшая проводка
 cmu-robotic-limb-detailed-state = протез
+cmu-robotic-limb-detailed-native = штатная синтетическая конечность
 cmu-robotic-limb-detailed-brute = механические повреждения: вмятины на обшивке
 cmu-robotic-limb-detailed-burn = термические повреждения: обгоревшая проводка
 cmu-robotic-limb-inspect-header = Повреждения роботизированной конечности

@@ -18,4 +18,11 @@ public sealed partial class CMURoboticsOrderSlipComponent : Component
 
     [DataField]
     public int Reward;
+
+    /// <summary>
+    /// The rendered order text. Kept so the paper can re-apply it after
+    /// PaperComponent's own map initialization.
+    /// </summary>
+    [DataField]
+    public string Content = string.Empty;
 }

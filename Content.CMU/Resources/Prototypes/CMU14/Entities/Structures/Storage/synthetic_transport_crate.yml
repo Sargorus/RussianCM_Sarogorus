@@ -6,14 +6,14 @@
   id: CMUCrateSyntheticTransport
   name: synthetic transport crate
   suffix: CMU
-  description: A black lockable transport crate sized for one synthetic. Attach a robotics order slip to its label slot before lowering it with the cargo platform.
+  description: A black lockable transport crate sized for one synthetic and one drone control tablet. Attach a robotics order slip to its label slot before lowering it with the cargo platform.
   components:
   - type: RemoveComponents
     components:
     - type: EntityStorageCloseOnMapInit
   - type: CMURoboticsTransportCrate
   - type: EntityStorage
-    capacity: 1
+    capacity: 2
     maxSize: 4
   - type: Lock
     locked: false

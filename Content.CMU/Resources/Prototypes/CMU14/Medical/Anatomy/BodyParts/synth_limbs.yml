@@ -21,6 +21,7 @@
   suffix: CMU
   components:
   - type: CMURoboticLimb
+    prosthetic: false
 
 - type: entity
   parent: [ CMUPartSynthVisual, CMUPartHumanRightArm ]
@@ -29,6 +30,7 @@
   suffix: CMU
   components:
   - type: CMURoboticLimb
+    prosthetic: false
 
 - type: entity
   parent: [ CMUPartSynthVisual, CMUPartHumanLeftHand ]
@@ -37,6 +39,7 @@
   suffix: CMU
   components:
   - type: CMURoboticLimb
+    prosthetic: false
 
 - type: entity
   parent: [ CMUPartSynthVisual, CMUPartHumanRightHand ]
@@ -45,6 +48,7 @@
   suffix: CMU
   components:
   - type: CMURoboticLimb
+    prosthetic: false
 
 - type: entity
   parent: [ CMUPartSynthVisual, CMUPartHumanLeftLeg ]
@@ -53,6 +57,7 @@
   suffix: CMU
   components:
   - type: CMURoboticLimb
+    prosthetic: false
 
 - type: entity
   parent: [ CMUPartSynthVisual, CMUPartHumanRightLeg ]
@@ -61,6 +66,7 @@
   suffix: CMU
   components:
   - type: CMURoboticLimb
+    prosthetic: false
 
 - type: entity
   parent: [ CMUPartSynthVisual, CMUPartHumanLeftFoot ]
@@ -69,6 +75,7 @@
   suffix: CMU
   components:
   - type: CMURoboticLimb
+    prosthetic: false
 
 - type: entity
   parent: [ CMUPartSynthVisual, CMUPartHumanRightFoot ]
@@ -77,3 +84,4 @@
   suffix: CMU
   components:
   - type: CMURoboticLimb
+    prosthetic: false

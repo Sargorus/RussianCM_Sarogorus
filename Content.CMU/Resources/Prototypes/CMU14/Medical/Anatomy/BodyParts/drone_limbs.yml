@@ -23,6 +23,7 @@
     current: 80
     severanceThreshold: 90
   - type: CMURoboticLimb
+    prosthetic: false
   - type: VisualOrgan
     data:
       sprite: CMU14/Mobs/DroneAndroid/parts.rsi
@@ -49,6 +50,7 @@
     current: 80
     severanceThreshold: 90
   - type: CMURoboticLimb
+    prosthetic: false
   - type: VisualOrgan
     data:
       sprite: CMU14/Mobs/DroneAndroid/parts.rsi
@@ -75,6 +77,7 @@
     current: 35
     severanceThreshold: 45
   - type: CMURoboticLimb
+    prosthetic: false
   - type: VisualOrgan
     data:
       sprite: CMU14/Mobs/DroneAndroid/parts.rsi
@@ -101,6 +104,7 @@
     current: 35
     severanceThreshold: 45
   - type: CMURoboticLimb
+    prosthetic: false
   - type: VisualOrgan
     data:
       sprite: CMU14/Mobs/DroneAndroid/parts.rsi
@@ -130,6 +134,7 @@
     current: 90
     severanceThreshold: 90
   - type: CMURoboticLimb
+    prosthetic: false
   - type: VisualOrgan
     data:
       sprite: CMU14/Mobs/DroneAndroid/parts.rsi
@@ -159,6 +164,7 @@
     current: 90
     severanceThreshold: 90
   - type: CMURoboticLimb
+    prosthetic: false
   - type: VisualOrgan
     data:
       sprite: CMU14/Mobs/DroneAndroid/parts.rsi
@@ -185,6 +191,7 @@
     current: 45
     severanceThreshold: 50
   - type: CMURoboticLimb
+    prosthetic: false
   - type: VisualOrgan
     data:
       sprite: CMU14/Mobs/DroneAndroid/parts.rsi
@@ -211,6 +218,7 @@
     current: 45
     severanceThreshold: 50
   - type: CMURoboticLimb
+    prosthetic: false
   - type: VisualOrgan
     data:
       sprite: CMU14/Mobs/DroneAndroid/parts.rsi
