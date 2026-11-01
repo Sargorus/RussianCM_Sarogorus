@@ -2,7 +2,7 @@ ent-CMURoboticsFabricator = robotics fabricator
     .desc = A Weyland-Yutani fabricator for android frames, limbs, control tablets, modules and activation keys. It needs a WL-6 universal fuel cell and a trained roboticist.
 
 ent-CMUCrateRoboticsFabricator = robotics fabricator crate
-    .desc = A sealed crate containing one Weyland-Yutani robotics fabricator and a WL-6 universal fuel cell to power it. Pry it open with a crowbar.
+    .desc = A sealed crate containing one Weyland-Yutani robotics fabricator with its WL-6 universal fuel cell installed. Pry it open with a crowbar.
 
 ent-CMURoboticsOrderConsole = robotics order console
     .desc = A Weyland-Yutani contract terminal for robotics work. Accept a build or repair order, receive its synthetic transport crates in cargo, then attach the order slip to a loaded crate and lower the platform. It can be anchored, moved and rotated.
@@ -11,7 +11,7 @@ ent-CMUCrateRoboticsOrderConsole = robotics order console crate
     .desc = A sealed crate containing one Weyland-Yutani robotics order console. Pry it open with a crowbar.
 
 ent-CMUCrateSyntheticTransport = synthetic transport crate
-    .desc = A black lockable transport crate sized for one synthetic and one drone control tablet. Attach a robotics order slip to its label slot before lowering it with the cargo platform.
+    .desc = A lockable transport crate sized for one synthetic and one drone control tablet. Attach a robotics order slip to its label slot before lowering it with the cargo platform.
 
 ent-CMURoboticsOrderSlip = robotics supply order
     .desc = A supply order form for a Weyland-Yutani robotics contract. The order details are printed on the sheet.
@@ -54,6 +54,7 @@ cmu-robotics-fabricator-cell-insert-fail = The fuel cell does not fit.
 cmu-robotics-fabricator-cell-insert-finish = You insert the fuel cell into the fabricator.
 cmu-robotics-fabricator-cell-none = The fabricator has no fuel cell to remove.
 cmu-robotics-fabricator-cell-remove-start = You start removing the fuel cell from the fabricator.
+cmu-robotics-fabricator-cell-remove-verb = Remove fuel cell
 cmu-robotics-fabricator-cell-remove-finish = You remove the fuel cell from the fabricator.
 cmu-robotics-fabricator-examine-cell-inserted = The fuel cell is [color=cyan]inserted[/color].
 cmu-robotics-fabricator-examine-cell-empty = The fuel cell is [color=red]not inserted[/color].
@@ -107,7 +108,10 @@ cmu-robotics-console-reason-tablet = the crate does not contain a drone control 
 cmu-robotics-console-reason-no-slip = the order slip is not attached to a transport crate
 cmu-robotics-console-reason-slip-not-on-crate = the order slip must be attached to a transport crate that contains an order unit
 cmu-robotics-slip-name = robotics work order #{$id}
+cmu-robotics-target-civilian-drone = civilian drone
+cmu-robotics-target-combat-drone = combat drone
+cmu-robotics-target-working-joe = Working Joe
 cmu-robotics-slip-module-none = not required
 cmu-robotics-slip-package-build = finished unit + drone control tablet
 cmu-robotics-slip-package-repair = repaired unit
-cmu-robotics-slip-content = [head=2]WEYLAND-YUTANI SUPPLY ORDER #{$id}[/head]\nForm: robotics supply order\nOrder type: {$type}\nTarget: {$target}\nRequired module: {$module}\nUnits: {$amount}\nPackage: {$package}\nReward: {$reward}\nTime limit: {$minutes} minutes\n\nAcceptance: install the required module in the target, place the unit in a synthetic transport crate, attach this form to the loaded crate, and lower the corporate cargo platform.
+cmu-robotics-slip-content = [bold]WEYLAND-YUTANI SUPPLY ORDER #{$id}[/bold]\n\nForm: robotics supply order\nOrder type: {$type}\nTarget: {$target}\nRequired module: {$module}\nUnits: {$amount}\nPackage: {$package}\nReward: {$reward}\nTime limit: {$minutes} minutes\n\nAcceptance: install the required module in the target, place the unit in a synthetic transport crate, attach this form to the loaded crate, and lower the corporate cargo platform.

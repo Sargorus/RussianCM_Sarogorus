@@ -14,3 +14,13 @@
     maxBurnDamage: 280
     minBruteDamage: 100
     maxBruteDamage: 200
+
+# Stable repair-order variant: the console pre-rolls the damage and applies it
+# when the crate arrives, so the reward does not change after acceptance.
+- type: entity
+  parent: CMUWorkingJoeRepair
+  id: CMUWorkingJoeRepairOrder
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: CMURoboticsDamagedBody
+    randomizeOnMapInit: false

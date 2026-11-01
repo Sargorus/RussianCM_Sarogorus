@@ -11,6 +11,7 @@ using Content.Shared.Lathe;
 using Content.Shared.Popups;
 using Content.Shared.Tools.Systems;
 using Content.Shared.UserInterface;
+using Content.Shared.Verbs;
 using Robust.Shared.Containers;
 
 namespace Content.Server.CMU14.Robotics;
@@ -36,6 +37,9 @@ public sealed partial class CMURoboticsFabricatorSystem : EntitySystem
         SubscribeLocalEvent<CMURoboticsFabricatorComponent, ComponentInit>(OnInit);
         SubscribeLocalEvent<CMURoboticsFabricatorComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<CMURoboticsFabricatorComponent, InteractUsingEvent>(OnInteractUsing);
+        SubscribeLocalEvent<CMURoboticsFabricatorComponent, GetVerbsEvent<AlternativeVerb>>(OnGetVerbs);
+        SubscribeLocalEvent<CMURoboticsFabricatorComponent, EntInsertedIntoContainerMessage>(OnCellInserted);
+        SubscribeLocalEvent<CMURoboticsFabricatorComponent, EntRemovedFromContainerMessage>(OnCellRemoved);
         SubscribeLocalEvent<CMURoboticsFabricatorComponent, CMURoboticsFabricatorInsertCellDoAfterEvent>(OnInsertCell);
         SubscribeLocalEvent<CMURoboticsFabricatorComponent, CMURoboticsFabricatorRemoveCellDoAfterEvent>(OnRemoveCell);
         SubscribeLocalEvent<CMURoboticsFabricatorComponent, ExaminedEvent>(OnExamined);
@@ -109,38 +113,73 @@ public sealed partial class CMURoboticsFabricatorSystem : EntitySystem
             return;
         }
 
-        if (_tool.HasQuality(args.Used, "Prying"))
+        if (_tool.HasQuality(args.Used, "Prying") && container.ContainedEntity != null)
         {
-            // Leave a crowbar without a cell to the wires panel and other
-            // interactions; only handle it as fuel-cell removal when one exists.
-            if (container.ContainedEntity == null)
-                return;
-
             args.Handled = true;
-
-            var doAfter = new DoAfterArgs(
-                EntityManager,
-                args.User,
-                ent.Comp.RemoveDelay,
-                new CMURoboticsFabricatorRemoveCellDoAfterEvent(),
-                ent.Owner,
-                target: ent.Owner,
-                used: args.Used)
-            {
-                BreakOnMove = true,
-                BreakOnDropItem = true,
-                NeedHand = true,
-                DuplicateCondition = DuplicateConditions.SameEvent,
-            };
-
-            if (_doAfter.TryStartDoAfter(doAfter))
-            {
-                _popup.PopupEntity(
-                    Loc.GetString("cmu-robotics-fabricator-cell-remove-start", ("fabricator", ent.Owner)),
-                    ent.Owner,
-                    args.User);
-            }
+            StartRemoveCell(ent, args.User, args.Used);
         }
+    }
+
+    private void OnGetVerbs(Entity<CMURoboticsFabricatorComponent> ent, ref GetVerbsEvent<AlternativeVerb> args)
+    {
+        if (!args.CanAccess || !args.CanInteract || args.Hands == null)
+            return;
+
+        if (!HasCell(ent))
+            return;
+
+        var user = args.User;
+        args.Verbs.Add(new AlternativeVerb
+        {
+            Text = Loc.GetString("cmu-robotics-fabricator-cell-remove-verb"),
+            Priority = 2,
+            Act = () => StartRemoveCell(ent, user),
+        });
+    }
+
+    private void StartRemoveCell(
+        Entity<CMURoboticsFabricatorComponent> ent,
+        EntityUid user,
+        EntityUid? used = null)
+    {
+        var container = EnsureCellContainer(ent);
+        if (container.ContainedEntity == null)
+            return;
+
+        var doAfter = new DoAfterArgs(
+            EntityManager,
+            user,
+            ent.Comp.RemoveDelay,
+            new CMURoboticsFabricatorRemoveCellDoAfterEvent(),
+            ent.Owner,
+            target: ent.Owner,
+            used: used)
+        {
+            BreakOnMove = true,
+            BreakOnDropItem = true,
+            NeedHand = true,
+            DuplicateCondition = DuplicateConditions.SameEvent,
+        };
+
+        if (_doAfter.TryStartDoAfter(doAfter))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-robotics-fabricator-cell-remove-start", ("fabricator", ent.Owner)),
+                ent.Owner,
+                user);
+        }
+    }
+
+    private void OnCellInserted(Entity<CMURoboticsFabricatorComponent> ent, ref EntInsertedIntoContainerMessage args)
+    {
+        if (args.Container.ID == ent.Comp.CellContainerSlot)
+            UpdatePower(ent);
+    }
+
+    private void OnCellRemoved(Entity<CMURoboticsFabricatorComponent> ent, ref EntRemovedFromContainerMessage args)
+    {
+        if (args.Container.ID == ent.Comp.CellContainerSlot)
+            UpdatePower(ent);
     }
 
     private void OnInsertCell(Entity<CMURoboticsFabricatorComponent> ent, ref CMURoboticsFabricatorInsertCellDoAfterEvent args)

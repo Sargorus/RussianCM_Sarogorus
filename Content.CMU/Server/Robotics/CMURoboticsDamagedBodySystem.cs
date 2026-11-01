@@ -35,32 +35,72 @@ public sealed partial class CMURoboticsDamagedBodySystem : EntitySystem
 
     private void OnMapInit(Entity<CMURoboticsDamagedBodyComponent> ent, ref MapInitEvent args)
     {
+        if (!ent.Comp.RandomizeOnMapInit)
+            return;
+
         if (!TryComp<BodyComponent>(ent.Owner, out var body))
             return;
 
-        SeverRandomLimbs(ent, body);
+        var missing = RollRange(ent.Comp.MinSeveredLimbs, ent.Comp.MaxSeveredLimbs);
+        var burn = RollRange(ent.Comp.MinBurnDamage, ent.Comp.MaxBurnDamage);
+        var brute = RollRange(ent.Comp.MinBruteDamage, ent.Comp.MaxBruteDamage);
 
-        var burn = _random.Next(
-            Math.Min(ent.Comp.MinBurnDamage, ent.Comp.MaxBurnDamage),
-            Math.Max(ent.Comp.MinBurnDamage, ent.Comp.MaxBurnDamage) + 1);
-        var brute = _random.Next(
-            Math.Min(ent.Comp.MinBruteDamage, ent.Comp.MaxBruteDamage),
-            Math.Max(ent.Comp.MinBruteDamage, ent.Comp.MaxBruteDamage) + 1);
-
-        var heat = _prototypes.Index<DamageTypePrototype>("Heat");
-        _damageable.TryChangeDamage(
-            ent.Owner,
-            new DamageSpecifier(heat, FixedPoint2.New(burn)),
-            ignoreResistances: true);
-
-        var blunt = _prototypes.Index<DamageTypePrototype>("Blunt");
-        _damageable.TryChangeDamage(
-            ent.Owner,
-            new DamageSpecifier(blunt, FixedPoint2.New(brute)),
-            ignoreResistances: true);
+        ApplyRepairProfile((ent.Owner, ent.Comp), body, missing, burn, brute);
     }
 
-    private void SeverRandomLimbs(Entity<CMURoboticsDamagedBodyComponent> ent, BodyComponent body)
+    /// <summary>
+    /// Applies a pre-rolled repair profile to an order unit. The console rolls
+    /// the damage when it creates the order, so the reward shown on the order
+    /// is final before the player accepts it.
+    /// </summary>
+    public bool ApplyRepairProfile(EntityUid uid, int missingLimbs, int burn, int brute)
+    {
+        if (!TryComp<CMURoboticsDamagedBodyComponent>(uid, out var damaged) ||
+            !TryComp<BodyComponent>(uid, out var body))
+        {
+            return false;
+        }
+
+        ApplyRepairProfile((uid, damaged), body, missingLimbs, burn, brute);
+        return true;
+    }
+
+    private void ApplyRepairProfile(
+        Entity<CMURoboticsDamagedBodyComponent> ent,
+        BodyComponent body,
+        int missingLimbs,
+        int burn,
+        int brute)
+    {
+        SeverLimbs(ent, body, missingLimbs);
+        ApplyDamage(ent.Owner, burn, brute);
+    }
+
+    private void ApplyDamage(EntityUid uid, int burn, int brute)
+    {
+        if (burn > 0)
+        {
+            var heat = _prototypes.Index<DamageTypePrototype>("Heat");
+            _damageable.TryChangeDamage(
+                uid,
+                new DamageSpecifier(heat, FixedPoint2.New(burn)),
+                ignoreResistances: true);
+        }
+
+        if (brute > 0)
+        {
+            var blunt = _prototypes.Index<DamageTypePrototype>("Blunt");
+            _damageable.TryChangeDamage(
+                uid,
+                new DamageSpecifier(blunt, FixedPoint2.New(brute)),
+                ignoreResistances: true);
+        }
+    }
+
+    private void SeverLimbs(
+        Entity<CMURoboticsDamagedBodyComponent> ent,
+        BodyComponent body,
+        int count)
     {
         var limbs = new List<(EntityUid Part, BodyPartType Type, BodyPartSymmetry Symmetry)>();
         foreach (var type in ent.Comp.SeverableParts)
@@ -73,9 +113,7 @@ public sealed partial class CMURoboticsDamagedBodySystem : EntitySystem
             return;
 
         _random.Shuffle(limbs);
-        var min = Math.Max(0, ent.Comp.MinSeveredLimbs);
-        var max = Math.Max(min, ent.Comp.MaxSeveredLimbs);
-        var count = Math.Min(_random.Next(min, max + 1), limbs.Count);
+        count = Math.Clamp(count, 0, limbs.Count);
 
         for (var i = 0; i < count; i++)
         {
@@ -90,5 +128,12 @@ public sealed partial class CMURoboticsDamagedBodySystem : EntitySystem
                 QueueDel(detached);
             }
         }
+    }
+
+    private int RollRange(int min, int max)
+    {
+        var low = Math.Min(min, max);
+        var high = Math.Max(min, max);
+        return _random.Next(low, high + 1);
     }
 }

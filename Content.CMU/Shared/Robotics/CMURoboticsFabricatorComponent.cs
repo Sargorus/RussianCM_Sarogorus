@@ -9,7 +9,8 @@ namespace Content.Shared.CMU14.Robotics;
 /// <summary>
 /// A lathe that only works while a WL-6 universal fuel cell is inserted and only
 /// for personnel with the required research skill. The cell is inserted by hand
-/// and removed with a crowbar; the fabricator itself does not drain it.
+/// and removed with a crowbar or the right-click verb; the fabricator itself
+/// does not drain it.
 /// </summary>
 [RegisterComponent]
 public sealed partial class CMURoboticsFabricatorComponent : Component
@@ -27,7 +28,7 @@ public sealed partial class CMURoboticsFabricatorComponent : Component
     public TimeSpan InsertDelay = TimeSpan.FromSeconds(2);
 
     [DataField]
-    public TimeSpan RemoveDelay = TimeSpan.FromSeconds(2);
+    public TimeSpan RemoveDelay = TimeSpan.FromSeconds(3);
 }
 
 [Serializable, NetSerializable]

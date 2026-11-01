@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Content.IntegrationTests.Fixtures;
 using Content.Server.CMU14.ColonyEconomy;
 using Content.Server.CMU14.Robotics;
@@ -7,6 +8,8 @@ using Content.Server._RMC14.Requisitions;
 using Content.Shared._RMC14.Requisitions;
 using Content.Shared._RMC14.Requisitions.Components;
 using Content.Shared._RMC14.Synth;
+using Content.Shared._RMC14.Power;
+using Content.Shared._RMC14.Crate;
 using Content.Shared.Body.Part;
 using Content.Shared.CMU14.DroneOperator;
 using Content.Shared.CMU14.Medical.Anatomy.BodyParts;
@@ -22,6 +25,7 @@ using Content.Shared.Storage.EntitySystems;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Timing;
+using Robust.Shared.Containers;
 
 namespace Content.IntegrationTests.CMU14.Robotics;
 
@@ -224,6 +228,162 @@ public sealed class CMURoboticsContractTest : GameTest
     }
 
     [Test]
+    public async Task PrintedOrderSlipUsesRealLineBreaks()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
+            var consoleComp = SEntMan.GetComponent<CMURoboticsOrderConsoleComponent>(console);
+            consoleComp.ActiveOrder = new CMURoboticsOrder
+            {
+                Id = 4242,
+                Type = CMURoboticsOrderType.Build,
+                Target = "CMUDroneAndroidUnarmed",
+                Amount = 1,
+                TargetName = "test drone",
+                Reward = 3500,
+            };
+
+            var print = new CMURoboticsPrintSlipMessage
+            {
+                Actor = EntityUid.Invalid,
+                UiKey = CMURoboticsOrderConsoleUiKey.Key,
+            };
+            SEntMan.EventBus.RaiseLocalEvent(console, print);
+
+            var query = SEntMan.EntityQueryEnumerator<CMURoboticsOrderSlipComponent, PaperComponent>();
+            Assert.That(query.MoveNext(out _, out _, out var paper), Is.True,
+                "printing an accepted order must create a paper slip");
+            Assert.That(paper.Content, Does.Contain("\n"), "the slip must contain real line breaks");
+            Assert.That(paper.Content, Does.Not.Contain("\\n"), "literal \\n must not be printed");
+            Assert.That(paper.Content, Does.Contain("[bold]"), "the title should use allowed paper markup");
+        });
+    }
+
+    [Test]
+    public async Task GeneratedRepairOrderShowsFinalRewardImmediately()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
+            var consoleComp = SEntMan.GetComponent<CMURoboticsOrderConsoleComponent>(console);
+            consoleComp.MaxAvailableOrders = 30;
+            consoleComp.AvailableOrders.Clear();
+
+            var refresh = new CMURoboticsRefreshOrdersMessage
+            {
+                Actor = EntityUid.Invalid,
+                UiKey = CMURoboticsOrderConsoleUiKey.Key,
+            };
+            SEntMan.EventBus.RaiseLocalEvent(console, refresh);
+
+            var repair = consoleComp.AvailableOrders.FirstOrDefault(
+                order => order.Type == CMURoboticsOrderType.Repair);
+
+            Assert.That(repair, Is.Not.Null, "the console must generate repair orders");
+            Assert.That(repair!.RepairBurnDamage, Is.GreaterThan(0));
+            Assert.That(repair.RepairBruteDamage, Is.GreaterThan(0));
+            Assert.That(repair.RepairMissingLimbs, Is.GreaterThan(0));
+            Assert.That(repair.Reward, Is.GreaterThan(2500),
+                "the reward shown in the order list must already include the repair bonus");
+        });
+    }
+
+    [Test]
+    public async Task RepairOrderDeliversPreRolledDamageWithoutChangingReward()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var elevator = SEntMan.SpawnEntity("AU14CorporateASRSElevator", map.GridCoords);
+            var console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
+            var elevatorComp = SEntMan.GetComponent<RequisitionsElevatorComponent>(elevator);
+            var consoleComp = SEntMan.GetComponent<CMURoboticsOrderConsoleComponent>(console);
+
+            var order = new CMURoboticsOrder
+            {
+                Id = 989,
+                Type = CMURoboticsOrderType.Repair,
+                Target = "CMUDroneAndroidUnarmed",
+                Amount = 1,
+                TargetName = "test drone",
+                Reward = 5000,
+                RepairBurnDamage = 50,
+                RepairBruteDamage = 40,
+                RepairMissingLimbs = 2,
+                Elevator = elevator,
+                FirstOrderIndex = 0,
+                CrateCount = 1,
+            };
+            consoleComp.ActiveOrder = order;
+
+            var requisitions = Server.System<RequisitionsSystem>();
+            var entry = new RequisitionsEntry
+            {
+                Crate = "CMUCrateSyntheticTransport",
+                Entities = { "CMUDroneAndroidUnarmedRepairOrder" },
+            };
+            Assert.That(
+                requisitions.TryAddElevatorOrders((elevator, elevatorComp), new List<RequisitionsEntry> { entry }),
+                Is.True);
+
+            var timing = Server.ResolveDependency<IGameTiming>();
+            elevatorComp.Mode = RequisitionsElevatorMode.Raising;
+            elevatorComp.NextMode = null;
+            elevatorComp.Busy = true;
+            elevatorComp.RaiseDelay = TimeSpan.Zero;
+            elevatorComp.LowerDelay = TimeSpan.Zero;
+            elevatorComp.ToggledAt = timing.CurTime - TimeSpan.FromSeconds(1);
+
+            var steps = 0;
+            while (elevatorComp.Mode != RequisitionsElevatorMode.Raised && steps++ < 100)
+                requisitions.Update(0f);
+
+            Assert.That(elevatorComp.Mode, Is.EqualTo(RequisitionsElevatorMode.Raised));
+            Assert.That(order.Reward, Is.EqualTo(5000),
+                "delivering a repair crate must not recalculate the accepted reward");
+
+            EntityUid? unit = null;
+            var query = SEntMan.EntityQueryEnumerator<CMURoboticsTransportCrateComponent, EntityStorageComponent>();
+            while (query.MoveNext(out _, out _, out var storage))
+            {
+                if (storage.Contents.ContainedEntities.Count > 0)
+                    unit = storage.Contents.ContainedEntities[0];
+            }
+
+            Assert.That(unit, Is.Not.Null);
+            var marker = SEntMan.GetComponent<CMURoboticsOrderTargetComponent>(unit!.Value);
+            Assert.That(marker.OrderId, Is.EqualTo(order.Id));
+            Assert.That(marker.InitialMissingLimbs, Is.EqualTo(2));
+            Assert.That(marker.InitialDamage, Is.EqualTo(Content.Shared.FixedPoint.FixedPoint2.New(90)));
+
+            var damageable = Server.System<Content.Shared.Damage.Systems.DamageableSystem>();
+            Assert.That(damageable.GetTotalDamage(unit.Value),
+                Is.EqualTo(Content.Shared.FixedPoint.FixedPoint2.New(90)));
+            Assert.That(CountMissingExternalLimbs(unit.Value), Is.EqualTo(2));
+        });
+    }
+
+    private int CountMissingExternalLimbs(EntityUid unit)
+    {
+        var body = SEntMan.GetComponent<Content.Shared.Body.BodyComponent>(unit);
+        var bodySystem = Server.System<Content.Shared.Body.Systems.SharedBodySystem>();
+        var missing = 0;
+        foreach (var type in new[] { BodyPartType.Arm, BodyPartType.Leg })
+        {
+            var count = 0;
+            foreach (var _ in bodySystem.GetBodyChildrenOfType(unit, type, body))
+                count++;
+
+            missing += Math.Max(0, 2 - count);
+        }
+
+        return missing;
+    }
+
+    [Test]
     public async Task RepairOrderPaysWhenPaperIsAttachedToLoadedCrate()
     {
         var map = await Pair.CreateTestMap();
@@ -311,6 +471,29 @@ public sealed class CMURoboticsContractTest : GameTest
             Assert.That(consoleComp.ActiveOrder, Is.Null);
             Assert.That(SEntMan.EntityExists(drone), Is.True);
             Assert.That(budget.GetBudget(), Is.EqualTo(before + 3500));
+        });
+    }
+
+    [Test]
+    public async Task FabricatorCrateIsSealedCaseWithInstalledCell()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var crate = SEntMan.SpawnEntity("CMUCrateRoboticsFabricator", map.GridCoords);
+            Assert.That(SEntMan.HasComponent<CrateOpenableComponent>(crate), Is.True,
+                "the fabricator crate must unpack when pried");
+            Assert.That(SEntMan.HasComponent<EntityStorageComponent>(crate), Is.False,
+                "the fabricator must arrive in a sealed case, not a container crate");
+
+            var fabricator = SEntMan.SpawnEntity("CMURoboticsFabricatorFilled", map.GridCoords);
+            var containers = Server.System<SharedContainerSystem>();
+            Assert.That(
+                containers.TryGetContainer(fabricator, "cmu_robotics_fabricator_cell", out var cell),
+                Is.True);
+            Assert.That(cell!.ContainedEntities.Count, Is.EqualTo(1),
+                "the cargo fabricator must arrive with its fuel cell installed");
+            Assert.That(SEntMan.HasComponent<RMCFusionCellComponent>(cell.ContainedEntities[0]), Is.True);
         });
     }
 

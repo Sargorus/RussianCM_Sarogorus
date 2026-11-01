@@ -39,11 +39,13 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     [Dependency] private DamageableSystem _damageable = default!;
     [Dependency] private EntityLookupSystem _lookup = default!;
     [Dependency] private MobStateSystem _mobState = default!;
+    [Dependency] private IComponentFactory _compFactory = default!;
     [Dependency] private IPrototypeManager _prototypes = default!;
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private RequisitionsSystem _requisitions = default!;
     [Dependency] private ColonyBudgetSystem _colonyBudget = default!;
     [Dependency] private BudgetConsoleSystem _budgetConsole = default!;
+    [Dependency] private CMURoboticsDamagedBodySystem _damagedBody = default!;
     [Dependency] private SharedBodySystem _body = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
@@ -207,10 +209,10 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     {
         return target.Id switch
         {
-            "CMUDroneAndroidCombat" => "CMUDroneAndroidCombatRepair",
-            "CMUDroneAndroidUnarmed" => "CMUDroneAndroidUnarmedRepair",
-            "CMUWorkingJoeRepair" => "CMUWorkingJoeRepair",
-            _ => "CMUDroneAndroidUnarmedRepair",
+            "CMUDroneAndroidCombat" => "CMUDroneAndroidCombatRepairOrder",
+            "CMUDroneAndroidUnarmed" => "CMUDroneAndroidUnarmedRepairOrder",
+            "CMUWorkingJoeRepair" => "CMUWorkingJoeRepairOrder",
+            _ => "CMUDroneAndroidUnarmedRepairOrder",
         };
     }
 
@@ -245,8 +247,8 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         if (!TryComp<EntityStorageComponent>(crate, out var storage))
             return;
 
-        var rewardChanged = false;
-        foreach (var contained in storage.Contents.ContainedEntities)
+        var containedEntities = new List<EntityUid>(storage.Contents.ContainedEntities);
+        foreach (var contained in containedEntities)
         {
             if (!HasComp<CMURoboticsDamagedBodyComponent>(contained))
                 continue;
@@ -257,54 +259,14 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             if (order.Type != CMURoboticsOrderType.Repair)
                 continue;
 
-            marker.InitialDamage = _damageable.GetTotalDamage(contained);
-            marker.InitialMissingLimbs = CountMissingExternalLimbs(contained);
+            _damagedBody.ApplyRepairProfile(
+                contained,
+                order.RepairMissingLimbs,
+                order.RepairBurnDamage,
+                order.RepairBruteDamage);
 
-            var bonus = (int) Math.Ceiling(marker.InitialDamage.Double() * RepairRewardPerDamage) +
-                        marker.InitialMissingLimbs * RepairRewardPerMissingLimb;
-            order.Reward += bonus;
-            rewardChanged = true;
-        }
-
-        if (!rewardChanged)
-            return;
-
-        RefreshOrderSlips(console, order);
-        console.Comp.NextUiUpdate = _timing.CurTime;
-    }
-
-    private int CountMissingExternalLimbs(EntityUid unit)
-    {
-        if (!TryComp<BodyComponent>(unit, out var body))
-            return 0;
-
-        var missing = 0;
-        foreach (var type in ExternalLimbTypes)
-        {
-            var count = 0;
-            foreach (var _ in _body.GetBodyChildrenOfType(unit, type, body))
-                count++;
-
-            missing += Math.Max(0, 2 - count);
-        }
-
-        return missing;
-    }
-
-    private void RefreshOrderSlips(Entity<CMURoboticsOrderConsoleComponent> console, CMURoboticsOrder order)
-    {
-        var query = EntityQueryEnumerator<CMURoboticsOrderSlipComponent>();
-        while (query.MoveNext(out var uid, out var slip))
-        {
-            if (slip.OrderId != order.Id)
-                continue;
-
-            slip.Reward = order.Reward;
-            slip.Content = BuildSlipContent(order, (int) console.Comp.OrderDuration.TotalMinutes);
-            if (!TryComp<PaperComponent>(uid, out var paper))
-                continue;
-
-            _paper.SetContent((uid, paper), slip.Content);
+            marker.InitialDamage = FixedPoint2.New(order.RepairBurnDamage + order.RepairBruteDamage);
+            marker.InitialMissingLimbs = order.RepairMissingLimbs;
         }
     }
 
@@ -329,7 +291,10 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             ("amount", order.Amount),
             ("package", package),
             ("reward", order.Reward),
-            ("minutes", minutes));
+            ("minutes", minutes))
+            // Fluent keeps the two characters "\n" in this single-line value;
+            // the paper renderer expects real line breaks.
+            .Replace("\\n", "\n");
     }
 
     private void OnElevatorLoweringAttempt(
@@ -561,19 +526,50 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             if (target.RequiredModules.Count > 0 && (!build || _random.Prob(0.5f)))
                 requiredModule = _random.Pick(target.RequiredModules);
 
+            var amount = build ? 1 : 3;
+            var reward = target.Reward + (requiredModule != null ? 150 : 0) + _random.Next(0, 101);
+            var repairBurn = 0;
+            var repairBrute = 0;
+            var repairMissing = 0;
+
+            if (!build &&
+                _prototypes.TryIndex<EntityPrototype>(GetRepairPrototype(target.Prototype), out var repairPrototype) &&
+                repairPrototype.TryComp<CMURoboticsDamagedBodyComponent>(out var damaged, _compFactory))
+            {
+                repairMissing = RollRange(damaged.MinSeveredLimbs, damaged.MaxSeveredLimbs);
+                repairBurn = RollRange(damaged.MinBurnDamage, damaged.MaxBurnDamage);
+                repairBrute = RollRange(damaged.MinBruteDamage, damaged.MaxBruteDamage);
+
+                var unitBonus = (int) Math.Ceiling((repairBurn + repairBrute) * (double) RepairRewardPerDamage) +
+                                repairMissing * RepairRewardPerMissingLimb;
+                reward += unitBonus * amount;
+            }
+
             var order = new CMURoboticsOrder
             {
                 Id = _nextOrderId++,
                 Type = build ? CMURoboticsOrderType.Build : CMURoboticsOrderType.Repair,
                 Target = target.Prototype,
                 RequiredModule = requiredModule,
-                Reward = target.Reward + (requiredModule != null ? 150 : 0) + _random.Next(0, 101),
-                Amount = build ? 1 : 3,
-                TargetName = GetPrototypeName(target.Prototype),
+                Reward = reward,
+                Amount = amount,
+                TargetName = string.IsNullOrEmpty(target.Name)
+                    ? GetPrototypeName(target.Prototype)
+                    : Loc.GetString(target.Name),
+                RepairBurnDamage = repairBurn,
+                RepairBruteDamage = repairBrute,
+                RepairMissingLimbs = repairMissing,
             };
 
             ent.Comp.AvailableOrders.Add(order);
         }
+    }
+
+    private int RollRange(int min, int max)
+    {
+        var low = Math.Min(min, max);
+        var high = Math.Max(min, max);
+        return _random.Next(low, high + 1);
     }
 
     private Entity<RequisitionsElevatorComponent>? FindCorporateElevator(EntityUid console)

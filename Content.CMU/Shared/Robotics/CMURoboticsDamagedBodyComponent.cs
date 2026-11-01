@@ -11,6 +11,14 @@ namespace Content.Shared.CMU14.Robotics;
 [RegisterComponent]
 public sealed partial class CMURoboticsDamagedBodyComponent : Component
 {
+    /// <summary>
+    /// Whether this unit should roll its own damage when it spawns. Order
+    /// units use a stable variant and receive the pre-rolled profile when the
+    /// console delivers their crate.
+    /// </summary>
+    [DataField]
+    public bool RandomizeOnMapInit = true;
+
     [DataField]
     public int MinSeveredLimbs = 1;
 

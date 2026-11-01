@@ -9,3 +9,7 @@ ent-CMUBeltHolsterPistolBlackFilledM77 = пояс general pistol holster схе�
 ent-CMUMatebaBeltLuxuriousFilledWEYADirector = изысканный пояс для Матебы схемы M276
     .desc = {ent-RMCMatebaBeltLuxurious.desc}
     .suffix = Заполнен, Директор Ве-Ю
+
+ent-AU14BeltUtilityFilled = {ent-CMBeltUtility}
+    .desc = {ent-CMBeltUtility.desc}
+    .suffix = Заполнен

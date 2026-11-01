@@ -141,6 +141,25 @@
   - type: CMUHumanMedical
   - type: CMURoboticsDamagedBody
 
+# Stable repair-order variants. Their damage is pre-rolled when the order is
+# generated and applied when the crate is delivered, so the displayed reward
+# never changes after the order is accepted.
+- type: entity
+  parent: CMUDroneAndroidUnarmedRepair
+  id: CMUDroneAndroidUnarmedRepairOrder
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: CMURoboticsDamagedBody
+    randomizeOnMapInit: false
+
+- type: entity
+  parent: CMUDroneAndroidCombatRepair
+  id: CMUDroneAndroidCombatRepairOrder
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: CMURoboticsDamagedBody
+    randomizeOnMapInit: false
+
 - type: entity
   parent: AppearanceDroneAndroid
   id: CMUDroneAndroidDummy

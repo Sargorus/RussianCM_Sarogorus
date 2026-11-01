@@ -50,6 +50,13 @@ public sealed partial class CMURoboticsOrderTarget
     [DataField]
     public EntProtoId Prototype = string.Empty;
 
+    /// <summary>
+    /// Optional localized display name for the order list and paper. Falls
+    /// back to the entity prototype name when empty.
+    /// </summary>
+    [DataField]
+    public string Name = string.Empty;
+
     [DataField]
     public int Reward = 300;
 
@@ -70,6 +77,12 @@ public sealed class CMURoboticsOrder
     public int Reward;
     public int Amount = 1;
     public string TargetName = string.Empty;
+
+    /// <summary>Pre-rolled repair profile, applied to each unit when its crate arrives.</summary>
+    public int RepairBurnDamage;
+    public int RepairBruteDamage;
+    public int RepairMissingLimbs;
+
     public TimeSpan Deadline;
     public EntityUid? Elevator;
 

@@ -216,7 +216,7 @@
     belt: AU14BeltUtilityFilled
     gloves: RMCHandsVeteranInsulated
     eyes: RMCWeldingGoggles
-    head: ClothingHeadHatWelding
+    head: RMCHelmetWelding
   storage:
     back:
     - AU14StampWYSci
