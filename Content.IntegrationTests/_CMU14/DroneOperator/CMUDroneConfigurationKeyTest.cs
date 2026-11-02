@@ -29,6 +29,7 @@ public sealed class CMUDroneConfigurationKeyTest : GameTest
         {
             var user = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords);
             Server.PlayerMan.SetAttachedEntity(ServerSession, user);
+            SEntMan.EnsureComponent<NpcFactionMemberComponent>(user).Factions.Add("CLF");
 
             var drone = SEntMan.SpawnEntity("CMUDroneAndroidUnarmed", map.GridCoords.Offset(new(1, 0)));
             var key = SEntMan.SpawnEntity("CMUDroneConfigurationKey", map.GridCoords.Offset(new(-1, 0)));
@@ -46,16 +47,33 @@ public sealed class CMUDroneConfigurationKeyTest : GameTest
 
             var hands = SEntMan.System<SharedHandsSystem>();
             Assert.That(hands.TryPickupAnyHand(user, key), Is.True);
-            Assert.That(hands.TryPickupAnyHand(user, card), Is.True);
 
             var afterInteract = new AfterInteractEvent(user, key, drone, SEntMan.GetComponent<TransformComponent>(drone).Coordinates, true);
             SEntMan.EventBus.RaiseLocalEvent(key, afterInteract);
             Assert.That(afterInteract.Handled, Is.True);
 
             var session = SComp<CMUDroneConfigurationSessionComponent>(drone);
-            Assert.That(session.HasIdCard, Is.True);
-            Assert.That(session.AvailableChannels, Does.Contain(new ProtoId<RadioChannelPrototype>("radioWEYU")));
+            Assert.That(session.HasIdCard, Is.False);
+            Assert.That(session.AvailableAccess, Is.Empty);
+
+            var state = (CMUDroneConfigurationBuiState) SComp<UserInterfaceComponent>(drone)
+                .States[CMUDroneConfigurationUi.Key];
+            Assert.That(state.Factions.Select(faction => faction.Id), Is.EquivalentTo(
+                new[] { "AUWeYu", "GOVFOR", "OPFOR", "AUColonist", "CLF" }));
+            Assert.That(state.Factions.Select(faction => faction.Id), Does.Not.Contain("THREAT"));
+
+            // Picking up the card after the window opened must refresh the access list immediately.
+            Assert.That(hands.TryPickupAnyHand(user, card), Is.True);
+            var handContents = string.Join(", ",
+                hands.EnumerateHands(user).Select(hand => $"{hand}={hands.GetHeldItem(user, hand)}"));
+            Assert.That(session.HasIdCard, Is.True,
+                $"session user={session.User} user={user} key={session.Key} card={card} hands={handContents} id={SEntMan.HasComponent<IdCardComponent>(card)} access={SEntMan.HasComponent<AccessComponent>(card)}");
             Assert.That(session.AvailableAccess, Does.Contain(new ProtoId<AccessLevelPrototype>("AU14AccessCorporateWEYU")));
+            state = (CMUDroneConfigurationBuiState) SComp<UserInterfaceComponent>(drone)
+                .States[CMUDroneConfigurationUi.Key];
+            Assert.That(state.HasIdCard, Is.True);
+            Assert.That(state.Access.Select(access => access.Id),
+                Does.Contain("AU14AccessCorporateWEYU"));
 
             var message = new CMUDroneConfigurationApplyMsg(
                 "AUWeYu",

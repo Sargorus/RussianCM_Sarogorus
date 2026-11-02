@@ -5,6 +5,7 @@ using Content.Shared.Access;
 using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
 using Content.Shared.CMU14.DroneOperator;
+using Content.Shared.Hands;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
@@ -16,6 +17,7 @@ using Content.Shared.Radio;
 using Content.Shared.Radio.Components;
 using Content.Shared.UserInterface;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Player;
 
 namespace Content.Server.CMU14.DroneOperator;
 
@@ -38,11 +40,37 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<CMUDroneConfigurationKeyComponent, AfterInteractEvent>(OnAfterInteract);
+        SubscribeLocalEvent<ActorComponent, DidEquipHandEvent>(OnDidEquipHand);
+        SubscribeLocalEvent<ActorComponent, DidUnequipHandEvent>(OnDidUnequipHand);
 
         Subs.BuiEvents<CMUDroneAndroidComponent>(CMUDroneConfigurationUi.Key, subs =>
         {
             subs.Event<CMUDroneConfigurationApplyMsg>(OnApply);
         });
+    }
+
+    private void OnDidEquipHand(Entity<ActorComponent> ent, ref DidEquipHandEvent args)
+        => RefreshOpenSession(ent.Owner);
+
+    private void OnDidUnequipHand(Entity<ActorComponent> ent, ref DidUnequipHandEvent args)
+        => RefreshOpenSession(ent.Owner);
+
+    private void RefreshOpenSession(EntityUid user)
+    {
+        var query = EntityQueryEnumerator<CMUDroneConfigurationSessionComponent>();
+        while (query.MoveNext(out var drone, out var session))
+        {
+            if (session.User != user)
+                continue;
+
+            session.AvailableChannels = GetAvailableChannels(user);
+            session.HasIdCard = TryFindHeldIdCard(user, session.Key, out var idCard);
+            session.AvailableAccess = idCard is { } card && TryComp<AccessComponent>(card, out var access)
+                ? new HashSet<ProtoId<AccessLevelPrototype>>(access.Tags)
+                : new HashSet<ProtoId<AccessLevelPrototype>>();
+
+            UpdateUi(drone, session);
+        }
     }
 
     private void OnAfterInteract(Entity<CMUDroneConfigurationKeyComponent> ent, ref AfterInteractEvent args)
@@ -132,19 +160,7 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
 
     private void UpdateUi(EntityUid drone, CMUDroneConfigurationSessionComponent session)
     {
-        var factions = new List<CMUDroneConfigurationOption>();
-        foreach (var faction in _proto.EnumeratePrototypes<NpcFactionPrototype>())
-        {
-            if (faction.Abstract)
-                continue;
-
-            var name = string.IsNullOrEmpty(faction.Name)
-                ? faction.ID
-                : Loc.GetString(faction.Name);
-            factions.Add(new CMUDroneConfigurationOption(faction.ID, name));
-        }
-
-        factions.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+        var factions = BuildFactionOptions(session.User);
 
         var currentFaction = string.Empty;
         if (TryComp<NpcFactionMemberComponent>(drone, out var member))
@@ -190,6 +206,39 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
             session.HasIdCard);
 
         _ui.SetUiState(drone, CMUDroneConfigurationUi.Key, state);
+    }
+
+    private List<CMUDroneConfigurationOption> BuildFactionOptions(EntityUid user)
+    {
+        var factions = new List<CMUDroneConfigurationOption>();
+        var seen = new HashSet<string>();
+
+        AddFactionOption(factions, seen, "AUWeYu");
+        AddFactionOption(factions, seen, "GOVFOR");
+        AddFactionOption(factions, seen, "OPFOR");
+        AddFactionOption(factions, seen, "AUColonist");
+
+        if (TryComp<NpcFactionMemberComponent>(user, out var member))
+        {
+            foreach (var faction in member.Factions)
+                AddFactionOption(factions, seen, faction.Id);
+        }
+
+        return factions;
+    }
+
+    private void AddFactionOption(
+        List<CMUDroneConfigurationOption> factions,
+        HashSet<string> seen,
+        string id)
+    {
+        if (!seen.Add(id) || !_proto.TryIndex<NpcFactionPrototype>(id, out var faction))
+            return;
+
+        var name = string.IsNullOrEmpty(faction.Name)
+            ? faction.ID
+            : Loc.GetString(faction.Name);
+        factions.Add(new CMUDroneConfigurationOption(faction.ID, name));
     }
 
     private bool TryFindIffFaction(string npcFaction, out EntProtoId<IFFFactionComponent> faction)

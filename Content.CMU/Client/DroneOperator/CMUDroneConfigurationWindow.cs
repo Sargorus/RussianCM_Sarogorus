@@ -80,7 +80,9 @@ public sealed class CMUDroneConfigurationWindow : DefaultWindow
         foreach (var faction in _factions)
             _faction.AddItem(faction.Name);
 
-        var factionIndex = _factions.FindIndex(faction => faction.Id == state.CurrentFaction);
+        var factionIndex = _factions.FindIndex(faction => faction.Id == _selectedFaction);
+        if (factionIndex < 0)
+            factionIndex = _factions.FindIndex(faction => faction.Id == state.CurrentFaction);
         if (factionIndex < 0 && _factions.Count > 0)
             factionIndex = 0;
 

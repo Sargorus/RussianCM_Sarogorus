@@ -85,12 +85,6 @@
       #  crate: CMUCrateXRF
       - cost: 4000
         crate: CMUCrateRoboticsFabricator
-      - cost: 2500
-        crate: CMUCrateCombatDroneFrame
-        maxStock: 1
-        startingStock: 1
-        stockReplenishDelay: 21600
-        stockReplenishAmount: 1
       - cost: 1500
         crate: CMUCrateRoboticsOrderConsole
       - cost: 100
@@ -105,8 +99,14 @@
         crate: CMUCrateTychoRadsuit
       - cost: 1500
         crate: CMUCrateGasMaskFilterWY
-    - name: Drone Equipment
+    - name: WEY drone
       entries:
+      - cost: 2500
+        crate: CMUCrateCombatDroneFrame
+        maxStock: 1
+        startingStock: 1
+        stockReplenishDelay: 21600
+        stockReplenishAmount: 1
       - cost: 1500
         crate: CMUCrateDroneOutfitEngineering
       - cost: 2000

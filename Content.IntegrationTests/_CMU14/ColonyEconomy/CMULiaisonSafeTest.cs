@@ -1,20 +1,18 @@
 using System.Linq;
 using Content.IntegrationTests.Fixtures;
 using Content.Server.Destructible;
-using Content.Shared.Access;
-using Content.Shared.Access.Components;
-using Content.Shared.Access.Systems;
 using Content.Shared.CMU14.ColonyEconomy;
 using Content.Shared.Destructible.Thresholds.Triggers;
 using Content.Shared.FixedPoint;
 using Content.Shared.GameTicking;
+using Content.Shared.Hands.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Lock;
 using Content.Shared.Preferences;
 using Content.Shared.Storage.Components;
+using Content.Shared.Verbs;
 using Content.Shared._RMC14.Dialog;
 using Robust.Shared.GameObjects;
-using Robust.Shared.Prototypes;
 
 namespace Content.IntegrationTests.CMU14.ColonyEconomy;
 
@@ -55,21 +53,38 @@ public sealed class CMULiaisonSafeTest : GameTest
             SEntMan.EventBus.RaiseLocalEvent(liaison, spawn, true);
 
             var safeComp = SComp<CMULiaisonSafeComponent>(safe);
+            Assert.That(safeComp.Pin, Is.Not.Zero, "The safe always has a PIN.");
             var pin = SComp<CMULiaisonPinComponent>(liaison).Pin;
             Assert.That(pin, Is.Not.Zero);
             Assert.That(safeComp.Pin, Is.EqualTo(pin));
-
-            var access = SEntMan.EnsureComponent<AccessComponent>(liaison);
-            Assert.That(SEntMan.System<SharedAccessSystem>().TrySetTags(
-                liaison,
-                new[] { new ProtoId<AccessLevelPrototype>("AU14AccessCorporateWEYU") },
-                access), Is.True);
 
             var activate = new ActivateInWorldEvent(liaison, safe, true);
             SEntMan.EventBus.RaiseLocalEvent(safe, activate);
             Assert.That(activate.Handled, Is.True);
             Assert.That(safeComp.PendingUser, Is.EqualTo(liaison));
             Assert.That(SEntMan.HasComponent<DialogComponent>(safe), Is.True);
+
+            SEntMan.EventBus.RaiseLocalEvent(safe, new CMULiaisonSafePinEvent(pin.ToString()));
+            Assert.That(SComp<LockComponent>(safe).Locked, Is.False);
+            Assert.That(SComp<EntityStorageComponent>(safe).Open, Is.True);
+
+            var hands = SComp<HandsComponent>(liaison);
+            var lockMenu = new GetVerbsEvent<AlternativeVerb>(
+                liaison, safe, null, hands, true, true, true, new List<VerbCategory>());
+            SEntMan.EventBus.RaiseLocalEvent(safe, lockMenu);
+            var lockVerb = lockMenu.Verbs.Single(verb =>
+                verb.Text == Loc.GetString("cmu-liaison-safe-lock-verb"));
+            lockVerb.Act();
+            Assert.That(SComp<LockComponent>(safe).Locked, Is.True);
+            Assert.That(SComp<EntityStorageComponent>(safe).Open, Is.False);
+
+            var unlockMenu = new GetVerbsEvent<AlternativeVerb>(
+                liaison, safe, null, hands, true, true, true, new List<VerbCategory>());
+            SEntMan.EventBus.RaiseLocalEvent(safe, unlockMenu);
+            var unlockVerb = unlockMenu.Verbs.Single(verb =>
+                verb.Text == Loc.GetString("cmu-liaison-safe-unlock-verb"));
+            unlockVerb.Act();
+            Assert.That(safeComp.PendingUser, Is.EqualTo(liaison));
 
             SEntMan.EventBus.RaiseLocalEvent(safe, new CMULiaisonSafePinEvent(pin.ToString()));
             Assert.That(SComp<LockComponent>(safe).Locked, Is.False);

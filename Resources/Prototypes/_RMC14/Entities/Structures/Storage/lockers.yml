@@ -115,6 +115,9 @@
     sprite: _RMC14/Structures/Storage/Lockers/safe.rsi
   - type: AccessReader
     access: [["AU14AccessCorporateWEYU"]]
+  - type: Lock
+    showLockVerbs: false
+    unlockOnClick: false
   - type: CMULiaisonSafe
   - type: UserInterface
     interfaces:

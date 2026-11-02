@@ -7,9 +7,6 @@ using Content.Server.NPC;
 using Content.Server.NPC.HTN;
 using Content.Server.NPC.Pathfinding;
 using Content.Server.NPC.Systems;
-using Content.Server.Radio;
-using Content.Server.Radio.Components;
-using Content.Server.Radio.EntitySystems;
 using Content.Server._RMC14.Humanoid.Markings;
 using Content.Server.CMU14.Robotics;
 using Content.Shared.CMU14.DroneOperator;
@@ -48,9 +45,8 @@ using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Pulling.Events;
 using Content.Shared.NPC;
 using Content.Shared.Popups;
-using Content.Shared.Random.Helpers;
 using Content.Shared.Radio;
-using Content.Shared.Radio.Components;
+using Content.Shared.Random.Helpers;
 using Content.Shared.SSDIndicator;
 using Content.Shared.StatusEffectNew;
 using Content.Shared.Stunnable;
@@ -78,7 +74,6 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
 {
     [Dependency] private SharedActionsSystem _actions = default!;
     [Dependency] private ActionBlockerSystem _blocker = default!;
-    [Dependency] private ChatSystem _chat = default!;
     [Dependency] private SharedCombatModeSystem _combatMode = default!;
     [Dependency] private SharedContainerSystem _containers = default!;
     [Dependency] private SharedDoAfterSystem _doAfter = default!;
@@ -96,7 +91,6 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
     [Dependency] private IPrototypeManager _prototypes = default!;
     [Dependency] private QuickDialogSystem _quickDialog = default!;
     [Dependency] private IRobustRandom _random = default!;
-    [Dependency] private RadioSystem _radio = default!;
     [Dependency] private SkillsSystem _skills = default!;
     [Dependency] private StatusEffectsSystem _statusEffects = default!;
     [Dependency] private IGameTiming _timing = default!;
@@ -155,7 +149,6 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         SubscribeLocalEvent<CMUDroneAndroidComponent, CMUDroneModuleInstallDoAfterEvent>(OnDroneModuleInstallComplete);
         SubscribeLocalEvent<CMUDroneAndroidComponent, CMUDroneModuleUninstallDoAfterEvent>(OnDroneModuleUninstallComplete);
         SubscribeLocalEvent<CMUDroneAndroidComponent, CMUDroneReviveDoAfterEvent>(OnDroneReviveComplete);
-        SubscribeLocalEvent<CMUDroneAndroidComponent, EntitySpokeEvent>(OnDroneSpoke);
         SubscribeLocalEvent<CMUDroneAndroidComponent, MobStateChangedEvent>(OnDroneMobStateChanged);
         SubscribeLocalEvent<CMUDroneAndroidComponent, RMCSynthRepairToolUseAttemptEvent>(OnDroneRepairAttempt);
         SubscribeLocalEvent<CMUDroneAndroidComponent, GetAdditionalAccessEvent>(OnDroneGetAdditionalAccess);
@@ -614,36 +607,6 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
 
         _tool.PlayToolSound(tool, toolComp, args.User);
         UninstallDroneModule(ent, args.User, module);
-    }
-
-    private void OnDroneSpoke(Entity<CMUDroneAndroidComponent> ent, ref EntitySpokeEvent args)
-    {
-        if (args.Source != ent.Owner ||
-            !TryComp<CMUDroneControlSessionComponent>(ent.Owner, out var session) ||
-            TerminatingOrDeleted(session.Operator))
-        {
-            return;
-        }
-
-        if (args.Channel != null &&
-            TryComp<WearingHeadsetComponent>(session.Operator, out var wearing) &&
-            TryComp<EncryptionKeyHolderComponent>(wearing.Headset, out var keys) &&
-            keys.Channels.Contains(args.Channel.ID) &&
-            !keys.ReadOnlyChannels.Contains(args.Channel.ID))
-        {
-            _radio.SendRadioMessage(session.Operator, args.Message, args.Channel, wearing.Headset, args.Language);
-            args.Channel = null;
-            return;
-        }
-
-        _chat.TrySendInGameICMessage(
-            session.Operator,
-            args.Message,
-            InGameICChatType.Whisper,
-            ChatTransmitRange.GhostRangeLimit,
-            hideLog: true,
-            checkRadioPrefix: false,
-            ignoreActionBlocker: true);
     }
 
     private void OnDroneMobStateChanged(Entity<CMUDroneAndroidComponent> ent, ref MobStateChangedEvent args)

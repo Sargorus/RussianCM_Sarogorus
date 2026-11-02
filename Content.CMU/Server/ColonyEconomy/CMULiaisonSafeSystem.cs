@@ -10,6 +10,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Lock;
 using Content.Shared.Popups;
 using Content.Shared.Storage.EntitySystems;
+using Content.Shared.Verbs;
 using Content.Shared._RMC14.Dialog;
 using Robust.Shared.Audio;
 using Robust.Shared.Random;
@@ -38,6 +39,7 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
 
         SubscribeLocalEvent<CMULiaisonSafeComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<CMULiaisonSafeComponent, ActivateInWorldEvent>(OnActivate, before: [typeof(LockSystem)]);
+        SubscribeLocalEvent<CMULiaisonSafeComponent, GetVerbsEvent<AlternativeVerb>>(OnGetVerbs);
         SubscribeLocalEvent<CMULiaisonSafeComponent, CMULiaisonSafePinEvent>(OnPinEntered);
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete);
     }
@@ -65,6 +67,20 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
                 },
             },
             null);
+
+        // All liaison safes share one PIN. A liaison receives it when they spawn.
+        var pin = 0;
+        var query = EntityQueryEnumerator<CMULiaisonSafeComponent>();
+        while (query.MoveNext(out var uid, out var other))
+        {
+            if (uid == ent.Owner || other.Pin <= 0)
+                continue;
+
+            pin = other.Pin;
+            break;
+        }
+
+        ent.Comp.Pin = pin > 0 ? pin : _random.Next(1000, 10000);
     }
 
     private void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent args)
@@ -72,54 +88,71 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
         if (args.JobId != LiaisonJob)
             return;
 
-        var pin = 0;
         var query = EntityQueryEnumerator<CMULiaisonSafeComponent>();
-        while (query.MoveNext(out _, out var existing))
-        {
-            if (existing.Pin <= 0)
-                continue;
-
-            pin = existing.Pin;
-            break;
-        }
-
-        if (pin <= 0)
-            pin = _random.Next(1000, 10000);
-
-        var assigned = false;
-        query = EntityQueryEnumerator<CMULiaisonSafeComponent>();
         while (query.MoveNext(out _, out var safe))
         {
-            safe.Pin = pin;
-            assigned = true;
-        }
+            if (safe.Pin <= 0)
+                continue;
 
-        if (assigned)
-            EnsureComp<CMULiaisonPinComponent>(args.Mob).Pin = pin;
+            EnsureComp<CMULiaisonPinComponent>(args.Mob).Pin = safe.Pin;
+            return;
+        }
     }
 
     private void OnActivate(Entity<CMULiaisonSafeComponent> ent, ref ActivateInWorldEvent args)
     {
-        if (args.Handled || !args.Complex || ent.Comp.Pin <= 0)
+        if (args.Handled || !args.Complex)
             return;
 
-        if (!TryComp<LockComponent>(ent.Owner, out var lockComp) || !lockComp.Locked)
-            return;
-
-        if (!_lock.HasUserAccess((ent.Owner, lockComp), args.User, quiet: true))
-            return;
-
-        ent.Comp.PendingUser = args.User;
         args.Handled = true;
+        OpenPinDialog(ent, args.User);
+    }
+
+    private void OnGetVerbs(Entity<CMULiaisonSafeComponent> ent, ref GetVerbsEvent<AlternativeVerb> args)
+    {
+        if (!args.CanAccess || !args.CanInteract || !args.CanComplexInteract)
+            return;
+
+        if (!TryComp<LockComponent>(ent.Owner, out var lockComp))
+            return;
+
+        var user = args.User;
+        var locked = lockComp.Locked;
+        args.Verbs.Add(new AlternativeVerb
+        {
+            Text = Loc.GetString(locked
+                ? "cmu-liaison-safe-unlock-verb"
+                : "cmu-liaison-safe-lock-verb"),
+            Priority = 2,
+            Act = () =>
+            {
+                if (locked)
+                    OpenPinDialog(ent, user);
+                else
+                    LockSafe(ent, user, lockComp);
+            },
+        });
+    }
+
+    private void OpenPinDialog(Entity<CMULiaisonSafeComponent> ent, EntityUid user)
+    {
+        ent.Comp.PendingUser = user;
 
         _dialog.OpenInput(
             ent.Owner,
-            args.User,
+            user,
             Loc.GetString("cmu-liaison-safe-pin-prompt"),
             new CMULiaisonSafePinEvent(),
             characterLimit: 4,
             minCharacterLimit: 4,
             title: Loc.GetString("cmu-liaison-safe-pin-title"));
+    }
+
+    private void LockSafe(Entity<CMULiaisonSafeComponent> ent, EntityUid user, LockComponent lockComp)
+    {
+        _storage.TryCloseStorage(ent.Owner, user);
+        _lock.Lock(ent.Owner, user, lockComp);
+        _popup.PopupEntity(Loc.GetString("cmu-liaison-safe-locked"), ent, user);
     }
 
     private void OnPinEntered(Entity<CMULiaisonSafeComponent> ent, ref CMULiaisonSafePinEvent args)
