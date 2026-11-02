@@ -72,8 +72,6 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
             return (false, null);
 
         var isCmuMedibot = _entManager.TryGetComponent<CMUMedibotComponent>(owner, out var cmuMedibot);
-        if (isCmuMedibot && !_medibot.HasUsableBeaker(owner))
-            return (false, null);
 
         if (!blackboard.TryGetValue<IEnumerable<KeyValuePair<EntityUid, float>>>("TargetList", out var patients, _entManager))
             return (false, null);
@@ -81,7 +79,9 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
         foreach (var (entity, _) in patients)
         {
             if (isCmuMedibot &&
-                (!IsValidCmuPatient(entity) || !_medibot.ShouldInjectFromBeaker(cmuMedibot!, entity)))
+                (!IsValidCmuPatient(entity) ||
+                 !_medibot.HasFieldTreatableDamage(entity) &&
+                 !_medibot.ShouldInjectFromBeaker(cmuMedibot!, entity)))
             {
                 continue;
             }
@@ -120,6 +120,9 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
                 var reserved = _entManager.EnsureComponent<CMUMedibotReservationComponent>(entity);
                 reserved.Bot = owner;
                 reserved.Expires = _timing.CurTime + TimeSpan.FromSeconds(30);
+
+                if (isCmuMedibot)
+                    _medibot.BeginFieldTreatment(owner, entity);
 
                 return (true, new Dictionary<string, object>()
                 {
