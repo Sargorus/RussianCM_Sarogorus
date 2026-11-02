@@ -14,7 +14,7 @@ ent-CMUCrateSyntheticTransport = synthetic transport crate
     .desc = A lockable transport crate sized for one synthetic and one drone control tablet. Attach a robotics order slip to its label slot before lowering it with the cargo platform.
 
 ent-CMUMedibot = medical bot
-    .desc = A Weyland-Yutani medical bot. It injects the contents of its beaker and performs CPR on intact corpses.
+    .desc = A Weyland-Yutani medical bot. It injects the contents of its beaker and performs CPR on intact corpses. Its beaker slot is behind a screw-fastened service panel.
 
 ent-CMUCleanBot = cleaner bot
     .desc = A Weyland-Yutani cleaner bot. It mops puddles and follows blood trails left by dragging a bleeding body.

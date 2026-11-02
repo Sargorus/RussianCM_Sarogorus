@@ -1,4 +1,6 @@
 cmu-medibot-beaker-slot = beaker
+cmu-medibot-panel = service panel
+cmu-medibot-panel-closed = The service panel is closed. Open it with a screwdriver first.
 cmu-medibot-config-title = Medical bot configuration
 cmu-medibot-config-amount = Amount per injection
 cmu-medibot-config-brute = On brute damage

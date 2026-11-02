@@ -63,8 +63,8 @@
   parent: MobMedibot
   id: CMUMedibot
   name: medical bot
-  description: A Weyland-Yutani medical bot. It injects the contents of its beaker and performs CPR on intact corpses.
   suffix: CMU14
+  description: A Weyland-Yutani medical bot. It injects the contents of its beaker and performs CPR on intact corpses. Its beaker slot is behind a screw-fastened service panel.
   components:
   - type: Medibot
     treatments:
@@ -75,15 +75,21 @@
         reagent: CMInaprovaline
         quantity: 15
   - type: CMUMedibot
+  - type: CMUHandsItemBlock
   - type: CMUBotSlogan
   - type: Marine
   - type: Hands
+    canBeStripped: false
     startingHands:
       hand_right:
         location: Right
       hand_left:
         location: Left
   - type: ComplexInteraction
+  - type: ToolOpenable
+    openToolQualityNeeded: Screwing
+    closeToolQualityNeeded: Screwing
+    name: cmu-medibot-panel
   - type: HTN
     rootTask:
       task: CMUMedibotCompound
@@ -98,6 +104,8 @@
     slots:
       cmu-medibot-beaker:
         name: cmu-medibot-beaker-slot
+        locked: true
+        lockedFailPopup: cmu-medibot-panel-closed
         ejectOnInteract: true
         whitelist:
           components:
@@ -107,7 +115,7 @@
   parent: MobHugBot
   id: CMUHugBot
   name: hug bot
-  description: A Weyland-Yutani hug bot. It wanders the colony looking for someone who needs a hug.
   suffix: CMU14
+  description: A Weyland-Yutani hug bot. It wanders the colony looking for someone who needs a hug.
   components:
   - type: CMUBotSlogan

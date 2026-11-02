@@ -1,4 +1,6 @@
 cmu-medibot-beaker-slot = мензурка
+cmu-medibot-panel = технический отсек
+cmu-medibot-panel-closed = Сначала откройте технический отсек отверткой.
 cmu-medibot-config-title = Настройка медицинского бота
 cmu-medibot-config-amount = Количество вещества на инъекцию
 cmu-medibot-config-brute = При брут-уроне

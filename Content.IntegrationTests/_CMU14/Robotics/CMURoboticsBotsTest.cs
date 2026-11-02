@@ -8,6 +8,7 @@ using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Damage;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Decals;
+using Content.Shared.Examine;
 using Content.Shared.FixedPoint;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
@@ -17,12 +18,15 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.NPC.Components;
 using Content.Shared.Silicons.Bots;
+using Content.Shared.Tools.Components;
 using Content.Shared.UserInterface;
 using Content.Shared._RMC14.Marines;
 using Content.Shared._RMC14.Medical.CPR;
+using Robust.Shared.Containers;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Utility;
 
 namespace Content.IntegrationTests.CMU14.Robotics;
 
@@ -50,8 +54,14 @@ public sealed class CMURoboticsBotsTest : GameTest
             Assert.That(SEntMan.HasComponent<MedibotComponent>(bot), Is.True);
             Assert.That(SEntMan.HasComponent<MarineComponent>(bot), Is.True);
             Assert.That(SEntMan.HasComponent<HandsComponent>(bot), Is.True);
+            Assert.That(SEntMan.HasComponent<CMUHandsItemBlockComponent>(bot), Is.True);
             Assert.That(SEntMan.System<ItemSlotsSystem>().GetItemOrNull(bot, "cmu-medibot-beaker"), Is.Null,
                 "The fabricator must produce the medical bot without a beaker.");
+
+            var panel = SComp<ToolOpenableComponent>(bot);
+            Assert.That(panel.IsOpen, Is.False, "The service panel must start closed.");
+            Assert.That(SEntMan.System<ItemSlotsSystem>().TryGetSlot(bot, "cmu-medibot-beaker", out var slot), Is.True);
+            Assert.That(slot!.Locked, Is.True, "The beaker slot must start locked behind the closed panel.");
         });
     }
 
@@ -67,6 +77,7 @@ public sealed class CMURoboticsBotsTest : GameTest
             var patient = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(2, 0)));
             SEntMan.EnsureComponent<NpcFactionMemberComponent>(patient).Factions.Add("AUWeYu");
 
+            OpenMedibotPanel(bot);
             InsertTricordBeaker(bot, user, map.GridCoords);
 
             var damage = new DamageSpecifier
@@ -148,6 +159,115 @@ public sealed class CMURoboticsBotsTest : GameTest
     }
 
     [Test]
+    public async Task MedibotBeakerRequiresOpenServicePanel()
+    {
+        var map = await Pair.CreateTestMap();
+        EntityUid user = default;
+        EntityUid bot = default;
+        EntityUid beaker = default;
+        EntityUid screwdriver = default;
+
+        await Server.WaitAssertion(() =>
+        {
+            user = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(1, 0)));
+            bot = SEntMan.SpawnEntity("CMUMedibot", map.GridCoords);
+            beaker = SEntMan.SpawnEntity("Beaker", map.GridCoords.Offset(new(2, 0)));
+            screwdriver = SEntMan.SpawnEntity("Screwdriver", map.GridCoords.Offset(new(3, 0)));
+            Assert.That(SEntMan.System<SharedHandsSystem>().TryPickup(user, screwdriver), Is.True);
+
+            Assert.That(SEntMan.System<ItemSlotsSystem>().TryInsert(
+                bot,
+                "cmu-medibot-beaker",
+                beaker,
+                user), Is.False, "A closed service panel must keep the beaker slot locked.");
+        });
+
+        await Server.WaitAssertion(() =>
+        {
+            var interaction = new InteractUsingEvent(
+                user,
+                screwdriver,
+                bot,
+                SEntMan.GetComponent<TransformComponent>(bot).Coordinates);
+            SEntMan.EventBus.RaiseLocalEvent(bot, interaction);
+            Assert.That(interaction.Handled, Is.True, "A screwdriver must begin opening the service panel.");
+        });
+
+        await Pair.RunTicksSync(60);
+
+        await Server.WaitAssertion(() =>
+        {
+            var panel = SComp<ToolOpenableComponent>(bot);
+            Assert.That(panel.IsOpen, Is.True, "The screwdriver must open the service panel.");
+
+            var examine = new FormattedMessage();
+            var examined = new ExaminedEvent(examine, bot, user, true, true);
+            SEntMan.EventBus.RaiseLocalEvent(bot, examined);
+            Assert.That(examined.GetTotalMessage().ToString(), Does.Contain(
+                    Loc.GetString("tool-openable-component-examine-opened",
+                        ("name", Loc.GetString("cmu-medibot-panel")))),
+                "The examine text must report that the service panel is open.");
+
+            var slots = SEntMan.System<ItemSlotsSystem>();
+            Assert.That(slots.TryInsert(bot, "cmu-medibot-beaker", beaker, user), Is.True,
+                "An open service panel must allow inserting a beaker.");
+            Assert.That(slots.TryEject(bot, "cmu-medibot-beaker", user, out var ejected), Is.True,
+                "An open service panel must allow removing the beaker.");
+            Assert.That(ejected, Is.EqualTo(beaker));
+        });
+
+        await Server.WaitAssertion(() =>
+        {
+            var interaction = new InteractUsingEvent(
+                user,
+                screwdriver,
+                bot,
+                SEntMan.GetComponent<TransformComponent>(bot).Coordinates);
+            SEntMan.EventBus.RaiseLocalEvent(bot, interaction);
+            Assert.That(interaction.Handled, Is.True, "A screwdriver must begin closing the service panel.");
+        });
+
+        await Pair.RunTicksSync(60);
+
+        await Server.WaitAssertion(() =>
+        {
+            var panel = SComp<ToolOpenableComponent>(bot);
+            Assert.That(panel.IsOpen, Is.False, "The screwdriver must close the service panel again.");
+            Assert.That(SEntMan.System<ItemSlotsSystem>().TryInsert(
+                bot,
+                "cmu-medibot-beaker",
+                beaker,
+                user), Is.False, "A closed service panel must lock the beaker slot again.");
+        });
+    }
+
+    [Test]
+    public async Task MedibotHandsCannotHoldItems()
+    {
+        var map = await Pair.CreateTestMap();
+
+        await Server.WaitAssertion(() =>
+        {
+            var bot = SEntMan.SpawnEntity("CMUMedibot", map.GridCoords);
+            var item = SEntMan.SpawnEntity("Screwdriver", map.GridCoords.Offset(new(1, 0)));
+            var hands = SEntMan.System<SharedHandsSystem>();
+            var handId = SComp<HandsComponent>(bot).Hands.Keys.First();
+
+            Assert.That(hands.TryPickupAnyHand(bot, item), Is.False,
+                "The medical bot must not pick up items into its hands.");
+            Assert.That(hands.TryForcePickupAnyHand(bot, item), Is.False,
+                "The medical bot must not force items into its hands.");
+
+            var containers = SEntMan.System<SharedContainerSystem>();
+            var handContainer = containers.GetContainer(bot, handId);
+            Assert.That(containers.CanInsert(item, handContainer), Is.False,
+                "Nothing may be inserted into the medical bot's hands.");
+            Assert.That(containers.Insert(item, handContainer), Is.False,
+                "Direct insertion into the medical bot's hands must fail.");
+        });
+    }
+
+    [Test]
     public async Task CleanbotRemovesBloodDecal()
     {
         var map = await Pair.CreateTestMap();
@@ -180,6 +300,12 @@ public sealed class CMURoboticsBotsTest : GameTest
             Assert.That(decals.ContainsDecal(map.Grid.Owner, footprint), Is.False,
                 "The cleaner bot must also remove bloody boot footprint decals.");
         });
+    }
+
+    private void OpenMedibotPanel(EntityUid bot)
+    {
+        SComp<ToolOpenableComponent>(bot).IsOpen = true;
+        SEntMan.System<ItemSlotsSystem>().SetLock(bot, "cmu-medibot-beaker", false);
     }
 
     private void InsertTricordBeaker(EntityUid bot, EntityUid user, EntityCoordinates coordinates)

@@ -39,8 +39,8 @@
   parent: MobCleanBot
   id: CMUCleanBot
   name: cleaner bot
-  description: A Weyland-Yutani cleaner bot. It mops puddles and follows blood trails left by dragging a bleeding body.
   suffix: CMU14
+  description: A Weyland-Yutani cleaner bot. It mops puddles and follows blood trails left by dragging a bleeding body.
   components:
   - type: CMUBotSlogan
   - type: HTN

@@ -1,7 +1,7 @@
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Serialization;
 using System.Diagnostics.CodeAnalysis;
-using Content.Shared.CMU14.Robotics;
+using Content.Shared.CMU14.Robotics; // CMU14
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
 using Content.Shared.Containers.ItemSlots;
@@ -28,13 +28,13 @@ public sealed partial class MedibotSystem : EntitySystem
 {
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private EmagSystem _emag = default!;
-    [Dependency] private ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private ItemSlotsSystem _itemSlots = default!; // CMU14: beaker slot
     [Dependency] private SharedInteractionSystem _interaction = default!;
     [Dependency] private SharedSolutionContainerSystem _solutionContainer = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private SharedDoAfterSystem _doAfter = default!;
     [Dependency] private DamageableSystem _damageable = default!;
-    [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private IGameTiming _timing = default!; // CMU14: target reservations
 
     public override void Initialize()
     {
@@ -101,9 +101,11 @@ public sealed partial class MedibotSystem : EntitySystem
     {
         if (!Resolve(medibot, ref medibot.Comp, false)) return false;
 
+        // CMU14: CMU medibots need an inserted beaker with reagents.
         if (!HasUsableBeaker(medibot.Owner))
             return false;
 
+        // CMU14: do not steal a patient reserved by another medibot.
         if (TryComp<CMUMedibotReservationComponent>(target, out var reservation) &&
             reservation.Bot != medibot.Owner &&
             _timing.CurTime < reservation.Expires)
@@ -139,6 +141,7 @@ public sealed partial class MedibotSystem : EntitySystem
         return true;
     }
 
+    // CMU14 method
     /// <summary>
     /// Whether a CMU medibot has a beaker with something in it. Vanilla
     /// medibots keep their built-in treatments and always return true.
@@ -168,6 +171,7 @@ public sealed partial class MedibotSystem : EntitySystem
         if (!TryGetTreatment(medibot.Comp, mobState.CurrentState, out var treatment)) return false;
         if (!_solutionContainer.TryGetInjectableSolution(target, out var injectable, out _)) return false;
 
+        // CMU14: CMU medibots inject the contents of the inserted beaker.
         if (TryComp<CMUMedibotComponent>(medibot.Owner, out var cmu))
         {
             if (!TryInjectFromBeaker(medibot.Owner, target, cmu, injectable.Value))
@@ -184,14 +188,16 @@ public sealed partial class MedibotSystem : EntitySystem
         _audio.PlayPredicted(medibot.Comp.InjectSound, medibot, medibot);
 
         // Keep every medibot, including the CMU one, from immediately treating the same patient again.
-        RemComp<CMUMedibotReservationComponent>(target);
+        RemComp<CMUMedibotReservationComponent>(target); // CMU14
         var recentlyInjected = EnsureComp<NPCRecentlyInjectedComponent>(target);
         recentlyInjected.RemoveTime = TimeSpan.FromMinutes(1);
         recentlyInjected.Accumulator = 0;
 
+        // CMU14 removed: the suture/mesh field treatment. CMU medibots only inject beaker contents.
         return true;
     }
 
+    // CMU14 method
     private bool TryInjectFromBeaker(
         EntityUid medibot,
         EntityUid target,
@@ -218,6 +224,7 @@ public sealed partial class MedibotSystem : EntitySystem
         return _solutionContainer.TryAddSolution(injectable, removed);
     }
 
+    // CMU14 method
     public bool ShouldInjectFromBeaker(CMUMedibotComponent component, EntityUid target)
     {
         if (!TryComp<DamageableComponent>(target, out var damageable))
