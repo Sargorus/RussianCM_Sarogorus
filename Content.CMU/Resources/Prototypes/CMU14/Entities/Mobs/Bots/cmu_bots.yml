@@ -1,12 +1,51 @@
 # CMU medical bot built by the Weyland-Yutani robotics fabricator.
-# It inherits the standard medibot AI and injects tricordrazine, then applies
-# passive suture/mesh treatment to patients who remain still nearby.
+# It draws its injection from the beaker in its slot; the drone configuration
+# key tunes the dose and the damage types that trigger an injection. Once a
+# Weyland-Yutani human stays still for three seconds, the bot also applies
+# suture-equivalent brute healing and mesh-equivalent burn healing.
+
+- type: entity
+  parent: Beaker
+  id: CMUMedibotBeaker
+  name: medical bot beaker
+  suffix: CMU14, Tricordrazine
+  components:
+  - type: Solution
+    solution:
+      reagents:
+      - ReagentId: CMTricordrazine
+        Quantity: 60
 
 - type: entity
   parent: MobMedibot
   id: CMUMedibot
   name: CMU medical bot
-  description: A Weyland-Yutani medical bot. It injects tricordrazine and applies field sutures and regenerative mesh to patients who stay still.
+  description: A Weyland-Yutani medical bot. It injects the contents of its beaker and applies field sutures and regenerative mesh to Weyland-Yutani patients who stay still.
   suffix: CMU14
   components:
+  - type: Medibot
+    treatments:
+      Alive:
+        reagent: CMTricordrazine
+        quantity: 15
+      Critical:
+        reagent: CMInaprovaline
+        quantity: 15
+  - type: CMUMedibot
   - type: CMUMedibotHealing
+  - type: UserInterface
+    interfaces:
+      enum.CMUMedibotConfigurationUi.Key:
+        type: CMUMedibotConfigurationBui
+  - type: ContainerContainer
+    containers:
+      cmu-medibot-beaker: !type:ContainerSlot
+  - type: ItemSlots
+    slots:
+      cmu-medibot-beaker:
+        name: cmu-medibot-beaker-slot
+        startingItem: CMUMedibotBeaker
+        ejectOnInteract: true
+        whitelist:
+          components:
+          - FitsInDispenser

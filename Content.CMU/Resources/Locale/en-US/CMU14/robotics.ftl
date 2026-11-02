@@ -14,7 +14,10 @@ ent-CMUCrateSyntheticTransport = synthetic transport crate
     .desc = A lockable transport crate sized for one synthetic and one drone control tablet. Attach a robotics order slip to its label slot before lowering it with the cargo platform.
 
 ent-CMUMedibot = CMU medical bot
-    .desc = A Weyland-Yutani medical bot. It injects tricordrazine and applies field sutures and regenerative mesh to patients who stay still nearby.
+    .desc = A Weyland-Yutani medical bot. It injects the contents of its beaker and applies field sutures and regenerative mesh to Weyland-Yutani patients who stay still nearby.
+
+ent-CMUCleanBot = CMU cleanbot
+    .desc = A Weyland-Yutani cleanbot. It mops puddles and follows blood trails left by dragging a bleeding body.
 
 ent-CMURoboticsOrderSlip = robotics supply order
     .desc = A supply order form for a Weyland-Yutani robotics contract. The order details are printed on the sheet.

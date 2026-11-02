@@ -402,7 +402,7 @@
 
 - type: latheRecipe
   id: CMURoboticsCleanBot
-  result: MobCleanBot
+  result: CMUCleanBot
   completetime: 10
   materials:
     CMSteel: 5000

@@ -1,17 +1,23 @@
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Serialization;
 using System.Diagnostics.CodeAnalysis;
+using Content.Shared.CMU14.Robotics;
+using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Damage;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.DoAfter;
 using Content.Shared.Emag.Components;
 using Content.Shared.Emag.Systems;
+using Content.Shared.FixedPoint;
 using Content.Shared.Interaction;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.NPC.Components;
 using Content.Shared.Popups;
+using Robust.Shared.Timing;
 
 namespace Content.Shared.Silicons.Bots;
 
@@ -22,11 +28,13 @@ public sealed partial class MedibotSystem : EntitySystem
 {
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private EmagSystem _emag = default!;
+    [Dependency] private ItemSlotsSystem _itemSlots = default!;
     [Dependency] private SharedInteractionSystem _interaction = default!;
     [Dependency] private SharedSolutionContainerSystem _solutionContainer = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private SharedDoAfterSystem _doAfter = default!;
     [Dependency] private DamageableSystem _damageable = default!;
+    [Dependency] private IGameTiming _timing = default!;
 
     public override void Initialize()
     {
@@ -93,6 +101,16 @@ public sealed partial class MedibotSystem : EntitySystem
     {
         if (!Resolve(medibot, ref medibot.Comp, false)) return false;
 
+        if (!HasUsableBeaker(medibot.Owner))
+            return false;
+
+        if (TryComp<CMUMedibotReservationComponent>(target, out var reservation) &&
+            reservation.Bot != medibot.Owner &&
+            _timing.CurTime < reservation.Expires)
+        {
+            return false;
+        }
+
         if (HasComp<NPCRecentlyInjectedComponent>(target))
         {
             _popup.PopupEntity(Loc.GetString("medibot-recently-injected"), medibot, medibot);
@@ -122,6 +140,22 @@ public sealed partial class MedibotSystem : EntitySystem
     }
 
     /// <summary>
+    /// Whether a CMU medibot has a beaker with something in it. Vanilla
+    /// medibots keep their built-in treatments and always return true.
+    /// </summary>
+    public bool HasUsableBeaker(EntityUid medibot)
+    {
+        if (!TryComp<CMUMedibotComponent>(medibot, out var component))
+            return true;
+
+        if (_itemSlots.GetItemOrNull(medibot, component.BeakerSlotId) is not { } beaker)
+            return false;
+
+        return _solutionContainer.TryGetSolution(beaker, "beaker", out _, out var solution) &&
+               solution.Volume > FixedPoint2.Zero;
+    }
+
+    /// <summary>
     /// Tries to inject the target.
     /// </summary>
     public bool TryInject(Entity<MedibotComponent?> medibot, EntityUid target)
@@ -134,14 +168,71 @@ public sealed partial class MedibotSystem : EntitySystem
         if (!TryGetTreatment(medibot.Comp, mobState.CurrentState, out var treatment)) return false;
         if (!_solutionContainer.TryGetInjectableSolution(target, out var injectable, out _)) return false;
 
-        _solutionContainer.TryAddReagent(injectable.Value, treatment.Reagent, treatment.Quantity, out _);
+        if (TryComp<CMUMedibotComponent>(medibot.Owner, out var cmu))
+        {
+            if (!TryInjectFromBeaker(medibot.Owner, target, cmu, injectable.Value))
+                return false;
+        }
+        else
+        {
+            _solutionContainer.TryAddReagent(injectable.Value, treatment.Reagent, treatment.Quantity, out _);
+        }
 
         _popup.PopupEntity(Loc.GetString("injector-component-feel-prick-message"), target, target);
         _popup.PopupEntity(Loc.GetString("medibot-target-injected"), medibot, medibot);
 
         _audio.PlayPredicted(medibot.Comp.InjectSound, medibot, medibot);
 
+        // Keep every medibot, including the CMU one, from immediately treating the same patient again.
+        RemComp<CMUMedibotReservationComponent>(target);
+        var recentlyInjected = EnsureComp<NPCRecentlyInjectedComponent>(target);
+        recentlyInjected.RemoveTime = TimeSpan.FromMinutes(1);
+        recentlyInjected.Accumulator = 0;
+
         return true;
+    }
+
+    private bool TryInjectFromBeaker(
+        EntityUid medibot,
+        EntityUid target,
+        CMUMedibotComponent component,
+        Entity<SolutionComponent> injectable)
+    {
+        if (!ShouldInjectFromBeaker(component, target))
+            return false;
+
+        if (_itemSlots.GetItemOrNull(medibot, component.BeakerSlotId) is not { } beaker)
+            return false;
+
+        if (!_solutionContainer.TryGetSolution(beaker, "beaker", out var beakerSolution, out var solution))
+            return false;
+
+        var amount = FixedPoint2.Min(component.InjectAmount, solution.Volume);
+        if (amount <= FixedPoint2.Zero)
+            return false;
+
+        var removed = _solutionContainer.SplitSolution(beakerSolution.Value, amount);
+        if (removed.Volume <= FixedPoint2.Zero)
+            return false;
+
+        return _solutionContainer.TryAddSolution(injectable, removed);
+    }
+
+    public bool ShouldInjectFromBeaker(CMUMedibotComponent component, EntityUid target)
+    {
+        if (!TryComp<DamageableComponent>(target, out var damageable))
+            return false;
+
+        var groups = _damageable.GetDamagePerGroup((target, damageable));
+        var hasBrute = groups.TryGetValue("Brute", out var brute) && brute > FixedPoint2.Zero;
+        var hasBurn = groups.TryGetValue("Burn", out var burn) && burn > FixedPoint2.Zero;
+
+        if (component.InjectOnBrute && hasBrute || component.InjectOnBurn && hasBurn)
+            return true;
+
+        return component.InjectOnCritical &&
+               TryComp<MobStateComponent>(target, out var mobState) &&
+               mobState.CurrentState == MobState.Critical;
     }
 }
 

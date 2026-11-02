@@ -15,6 +15,9 @@ public sealed partial class CMUMedibotHealingComponent : Component
     public float Range = 3f;
 
     [DataField]
+    public TimeSpan StartDelay = TimeSpan.FromSeconds(3);
+
+    [DataField]
     public TimeSpan Interval = TimeSpan.FromSeconds(2);
 
     [DataField]
@@ -25,7 +28,4 @@ public sealed partial class CMUMedibotHealingComponent : Component
 
     [DataField]
     public float MaxPatientSpeed = 0.15f;
-
-    [DataField]
-    public TimeSpan NextHeal;
 }

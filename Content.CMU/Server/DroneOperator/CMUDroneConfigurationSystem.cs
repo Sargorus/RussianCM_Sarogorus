@@ -5,6 +5,10 @@ using Content.Shared.Access;
 using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
 using Content.Shared.CMU14.DroneOperator;
+using Content.Shared.CMU14.Robotics;
+using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Containers.ItemSlots;
+using Content.Shared.FixedPoint;
 using Content.Shared.Hands;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
@@ -29,9 +33,11 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
     [Dependency] private SharedAccessSystem _access = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
     [Dependency] private GunIFFSystem _iff = default!;
+    [Dependency] private ItemSlotsSystem _itemSlots = default!;
     [Dependency] private NpcFactionSystem _npcFactions = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private IPrototypeManager _proto = default!;
+    [Dependency] private SharedSolutionContainerSystem _solutions = default!;
     [Dependency] private SharedUserInterfaceSystem _ui = default!;
     [Dependency] private IComponentFactory _factory = default!;
 
@@ -46,6 +52,10 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
         Subs.BuiEvents<CMUDroneAndroidComponent>(CMUDroneConfigurationUi.Key, subs =>
         {
             subs.Event<CMUDroneConfigurationApplyMsg>(OnApply);
+        });
+        Subs.BuiEvents<CMUMedibotComponent>(CMUMedibotConfigurationUi.Key, subs =>
+        {
+            subs.Event<CMUMedibotConfigurationApplyMsg>(OnMedibotApply);
         });
     }
 
@@ -77,11 +87,23 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
     {
         if (args.Handled ||
             args.Target is not { } target ||
-            !HasComp<CMUDroneAndroidComponent>(target) ||
             !IsHolding(args.User, ent.Owner))
         {
             return;
         }
+
+        if (TryComp<CMUMedibotComponent>(target, out var medibot))
+        {
+            args.Handled = true;
+            medibot.ConfigUser = args.User;
+            medibot.ConfigKey = ent.Owner;
+            UpdateMedibotUi(target, medibot);
+            _ui.TryOpenUi(target, CMUMedibotConfigurationUi.Key, args.User);
+            return;
+        }
+
+        if (!HasComp<CMUDroneAndroidComponent>(target))
+            return;
 
         args.Handled = true;
 
@@ -156,6 +178,52 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
 
         UpdateUi(ent.Owner, session);
         _popup.PopupEntity(Loc.GetString("cmu-drone-config-applied"), ent, session.User);
+    }
+
+    private void OnMedibotApply(Entity<CMUMedibotComponent> ent, ref CMUMedibotConfigurationApplyMsg msg)
+    {
+        if (ent.Comp.ConfigUser != msg.Actor ||
+            ent.Comp.ConfigKey is not { } key ||
+            !IsHolding(msg.Actor, key))
+        {
+            return;
+        }
+
+        ent.Comp.InjectAmount = FixedPoint2.New(Math.Clamp(msg.InjectAmount, 1, 50));
+        ent.Comp.InjectOnBrute = msg.InjectOnBrute;
+        ent.Comp.InjectOnBurn = msg.InjectOnBurn;
+        ent.Comp.InjectOnCritical = msg.InjectOnCritical;
+
+        UpdateMedibotUi(ent.Owner, ent.Comp);
+        _popup.PopupEntity(Loc.GetString("cmu-medibot-config-applied"), ent, msg.Actor);
+    }
+
+    private void UpdateMedibotUi(EntityUid medibot, CMUMedibotComponent component)
+    {
+        var beaker = _itemSlots.GetItemOrNull(medibot, component.BeakerSlotId);
+        var hasBeaker = false;
+        string beakerText;
+
+        if (beaker is { } beakerUid &&
+            _solutions.TryGetSolution(beakerUid, "beaker", out _, out var solution))
+        {
+            hasBeaker = true;
+            beakerText = Loc.GetString("cmu-medibot-config-beaker", ("volume", solution.Volume));
+        }
+        else
+        {
+            beakerText = Loc.GetString("cmu-medibot-config-no-beaker");
+        }
+
+        var state = new CMUMedibotConfigurationBuiState(
+            component.InjectAmount.Int(),
+            component.InjectOnBrute,
+            component.InjectOnBurn,
+            component.InjectOnCritical,
+            hasBeaker,
+            beakerText);
+
+        _ui.SetUiState(medibot, CMUMedibotConfigurationUi.Key, state);
     }
 
     private void UpdateUi(EntityUid drone, CMUDroneConfigurationSessionComponent session)
