@@ -107,11 +107,11 @@
         startingStock: 1
         stockReplenishDelay: 21600
         stockReplenishAmount: 1
-      - cost: 1500
+      - cost: 1125
         crate: CMUCrateDroneOutfitEngineering
-      - cost: 2000
+      - cost: 1500
         crate: CMUCrateDroneOutfitMedical
-      - cost: 2000
+      - cost: 1500
         crate: CMUCrateDroneOutfitPolice
       - cost: 500
         crate: CMUCrateDroneArmorM4

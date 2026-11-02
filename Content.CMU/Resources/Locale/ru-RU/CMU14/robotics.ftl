@@ -13,6 +13,9 @@ ent-CMUCrateRoboticsOrderConsole = ящик консоли робототехн�
 ent-CMUCrateSyntheticTransport = транспортный ящик для синтетиков
     .desc = Запираемый транспортный ящик для перевозки одного синтетика и одного пульта управления дроном. Прикрепите к нему листок робототехнического заказа перед опусканием грузовой платформы.
 
+ent-CMUMedibot = медицинский бот CMU
+    .desc = Медицинский бот «Вейланд-Ютани». Вводит трикордразин и накладывает полевые швы и регенеративную сетку неподвижным пациентам рядом с собой.
+
 ent-CMURoboticsOrderSlip = робототехнический бланк заказа снабжения
     .desc = Бланк заказа снабжения для робототехнического контракта «Вейланд-Ютани». Детали заказа напечатаны на самом листе.
 
@@ -77,6 +80,7 @@ cmu-lathe-category-robotics-synth-limbs = Конечности синтетик�
 cmu-lathe-category-robotics-working-joe-limbs = Конечности Рабочих Джо
 cmu-lathe-category-robotics-prosthetics = Протезы для людей
 cmu-lathe-category-robotics-components = Компоненты
+cmu-lathe-category-robotics-bots = Боты
 
 cmu-robotics-fabricator-cell-already = В фабрикаторе уже есть топливная ячейка.
 cmu-robotics-fabricator-cell-insert-start = Вы начинаете вставлять топливную ячейку в фабрикатор.

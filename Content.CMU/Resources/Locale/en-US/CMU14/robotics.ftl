@@ -13,6 +13,9 @@ ent-CMUCrateRoboticsOrderConsole = robotics order console crate
 ent-CMUCrateSyntheticTransport = synthetic transport crate
     .desc = A lockable transport crate sized for one synthetic and one drone control tablet. Attach a robotics order slip to its label slot before lowering it with the cargo platform.
 
+ent-CMUMedibot = CMU medical bot
+    .desc = A Weyland-Yutani medical bot. It injects tricordrazine and applies field sutures and regenerative mesh to patients who stay still nearby.
+
 ent-CMURoboticsOrderSlip = robotics supply order
     .desc = A supply order form for a Weyland-Yutani robotics contract. The order details are printed on the sheet.
 
@@ -77,6 +80,7 @@ cmu-lathe-category-robotics-synth-limbs = Synthetic limbs
 cmu-lathe-category-robotics-working-joe-limbs = Working Joe limbs
 cmu-lathe-category-robotics-prosthetics = Human prosthetics
 cmu-lathe-category-robotics-components = Components
+cmu-lathe-category-robotics-bots = Bots
 
 cmu-robotics-fabricator-cell-already = The fabricator already has a fuel cell.
 cmu-robotics-fabricator-cell-insert-start = You start inserting the fuel cell into the fabricator.

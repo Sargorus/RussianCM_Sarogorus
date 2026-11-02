@@ -32,6 +32,11 @@ public sealed class CMUDroneConfigurationKeyTest : GameTest
             SEntMan.EnsureComponent<NpcFactionMemberComponent>(user).Factions.Add("CLF");
 
             var drone = SEntMan.SpawnEntity("CMUDroneAndroidUnarmed", map.GridCoords.Offset(new(1, 0)));
+            var govforDrone = SEntMan.SpawnEntity("CMUDroneAndroid", map.GridCoords.Offset(new(2, 0)));
+            Assert.That(SComp<CMUDroneAndroidComponent>(drone).RelayOperatorSpeech, Is.False,
+                "Weyland-Yutani fabricator drones must not relay their speech through the operator.");
+            Assert.That(SComp<CMUDroneAndroidComponent>(govforDrone).RelayOperatorSpeech, Is.True,
+                "GOVFOR and OPFOR issue drones must relay their speech through the operator.");
             var key = SEntMan.SpawnEntity("CMUDroneConfigurationKey", map.GridCoords.Offset(new(-1, 0)));
             var card = SEntMan.SpawnEntity("CMIDCardBase", map.GridCoords.Offset(new(0, -1)));
 

@@ -20,6 +20,10 @@
   id: CMURoboticsComponents
   name: cmu-lathe-category-robotics-components
 
+- type: latheCategory
+  id: CMURoboticsBots
+  name: cmu-lathe-category-robotics-bots
+
 - type: entity
   parent: CMAutolathe
   id: CMURoboticsFabricator
@@ -396,6 +400,36 @@
     RMCPlastic: 1875
   categories: [ CMURoboticsProsthetics ]
 
+- type: latheRecipe
+  id: CMURoboticsCleanBot
+  result: MobCleanBot
+  completetime: 10
+  materials:
+    CMSteel: 5000
+    CMGlass: 1000
+    RMCPlastic: 2500
+  categories: [ CMURoboticsBots ]
+
+- type: latheRecipe
+  id: CMURoboticsHugBot
+  result: MobHugBot
+  completetime: 10
+  materials:
+    CMSteel: 4000
+    CMGlass: 1000
+    RMCPlastic: 2500
+  categories: [ CMURoboticsBots ]
+
+- type: latheRecipe
+  id: CMURoboticsMedibot
+  result: CMUMedibot
+  completetime: 12
+  materials:
+    CMSteel: 5000
+    CMGlass: 2000
+    RMCPlastic: 3000
+  categories: [ CMURoboticsBots ]
+
 - type: latheRecipePack
   id: CMURoboticsFabricatorRecipes
   recipes:
@@ -413,6 +447,9 @@
   - CMURoboticsModuleMedical
   - CMURoboticsModuleEngineering
   - CMURoboticsModulePolice
+  - CMURoboticsCleanBot
+  - CMURoboticsHugBot
+  - CMURoboticsMedibot
   - CMURoboticsWorkingJoeLeftArm
   - CMURoboticsWorkingJoeRightArm
   - CMURoboticsWorkingJoeLeftHand

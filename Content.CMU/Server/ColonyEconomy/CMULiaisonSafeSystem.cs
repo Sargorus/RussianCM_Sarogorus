@@ -9,6 +9,7 @@ using Content.Shared.GameTicking;
 using Content.Shared.Interaction;
 using Content.Shared.Lock;
 using Content.Shared.Popups;
+using Content.Shared.Storage.Components;
 using Content.Shared.Storage.EntitySystems;
 using Content.Shared.Verbs;
 using Content.Shared._RMC14.Dialog;
@@ -105,6 +106,14 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
             return;
 
         args.Handled = true;
+
+        // An open safe closes on a normal left click. A closed safe always asks for the PIN.
+        if (TryComp<EntityStorageComponent>(ent.Owner, out var storage) && storage.Open)
+        {
+            _storage.TryCloseStorage(ent.Owner, args.User);
+            return;
+        }
+
         OpenPinDialog(ent, args.User);
     }
 

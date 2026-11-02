@@ -4,25 +4,25 @@
   parent: RMCCrateBase
   id: CMUCrateDroneOutfitEngineering
   name: drone engineering outfit crate
-  description: A crate containing a Weyland-Yutani engineering jumpsuit, an engineer oversuit, a filled M276 toolbelt, and a PMC technician welderpack.
+  description: A crate containing a Weyland-Yutani engineering jumpsuit, an engineer oversuit, a filled M276 toolbelt, and an engineering welder backpack.
   components:
   - type: StorageFill
     contents:
     - id: RMCJumpsuitCivilianEngineerWorker
     - id: CMUClothingOuterSuitEngineer
     - id: CMBeltUtilityFilled
-    - id: RMCBackpackWelderPMC
+    - id: CMBackpackWelder
 
 - type: entity
   parent: RMCCrateBase
   id: CMUCrateDroneOutfitMedical
   name: drone medical outfit crate
-  description: A crate containing orange medical scrubs, a white lab coat, an empty medical belt, a medical backpack, and an orange surgical cap.
+  description: A crate containing orange medical scrubs, a CMU medical labcoat, an empty medical belt, a medical backpack, and an orange surgical cap.
   components:
   - type: StorageFill
     contents:
     - id: CMScrubsOrange
-    - id: ClothingOuterCoatLab
+    - id: RMCLabcoat
     - id: CMBeltMedical
     - id: CMBackpackMedical
     - id: CMHeadCapSurgOrange

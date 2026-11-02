@@ -105,6 +105,13 @@ public sealed partial class CMUDroneAndroidComponent : Component
     [DataField]
     public bool InheritsOperatorSkills = true;
 
+    /// <summary>
+    /// Whether the operator repeats the drone's speech on their own radio or as a whisper.
+    /// GOVFOR and OPFOR issue drones keep this enabled; the Weyland-Yutani drone frames disable it.
+    /// </summary>
+    [DataField]
+    public bool RelayOperatorSpeech = true;
+
     [DataField]
     public string ModuleContainerId = "cmu-drone-module";
 

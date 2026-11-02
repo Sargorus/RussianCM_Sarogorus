@@ -68,6 +68,19 @@ public sealed class CMULiaisonSafeTest : GameTest
             Assert.That(SComp<LockComponent>(safe).Locked, Is.False);
             Assert.That(SComp<EntityStorageComponent>(safe).Open, Is.True);
 
+            // Clicking an open safe closes it instead of opening the PIN dialog again.
+            var closeClick = new ActivateInWorldEvent(liaison, safe, true);
+            SEntMan.EventBus.RaiseLocalEvent(safe, closeClick);
+            Assert.That(closeClick.Handled, Is.True);
+            Assert.That(SComp<EntityStorageComponent>(safe).Open, Is.False);
+            Assert.That(safeComp.PendingUser, Is.Null);
+
+            // Reopen it so the lock verb still has an open storage to close.
+            SEntMan.EventBus.RaiseLocalEvent(safe, new ActivateInWorldEvent(liaison, safe, true));
+            Assert.That(safeComp.PendingUser, Is.EqualTo(liaison));
+            SEntMan.EventBus.RaiseLocalEvent(safe, new CMULiaisonSafePinEvent(pin.ToString()));
+            Assert.That(SComp<EntityStorageComponent>(safe).Open, Is.True);
+
             var hands = SComp<HandsComponent>(liaison);
             var lockMenu = new GetVerbsEvent<AlternativeVerb>(
                 liaison, safe, null, hands, true, true, true, new List<VerbCategory>());

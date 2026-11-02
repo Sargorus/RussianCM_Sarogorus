@@ -105,6 +105,7 @@
     canUseGuns: false
   - type: CMUDroneAndroid
     supportsCombatModule: false
+    relayOperatorSpeech: false
 
 - type: entity
   parent: CMUDroneAndroid
@@ -117,6 +118,7 @@
     canUseGuns: true
   - type: CMUDroneAndroid
     inheritsOperatorSkills: true
+    relayOperatorSpeech: false
   - type: Skills
     skills:
       RMCSkillCqc: 4

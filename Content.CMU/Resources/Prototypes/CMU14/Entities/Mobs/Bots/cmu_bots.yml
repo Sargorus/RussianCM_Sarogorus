@@ -1,0 +1,12 @@
+# CMU medical bot built by the Weyland-Yutani robotics fabricator.
+# It inherits the standard medibot AI and injects tricordrazine, then applies
+# passive suture/mesh treatment to patients who remain still nearby.
+
+- type: entity
+  parent: MobMedibot
+  id: CMUMedibot
+  name: CMU medical bot
+  description: A Weyland-Yutani medical bot. It injects tricordrazine and applies field sutures and regenerative mesh to patients who stay still.
+  suffix: CMU14
+  components:
+  - type: CMUMedibotHealing
