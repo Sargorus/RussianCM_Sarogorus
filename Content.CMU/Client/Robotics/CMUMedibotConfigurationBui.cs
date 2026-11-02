@@ -16,8 +16,8 @@ public sealed class CMUMedibotConfigurationBui : BoundUserInterface
         base.Open();
 
         _window = this.CreateWindow<CMUMedibotConfigurationWindow>();
-        _window.OnApply += (amount, brute, burn, critical) =>
-            SendMessage(new CMUMedibotConfigurationApplyMsg(amount, brute, burn, critical));
+        _window.OnApply += (amount, brute, burn, critical, factions) =>
+            SendMessage(new CMUMedibotConfigurationApplyMsg(amount, brute, burn, critical, factions));
     }
 
     protected override void UpdateState(BoundUserInterfaceState state)

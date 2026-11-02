@@ -194,6 +194,14 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
         ent.Comp.InjectOnBurn = msg.InjectOnBurn;
         ent.Comp.InjectOnCritical = msg.InjectOnCritical;
 
+        var factions = new HashSet<string>();
+        foreach (var id in msg.Factions)
+        {
+            if (_proto.TryIndex<NpcFactionPrototype>(id, out var faction) && !faction.Abstract)
+                factions.Add(faction.ID);
+        }
+        ent.Comp.TreatFactions = factions;
+
         UpdateMedibotUi(ent.Owner, ent.Comp);
         _popup.PopupEntity(Loc.GetString("cmu-medibot-config-applied"), ent, msg.Actor);
     }
@@ -215,13 +223,28 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
             beakerText = Loc.GetString("cmu-medibot-config-no-beaker");
         }
 
+        var factions = new List<CMUDroneConfigurationOption>();
+        foreach (var faction in _proto.EnumeratePrototypes<NpcFactionPrototype>())
+        {
+            if (faction.Abstract)
+                continue;
+
+            var name = string.IsNullOrEmpty(faction.Name)
+                ? faction.ID
+                : Loc.GetString(faction.Name);
+            factions.Add(new CMUDroneConfigurationOption(faction.ID, name));
+        }
+        factions.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
+
         var state = new CMUMedibotConfigurationBuiState(
             component.InjectAmount.Int(),
             component.InjectOnBrute,
             component.InjectOnBurn,
             component.InjectOnCritical,
             hasBeaker,
-            beakerText);
+            beakerText,
+            factions,
+            component.TreatFactions);
 
         _ui.SetUiState(medibot, CMUMedibotConfigurationUi.Key, state);
     }

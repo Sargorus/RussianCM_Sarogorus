@@ -1,3 +1,4 @@
+using Content.Shared.CMU14.DroneOperator;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.CMU14.Robotics;
@@ -17,6 +18,8 @@ public sealed class CMUMedibotConfigurationBuiState : BoundUserInterfaceState
     public bool InjectOnCritical { get; }
     public bool HasBeaker { get; }
     public string BeakerText { get; }
+    public List<CMUDroneConfigurationOption> Factions { get; }
+    public HashSet<string> SelectedFactions { get; }
 
     public CMUMedibotConfigurationBuiState(
         int injectAmount,
@@ -24,7 +27,9 @@ public sealed class CMUMedibotConfigurationBuiState : BoundUserInterfaceState
         bool injectOnBurn,
         bool injectOnCritical,
         bool hasBeaker,
-        string beakerText)
+        string beakerText,
+        List<CMUDroneConfigurationOption> factions,
+        HashSet<string> selectedFactions)
     {
         InjectAmount = injectAmount;
         InjectOnBrute = injectOnBrute;
@@ -32,6 +37,8 @@ public sealed class CMUMedibotConfigurationBuiState : BoundUserInterfaceState
         InjectOnCritical = injectOnCritical;
         HasBeaker = hasBeaker;
         BeakerText = beakerText;
+        Factions = factions;
+        SelectedFactions = selectedFactions;
     }
 }
 
@@ -42,16 +49,19 @@ public sealed class CMUMedibotConfigurationApplyMsg : BoundUserInterfaceMessage
     public bool InjectOnBrute { get; }
     public bool InjectOnBurn { get; }
     public bool InjectOnCritical { get; }
+    public HashSet<string> Factions { get; }
 
     public CMUMedibotConfigurationApplyMsg(
         int injectAmount,
         bool injectOnBrute,
         bool injectOnBurn,
-        bool injectOnCritical)
+        bool injectOnCritical,
+        HashSet<string> factions)
     {
         InjectAmount = injectAmount;
         InjectOnBrute = injectOnBrute;
         InjectOnBurn = injectOnBurn;
         InjectOnCritical = injectOnCritical;
+        Factions = factions;
     }
 }

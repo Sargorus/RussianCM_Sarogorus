@@ -25,6 +25,12 @@ public sealed partial class CMUMedibotComponent : Component
     [DataField]
     public bool InjectOnCritical = true;
 
+    /// <summary>
+    /// Faction ids whose humanoid members this bot is allowed to serve.
+    /// </summary>
+    [DataField]
+    public HashSet<string> TreatFactions = new() { "AUWeYu" };
+
     public EntityUid? ConfigUser;
 
     public EntityUid? ConfigKey;

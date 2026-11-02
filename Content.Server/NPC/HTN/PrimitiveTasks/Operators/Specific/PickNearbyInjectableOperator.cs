@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Content.Shared.NPC.Components;
@@ -79,8 +80,7 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
         foreach (var (entity, _) in patients)
         {
             if (isCmuMedibot &&
-                (!IsValidCmuPatient(entity) ||
-                 !_medibot.HasFieldTreatableDamage(entity) &&
+                (!IsValidCmuPatient(entity, cmuMedibot!) ||
                  !_medibot.ShouldInjectFromBeaker(cmuMedibot!, entity)))
             {
                 continue;
@@ -121,9 +121,6 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
                 reserved.Bot = owner;
                 reserved.Expires = _timing.CurTime + TimeSpan.FromSeconds(30);
 
-                if (isCmuMedibot)
-                    _medibot.BeginFieldTreatment(owner, entity);
-
                 return (true, new Dictionary<string, object>()
                 {
                     {TargetKey, entity},
@@ -136,10 +133,10 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
         return (false, null);
     }
 
-    private bool IsValidCmuPatient(EntityUid entity)
+    private bool IsValidCmuPatient(EntityUid entity, CMUMedibotComponent component)
     {
         if (!_entManager.TryGetComponent<NpcFactionMemberComponent>(entity, out var factions) ||
-            !factions.Factions.Contains("AUWeYu") ||
+            !factions.Factions.Any(faction => component.TreatFactions.Contains(faction.Id)) ||
             !_entManager.HasComponent<HumanoidProfileComponent>(entity) ||
             _entManager.HasComponent<CMUDroneAndroidComponent>(entity) ||
             _entManager.HasComponent<SynthComponent>(entity))

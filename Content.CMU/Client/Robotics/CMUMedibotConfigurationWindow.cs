@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Numerics;
 using Content.Shared.CMU14.Robotics;
 using Robust.Client.UserInterface.Controls;
@@ -8,13 +9,15 @@ namespace Content.Client.CMU14.Robotics;
 
 public sealed class CMUMedibotConfigurationWindow : DefaultWindow
 {
-    public event Action<int, bool, bool, bool>? OnApply;
+    public event Action<int, bool, bool, bool, HashSet<string>>? OnApply;
 
     private readonly Label _beaker;
     private readonly SpinBox _amount;
     private readonly CheckBox _brute;
     private readonly CheckBox _burn;
     private readonly CheckBox _critical;
+    private readonly BoxContainer _factions;
+    private readonly Dictionary<string, CheckBox> _factionChecks = new();
 
     public CMUMedibotConfigurationWindow()
     {
@@ -61,8 +64,21 @@ public sealed class CMUMedibotConfigurationWindow : DefaultWindow
         };
         root.AddChild(_critical);
 
+        root.AddChild(new Label { Text = Loc.GetString("cmu-medibot-config-factions") });
+        _factions = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical };
+        var factionScroll = new ScrollContainer { VerticalExpand = true, HScrollEnabled = false };
+        factionScroll.AddChild(_factions);
+        root.AddChild(factionScroll);
+
         var apply = new Button { Text = Loc.GetString("cmu-medibot-config-apply") };
-        apply.OnPressed += _ => OnApply?.Invoke(_amount.Value, _brute.Pressed, _burn.Pressed, _critical.Pressed);
+        apply.OnPressed += _ =>
+        {
+            var factions = _factionChecks
+                .Where(pair => pair.Value.Pressed)
+                .Select(pair => pair.Key)
+                .ToHashSet();
+            OnApply?.Invoke(_amount.Value, _brute.Pressed, _burn.Pressed, _critical.Pressed, factions);
+        };
         root.AddChild(apply);
     }
 
@@ -73,5 +89,18 @@ public sealed class CMUMedibotConfigurationWindow : DefaultWindow
         _brute.Pressed = state.InjectOnBrute;
         _burn.Pressed = state.InjectOnBurn;
         _critical.Pressed = state.InjectOnCritical;
+
+        _factions.RemoveAllChildren();
+        _factionChecks.Clear();
+        foreach (var faction in state.Factions)
+        {
+            var check = new CheckBox
+            {
+                Text = faction.Name,
+                Pressed = state.SelectedFactions.Contains(faction.Id),
+            };
+            _factionChecks[faction.Id] = check;
+            _factions.AddChild(check);
+        }
     }
 }

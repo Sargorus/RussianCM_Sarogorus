@@ -412,7 +412,7 @@
 
 - type: latheRecipe
   id: CMURoboticsHugBot
-  result: MobHugBot
+  result: CMUHugBot
   completetime: 10
   materials:
     CMSteel: 4000

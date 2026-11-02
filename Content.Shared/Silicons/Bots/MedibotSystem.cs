@@ -189,41 +189,7 @@ public sealed partial class MedibotSystem : EntitySystem
         recentlyInjected.RemoveTime = TimeSpan.FromMinutes(1);
         recentlyInjected.Accumulator = 0;
 
-        BeginFieldTreatment(medibot.Owner, target);
-
         return true;
-    }
-
-    /// <summary>
-    /// Whether the patient has damage the CMU field treatment can handle.
-    /// </summary>
-    public bool HasFieldTreatableDamage(EntityUid target)
-    {
-        if (!TryComp<DamageableComponent>(target, out var damageable))
-            return false;
-
-        var groups = _damageable.GetDamagePerGroup((target, damageable));
-        return groups.TryGetValue("Brute", out var brute) && brute > FixedPoint2.Zero ||
-               groups.TryGetValue("Burn", out var burn) && burn > FixedPoint2.Zero;
-    }
-
-    /// <summary>
-    /// Starts or refreshes the CMU field treatment on a patient.
-    /// </summary>
-    public void BeginFieldTreatment(EntityUid medibot, EntityUid target)
-    {
-        if (!TryComp<CMUMedibotHealingComponent>(medibot, out var healing))
-            return;
-
-        var fieldTreatment = EnsureComp<CMUMedibotTreatmentComponent>(target);
-        fieldTreatment.Healer = medibot;
-        fieldTreatment.Position = Transform(target).LocalPosition;
-        fieldTreatment.StartDelay = healing.StartDelay;
-        fieldTreatment.Interval = healing.Interval;
-        fieldTreatment.NextHeal = _timing.CurTime + healing.StartDelay;
-        fieldTreatment.BruteHeal = healing.BruteHeal;
-        fieldTreatment.BurnHeal = healing.BurnHeal;
-        fieldTreatment.MaxPatientSpeed = healing.MaxPatientSpeed;
     }
 
     private bool TryInjectFromBeaker(

@@ -1,20 +1,25 @@
+using System.Collections.Generic;
 using System.Linq;
 using Content.IntegrationTests.Fixtures;
 using Content.Server.Decals;
-using Content.Server.NPC.HTN;
 using Content.Shared.CMU14.Robotics;
 using Content.Shared.Chemistry.EntitySystems;
+using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Damage;
-using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Decals;
 using Content.Shared.FixedPoint;
+using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.Lathe.Prototypes;
+using Content.Shared.Mobs;
+using Content.Shared.Mobs.Components;
 using Content.Shared.NPC.Components;
 using Content.Shared.Silicons.Bots;
 using Content.Shared.UserInterface;
+using Content.Shared._RMC14.Marines;
+using Content.Shared._RMC14.Medical.CPR;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
@@ -25,58 +30,33 @@ namespace Content.IntegrationTests.CMU14.Robotics;
 public sealed class CMURoboticsBotsTest : GameTest
 {
     [Test]
-    public async Task FabricatorBuildsBotsAndMedibotTreatsStillPatients()
+    public async Task FabricatorBuildsBotsWithoutStartingBeaker()
     {
         var map = await Pair.CreateTestMap();
-        EntityUid patient = default;
 
         await Server.WaitAssertion(() =>
         {
             var prototypes = Server.ResolveDependency<IPrototypeManager>();
             Assert.That(prototypes.HasIndex<EntityPrototype>("CMUCleanBot"), Is.True);
+            Assert.That(prototypes.HasIndex<EntityPrototype>("CMUHugBot"), Is.True);
+
             var pack = prototypes.Index<LatheRecipePackPrototype>("CMURoboticsFabricatorRecipes");
             Assert.That(pack.Recipes.Select(recipe => recipe.Id), Does.Contain("CMURoboticsCleanBot"));
             Assert.That(pack.Recipes.Select(recipe => recipe.Id), Does.Contain("CMURoboticsHugBot"));
             Assert.That(pack.Recipes.Select(recipe => recipe.Id), Does.Contain("CMURoboticsMedibot"));
 
             var bot = SEntMan.SpawnEntity("CMUMedibot", map.GridCoords);
-            Assert.That(SEntMan.HasComponent<CMUMedibotHealingComponent>(bot), Is.True);
             Assert.That(SEntMan.HasComponent<CMUMedibotComponent>(bot), Is.True);
             Assert.That(SEntMan.HasComponent<MedibotComponent>(bot), Is.True);
-            Assert.That(SEntMan.GetComponent<MedibotComponent>(bot).Treatments.Keys,
-                Does.Contain(Content.Shared.Mobs.MobState.Alive));
-
-            // Keep the bot in place so this test measures only the field treatment.
-            SEntMan.GetComponent<HTNComponent>(bot).Enabled = false;
-
-            patient = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(1, 0)));
-            SEntMan.EnsureComponent<NpcFactionMemberComponent>(patient).Factions.Add("AUWeYu");
-            var damage = new DamageSpecifier
-            {
-                DamageDict =
-                {
-                    ["Blunt"] = 30,
-                    ["Heat"] = 30,
-                },
-            };
-            SEntMan.System<DamageableSystem>().TryChangeDamage(patient, damage, ignoreResistances: true);
-            Assert.That(SEntMan.System<MedibotSystem>().TryInject((bot, SComp<MedibotComponent>(bot)), patient),
-                Is.True, "The medibot must start field treatment by injecting this patient.");
-        });
-
-        await Pair.RunTicksSync(120);
-
-        await Server.WaitAssertion(() =>
-        {
-            var damageable = SComp<DamageableComponent>(patient);
-            var total = SEntMan.System<DamageableSystem>().GetTotalDamage((patient, damageable)).Float();
-            Assert.That(total, Is.LessThan(60f),
-                "A still Weyland-Yutani patient next to the CMU medibot must receive suture and regenerative-mesh healing.");
+            Assert.That(SEntMan.HasComponent<MarineComponent>(bot), Is.True);
+            Assert.That(SEntMan.HasComponent<HandsComponent>(bot), Is.True);
+            Assert.That(SEntMan.System<ItemSlotsSystem>().GetItemOrNull(bot, "cmu-medibot-beaker"), Is.Null,
+                "The fabricator must produce the medical bot without a beaker.");
         });
     }
 
     [Test]
-    public async Task MedibotInjectsBeakerDoseAndKeyChangesSettings()
+    public async Task MedibotInjectsAnyBeakerAndKeyChangesSettings()
     {
         var map = await Pair.CreateTestMap();
 
@@ -86,6 +66,8 @@ public sealed class CMURoboticsBotsTest : GameTest
             var bot = SEntMan.SpawnEntity("CMUMedibot", map.GridCoords.Offset(new(1, 0)));
             var patient = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(2, 0)));
             SEntMan.EnsureComponent<NpcFactionMemberComponent>(patient).Factions.Add("AUWeYu");
+
+            InsertTricordBeaker(bot, user, map.GridCoords);
 
             var damage = new DamageSpecifier
             {
@@ -98,7 +80,7 @@ public sealed class CMURoboticsBotsTest : GameTest
 
             var medibot = SComp<MedibotComponent>(bot);
             Assert.That(SEntMan.System<MedibotSystem>().TryInject((bot, medibot), patient), Is.True,
-                "A medibot with its starting tricordrazine beaker must be able to inject a brute-damaged patient.");
+                "A medibot with an inserted beaker must be able to inject a brute-damaged patient.");
 
             var solutions = SEntMan.System<SharedSolutionContainerSystem>();
             Assert.That(solutions.TryGetInjectableSolution(patient, out var injectable, out _), Is.True);
@@ -126,7 +108,7 @@ public sealed class CMURoboticsBotsTest : GameTest
             SEntMan.System<SharedUserInterfaceSystem>().RaiseUiMessage(
                 bot,
                 CMUMedibotConfigurationUi.Key,
-                new CMUMedibotConfigurationApplyMsg(25, false, true, false)
+                new CMUMedibotConfigurationApplyMsg(25, false, true, false, new HashSet<string> { "GOVFOR" })
                 {
                     Actor = user,
                 });
@@ -135,6 +117,33 @@ public sealed class CMURoboticsBotsTest : GameTest
             Assert.That(medibotComponent.InjectOnBrute, Is.False);
             Assert.That(medibotComponent.InjectOnBurn, Is.True);
             Assert.That(medibotComponent.InjectOnCritical, Is.False);
+            Assert.That(medibotComponent.TreatFactions, Is.EquivalentTo(new[] { "GOVFOR" }));
+        });
+    }
+
+    [Test]
+    public async Task MedibotCanStartCPROnIntactCorpse()
+    {
+        var map = await Pair.CreateTestMap();
+
+        await Server.WaitAssertion(() =>
+        {
+            var bot = SEntMan.SpawnEntity("CMUMedibot", map.GridCoords);
+            var corpse = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(1, 0)));
+            SEntMan.EnsureComponent<NpcFactionMemberComponent>(corpse).Factions.Add("AUWeYu");
+
+            var damage = new DamageSpecifier
+            {
+                DamageDict =
+                {
+                    ["Blunt"] = 1000,
+                },
+            };
+            SEntMan.System<DamageableSystem>().TryChangeDamage(corpse, damage, ignoreResistances: true);
+
+            Assert.That(SComp<MobStateComponent>(corpse).CurrentState, Is.EqualTo(MobState.Dead));
+            Assert.That(SEntMan.System<CPRSystem>().TryStartCPR(bot, corpse), Is.True,
+                "The medical bot must be able to start CPR on an intact Weyland-Yutani corpse.");
         });
     }
 
@@ -143,6 +152,7 @@ public sealed class CMURoboticsBotsTest : GameTest
     {
         var map = await Pair.CreateTestMap();
         DecalIndex blood = default;
+        DecalIndex footprint = default;
 
         await Server.WaitAssertion(() =>
         {
@@ -153,6 +163,11 @@ public sealed class CMURoboticsBotsTest : GameTest
                 map.GridCoords,
                 out blood,
                 cleanable: true), Is.True);
+            Assert.That(decals.TryAddDecal(
+                "FootprintShoes",
+                map.GridCoords,
+                out footprint,
+                cleanable: true), Is.True);
         });
 
         await Pair.RunTicksSync(30);
@@ -161,7 +176,20 @@ public sealed class CMURoboticsBotsTest : GameTest
         {
             var decals = SEntMan.System<DecalSystem>();
             Assert.That(decals.ContainsDecal(map.Grid.Owner, blood), Is.False,
-                "The CMU cleanbot must walk to and remove cleanable blood decals.");
+                "The cleaner bot must walk to and remove cleanable blood decals.");
+            Assert.That(decals.ContainsDecal(map.Grid.Owner, footprint), Is.False,
+                "The cleaner bot must also remove bloody boot footprint decals.");
         });
+    }
+
+    private void InsertTricordBeaker(EntityUid bot, EntityUid user, EntityCoordinates coordinates)
+    {
+        var beaker = SEntMan.SpawnEntity("Beaker", coordinates);
+        var solutions = SEntMan.System<SharedSolutionContainerSystem>();
+        Assert.That(solutions.TryGetSolution(beaker, "beaker", out var beakerSolution, out _), Is.True);
+        solutions.TryAddReagent(beakerSolution!.Value, "CMTricordrazine", FixedPoint2.New(60), out _);
+
+        Assert.That(SEntMan.System<ItemSlotsSystem>().TryInsert(bot, "cmu-medibot-beaker", beaker, user), Is.True,
+            "Any dispenser-compatible beaker must fit into the medical bot.");
     }
 }

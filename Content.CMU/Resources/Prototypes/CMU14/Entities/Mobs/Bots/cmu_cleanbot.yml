@@ -38,10 +38,11 @@
 - type: entity
   parent: MobCleanBot
   id: CMUCleanBot
-  name: CMU cleanbot
-  description: A Weyland-Yutani cleanbot. It mops puddles and follows blood trails left by dragging a bleeding body.
+  name: cleaner bot
+  description: A Weyland-Yutani cleaner bot. It mops puddles and follows blood trails left by dragging a bleeding body.
   suffix: CMU14
   components:
+  - type: CMUBotSlogan
   - type: HTN
     rootTask:
       task: CMUCleanbotCompound

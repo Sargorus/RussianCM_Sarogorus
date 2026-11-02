@@ -63,9 +63,16 @@ public sealed partial class CMUPickNearbyBloodDecalOperator : HTNOperator
 
     public static bool IsBlood(Decal decal)
     {
-        return decal.Cleanable &&
-               decal.Id.Contains("Blood", StringComparison.OrdinalIgnoreCase) &&
-               !decal.Id.Contains("Xeno", StringComparison.OrdinalIgnoreCase) &&
-               !decal.Id.Contains("Acid", StringComparison.OrdinalIgnoreCase);
+        if (!decal.Cleanable ||
+            decal.Id.Contains("Xeno", StringComparison.OrdinalIgnoreCase) ||
+            decal.Id.Contains("Acid", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        // Bloody boot prints reuse the generic footprint decals, so clean all
+        // footprint decals rather than only ids containing "Blood".
+        return decal.Id.Contains("Blood", StringComparison.OrdinalIgnoreCase) ||
+               decal.Id.Contains("Footprint", StringComparison.OrdinalIgnoreCase);
     }
 }
