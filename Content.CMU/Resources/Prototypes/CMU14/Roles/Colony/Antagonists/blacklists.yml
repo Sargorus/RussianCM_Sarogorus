@@ -16,6 +16,7 @@
     - AU14JobCivilianCorporateAssistant
     - AU14JobWYGuard
     - AU14JobCivilianScientist
+    - AU14JobCivilianScientistRoboticist
     - AU14JobCorporateSynthetic
 
 - type: antagJobBlacklist

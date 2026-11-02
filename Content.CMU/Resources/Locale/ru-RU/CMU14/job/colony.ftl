@@ -139,6 +139,10 @@ au14-job-name-civilianscientist = Учёный
 au14-job-description-civilianscientist = Вы учёный, работающий на корпорацию «Вейланд-Ютани» или государственное учреждение.
 au14-job-prefix-civilianscientist = SCI.
 
+au14-job-name-civilianscientistroboticist = Учёный-Робототехник
+au14-job-description-civilianscientistroboticist = Вы учёный-робототехник, работающий на корпорацию «Вейланд-Ютани». Собирайте, ремонтируйте и программируйте дронов и андроидов в робототехнической лаборатории. Медицинской подготовки у вас нет.
+au14-job-prefix-civilianscientistroboticist = ROBO.
+
 au14-job-name-usasfrecruiter = Вербовщик ОА
 au14-job-description-usasfrecruiter = Вы военный вербовщик Соединённых Америк. Вас направили в колонию для законного набора гражданских на военную службу ОА. (Роль доступна на LV-624)
 au14-job-prefix-usasfrecruiter = UA RECR

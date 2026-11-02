@@ -2,8 +2,8 @@ cmu-job-name-govfordroneoperator = Оператор дронов
 cmu-job-description-govfordroneoperator = Собирайте, подключайте и дистанционно управляйте андроидом-дроном, боевым НБТ или огнемётным НБТ.
 cmu-job-prefix-govfordroneoperator = DRO
 
-cmu-species-name-drone-android = Андроид-дрон
-cmu-species-drone-android-generation = андроид-дрон
+cmu-species-name-drone-android = Гуманоидный дрон
+cmu-species-drone-android-generation = гуманоидный дрон
 
 cmu-drone-operator-required = Вы не обучены работе с этой системой дронов.
 cmu-drone-assembly-finish = Вы завершаете сборку {$drone}.
@@ -41,6 +41,8 @@ cmu-drone-tablet-bound = Планшет уже привязан к другом�
 cmu-drone-link-finish = Вы связываете планшет с {$drone}.
 cmu-drone-tablet-must-carry = Для управления дроном планшет должен находиться при вас.
 cmu-drone-tablet-no-link = Планшет не связан с дроном.
+cmu-drone-unlink-verb = Отвязаться от текущего дрона
+cmu-drone-unlink-finish = Планшет отвязан от {$drone}.
 cmu-drone-rename-verb = Переименовать дрона
 cmu-drone-rename-title = Переименовать дрона
 cmu-drone-rename-prompt = Введите однословное имя дрона (не более {$max} символов).
@@ -79,13 +81,30 @@ cmu-drone-control-ended-operator-hurt = Сеанс управления дрон
 cmu-drone-control-ended-operator-disabled = Сеанс управления дроном завершается, поскольку ваше тело выведено из строя.
 cmu-drone-control-ended-link-lost = Сеанс управления дроном завершается из-за потери связи.
 cmu-drone-control-ended-leash = Сеанс управления дроном завершается, поскольку дрон выходит за пределы радиуса действия планшета.
+cmu-drone-control-ended-unlinked = Сеанс управления дроном завершается, поскольку планшет отвязан от дрона.
 
 cmu-drone-self-repair-blocked = Каркас дрона не способен к саморемонту.
+cmu-drone-revive-already-alive = {$drone} уже активен.
+cmu-drone-revive-repair-first = Сначала отремонтируйте {$drone}, затем вставляйте ключ активации.
+cmu-drone-revive-start = Вы начинаете реактивировать {$drone} ключом синтетика.
+cmu-drone-revive-finish = {$drone} снова в строю.
+cmu-drone-repair-target-locked = Эта единица закреплена за контрактом на ремонт и не поддаётся управлению.
+cmu-drone-module-combat-blocked = {$drone} не принимает боевой модуль.
 cmu-drone-module-tool-required = Чтобы установить {$module}, в другой руке должен находиться подходящий инструмент.
 cmu-drone-module-install-start = Вы начинаете устанавливать {$module} в {$drone}.
 cmu-drone-module-install-finish = Вы устанавливаете {$module} в {$drone}.
 cmu-drone-module-remove-start = Вы начинаете извлекать {$module} из {$drone}.
 cmu-drone-module-remove-finish = Вы извлекаете {$module} из {$drone}.
+
+ent-CMUDroneConfigurationKey = ключ настройки дронов Вей-Ю
+    .desc = Служебный ключ Weyland-Yutani для изменения фракции дрона, доступных ему радиочастот и уровней доступа по учётным данным владельца.
+cmu-drone-config-title = Настройка дрона
+cmu-drone-config-faction = Фракция
+cmu-drone-config-channels = Доступные частоты
+cmu-drone-config-access = Доступы
+cmu-drone-config-no-id = Во второй руке нет ID-карты: доступы не будут выданы.
+cmu-drone-config-apply = Применить
+cmu-drone-config-applied = Вы перенастраиваете дрона.
 
 cmu-name-drone-android-1 = Apex
 cmu-name-drone-android-2 = Argus

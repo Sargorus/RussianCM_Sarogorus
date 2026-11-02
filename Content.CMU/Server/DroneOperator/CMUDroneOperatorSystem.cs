@@ -7,16 +7,17 @@ using Content.Server.NPC;
 using Content.Server.NPC.HTN;
 using Content.Server.NPC.Pathfinding;
 using Content.Server.NPC.Systems;
-using Content.Server.Radio;
 using Content.Server.Radio.Components;
 using Content.Server.Radio.EntitySystems;
 using Content.Server._RMC14.Humanoid.Markings;
+using Content.Server.CMU14.Robotics;
 using Content.Shared.CMU14.DroneOperator;
 using Content.Shared.CMU14.Threats.Mobs.Xeno.Caste.Warlock;
 using Content.Shared.CMU14.ZLevels.Core.EntitySystems;
 using Content.Shared._RMC14.Humanoid.Markings;
 using Content.Shared._RMC14.Marines.Skills;
 using Content.Shared._RMC14.Synth;
+using Content.Shared._RMC14.Tools;
 using Content.Shared._RMC14.Weapons.Ranged.IFF;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Access.Components;
@@ -27,6 +28,7 @@ using Content.Shared.Coordinates;
 using Content.Shared.Dataset;
 using Content.Shared.Damage.Systems;
 using Content.Shared.DoAfter;
+using Content.Shared.FixedPoint;
 using Content.Shared.Drunk;
 using Content.Shared.Ghost;
 using Content.Shared.Ghost.Components;
@@ -45,9 +47,9 @@ using Content.Shared.Movement.Events;
 using Content.Shared.Movement.Pulling.Events;
 using Content.Shared.NPC;
 using Content.Shared.Popups;
-using Content.Shared.Random.Helpers;
 using Content.Shared.Radio;
 using Content.Shared.Radio.Components;
+using Content.Shared.Random.Helpers;
 using Content.Shared.SSDIndicator;
 using Content.Shared.StatusEffectNew;
 using Content.Shared.Stunnable;
@@ -141,6 +143,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         SubscribeLocalEvent<CMUDroneFrameComponent, CMUDroneFrameActivateDoAfterEvent>(OnFrameActivateComplete);
 
         SubscribeLocalEvent<CMUDroneControlTabletComponent, UseInHandEvent>(OnTabletUseInHand);
+        SubscribeLocalEvent<CMUDroneControlTabletComponent, GetVerbsEvent<Verb>>(OnTabletGetVerbs);
         SubscribeLocalEvent<CMUDroneControlTabletComponent, GotUnequippedEvent>(OnTabletGotUnequipped);
         SubscribeLocalEvent<CMUDroneControlTabletComponent, ComponentShutdown>(OnTabletShutdown);
         SubscribeLocalEvent<CMUDroneControlTabletComponent, EntityTerminatingEvent>(OnTabletTerminating);
@@ -150,6 +153,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         SubscribeLocalEvent<CMUDroneAndroidComponent, InteractUsingEvent>(OnDroneInteractUsing);
         SubscribeLocalEvent<CMUDroneAndroidComponent, CMUDroneModuleInstallDoAfterEvent>(OnDroneModuleInstallComplete);
         SubscribeLocalEvent<CMUDroneAndroidComponent, CMUDroneModuleUninstallDoAfterEvent>(OnDroneModuleUninstallComplete);
+        SubscribeLocalEvent<CMUDroneAndroidComponent, CMUDroneReviveDoAfterEvent>(OnDroneReviveComplete);
         SubscribeLocalEvent<CMUDroneAndroidComponent, EntitySpokeEvent>(OnDroneSpoke);
         SubscribeLocalEvent<CMUDroneAndroidComponent, MobStateChangedEvent>(OnDroneMobStateChanged);
         SubscribeLocalEvent<CMUDroneAndroidComponent, RMCSynthRepairToolUseAttemptEvent>(OnDroneRepairAttempt);
@@ -272,6 +276,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
     {
         EnsureFramePartsContainer(ent);
         EnsureFramePartStates(ent);
+        UpdateFrameVisuals(ent);
     }
 
     private void OnFrameInteractUsing(Entity<CMUDroneFrameComponent> ent, ref InteractUsingEvent args)
@@ -355,6 +360,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
 
         ent.Comp.PartStates[part.Part] = CMUDroneAssemblyPartState.Installed;
         ent.Comp.InstalledParts[part.Part] = partUid;
+        UpdateFrameVisuals(ent);
 
         _popup.PopupEntity(
             Loc.GetString("cmu-drone-frame-part-install-finish", ("part", partUid), ("frame", ent.Owner)),
@@ -437,6 +443,74 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         TryStartControl(ent, args.User);
     }
 
+    private void OnTabletGetVerbs(Entity<CMUDroneControlTabletComponent> ent, ref GetVerbsEvent<Verb> args)
+    {
+        if (!args.CanInteract || ent.Comp.LinkedDrone == null)
+            return;
+
+        if (ent.Comp.Operator is { } tabletOperator &&
+            tabletOperator != args.User &&
+            Exists(tabletOperator))
+        {
+            return;
+        }
+
+        var user = args.User;
+        args.Verbs.Add(new Verb
+        {
+            Text = Loc.GetString("cmu-drone-unlink-verb"),
+            Priority = -3,
+            Act = () => UnlinkTablet(ent, user),
+        });
+    }
+
+    private void UnlinkTablet(Entity<CMUDroneControlTabletComponent> tablet, EntityUid user)
+    {
+        var linkedDrone = tablet.Comp.LinkedDrone;
+        var tabletOperator = tablet.Comp.Operator;
+
+        EndControlForTablet(tablet.Owner, Loc.GetString("cmu-drone-control-ended-unlinked"));
+
+        if (linkedDrone is { } drone &&
+            !TerminatingOrDeleted(drone) &&
+            TryComp<CMUDroneAndroidComponent>(drone, out var droneComp))
+        {
+            if (droneComp.Tablet == tablet.Owner ||
+                droneComp.Operator == tabletOperator)
+            {
+                droneComp.Operator = null;
+                droneComp.Tablet = null;
+            }
+        }
+
+        if (tabletOperator is { } operatorUid &&
+            !TerminatingOrDeleted(operatorUid) &&
+            TryComp<CMUDroneOperatorComponent>(operatorUid, out var operatorComp))
+        {
+            if (linkedDrone is { } linked)
+            {
+                if (operatorComp.Drone == linked)
+                    operatorComp.Drone = null;
+                if (operatorComp.ControlledDrone == linked)
+                    operatorComp.ControlledDrone = null;
+            }
+
+            if (operatorComp.Tablet == tablet.Owner)
+                operatorComp.Tablet = null;
+        }
+
+        tablet.Comp.LinkedDrone = null;
+        tablet.Comp.Operator = null;
+
+        if (linkedDrone is { } popupDrone && !TerminatingOrDeleted(popupDrone))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-drone-unlink-finish", ("drone", popupDrone)),
+                user,
+                user);
+        }
+    }
+
     private void OnTabletGotUnequipped(Entity<CMUDroneControlTabletComponent> ent, ref GotUnequippedEvent args)
     {
         EndControlForTablet(ent.Owner, Loc.GetString("cmu-drone-control-ended-tablet-removed"));
@@ -472,6 +546,23 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         {
             args.Handled = true;
             TryLinkTablet((args.Used, tabletComp), args.User, ent.Owner);
+            return;
+        }
+
+        // A multitool can also bind the tablet the operator is holding to the drone.
+        if (HasComp<MultitoolComponent>(args.Used) &&
+            TryGetHeldTablet(args.User, out var heldTablet) &&
+            TryComp<CMUDroneControlTabletComponent>(heldTablet, out var heldTabletComp))
+        {
+            args.Handled = true;
+            TryLinkTablet((heldTablet, heldTabletComp), args.User, ent.Owner, allowRelink: true);
+            return;
+        }
+
+        if (HasComp<CMUDroneSynthKeyComponent>(args.Used))
+        {
+            args.Handled = true;
+            TryStartDroneRevive(ent, args.Used, args.User);
             return;
         }
 
@@ -526,7 +617,10 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
 
     private void OnDroneSpoke(Entity<CMUDroneAndroidComponent> ent, ref EntitySpokeEvent args)
     {
-        if (args.Source != ent.Owner ||
+        // GOVFOR and OPFOR issue drones relay through their operator. The
+        // Weyland-Yutani fabricator frames opt out of this duplication.
+        if (!ent.Comp.RelayOperatorSpeech ||
+            args.Source != ent.Owner ||
             !TryComp<CMUDroneControlSessionComponent>(ent.Owner, out var session) ||
             TerminatingOrDeleted(session.Operator))
         {
@@ -654,6 +748,16 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         Entity<CMUDroneModuleComponent> module,
         EntityUid user)
     {
+        if (!CanUseDroneModule(drone, module.Owner))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-drone-module-combat-blocked", ("drone", drone.Owner)),
+                user,
+                user,
+                PopupType.SmallCaution);
+            return true;
+        }
+
         if (!TryGetHeldTool(user, module.Comp.InstallTool, module.Owner, out _))
         {
             _popup.PopupEntity(
@@ -689,6 +793,85 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
             user,
             user);
         return true;
+    }
+
+    private void TryStartDroneRevive(Entity<CMUDroneAndroidComponent> drone, EntityUid key, EntityUid user)
+    {
+        if (TerminatingOrDeleted(drone.Owner) ||
+            TerminatingOrDeleted(key) ||
+            !HasComp<CMUDroneSynthKeyComponent>(key))
+        {
+            return;
+        }
+
+        if (_mobState.IsAlive(drone.Owner))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-drone-revive-already-alive", ("drone", drone.Owner)),
+                drone.Owner,
+                user,
+                PopupType.SmallCaution);
+            return;
+        }
+
+        if (_combatDamage.GetTotalDamage(drone.Owner) > FixedPoint2.New(5))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-drone-revive-repair-first", ("drone", drone.Owner)),
+                drone.Owner,
+                user,
+                PopupType.SmallCaution);
+            return;
+        }
+
+        var doAfter = new DoAfterArgs(
+            EntityManager,
+            user,
+            TimeSpan.FromSeconds(5),
+            new CMUDroneReviveDoAfterEvent(),
+            drone.Owner,
+            used: key)
+        {
+            BreakOnMove = true,
+            BreakOnDropItem = true,
+            NeedHand = true,
+            DuplicateCondition = DuplicateConditions.SameEvent,
+            ExtraCheck = () =>
+                _hands.IsHolding(user, key) &&
+                _mobState.IsDead(drone.Owner) &&
+                _combatDamage.GetTotalDamage(drone.Owner) <= FixedPoint2.New(5),
+        };
+
+        if (!_doAfter.TryStartDoAfter(doAfter))
+            return;
+
+        _popup.PopupEntity(
+            Loc.GetString("cmu-drone-revive-start", ("drone", drone.Owner)),
+            drone.Owner,
+            user);
+    }
+
+    private void OnDroneReviveComplete(Entity<CMUDroneAndroidComponent> ent, ref CMUDroneReviveDoAfterEvent args)
+    {
+        if (args.Cancelled || args.Handled || args.Used is not { } key)
+            return;
+
+        args.Handled = true;
+
+        if (TerminatingOrDeleted(key) ||
+            !HasComp<CMUDroneSynthKeyComponent>(key) ||
+            !_mobState.IsDead(ent.Owner) ||
+            _combatDamage.GetTotalDamage(ent.Owner) > FixedPoint2.New(5))
+        {
+            return;
+        }
+
+        _mobState.ChangeMobState(ent.Owner, MobState.Alive);
+        QueueDel(key);
+        _popup.PopupEntity(
+            Loc.GetString("cmu-drone-revive-finish", ("drone", ent.Owner)),
+            ent.Owner,
+            args.User);
     }
 
     private bool TryStartModuleUninstall(
@@ -741,8 +924,15 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
     {
         return !TerminatingOrDeleted(drone.Owner) &&
                !TerminatingOrDeleted(module.Owner) &&
+               CanUseDroneModule(drone, module.Owner) &&
                _hands.IsHolding(user, module.Owner) &&
                TryGetHeldTool(user, module.Comp.InstallTool, module.Owner, out _);
+    }
+
+    private bool CanUseDroneModule(Entity<CMUDroneAndroidComponent> drone, EntityUid module)
+    {
+        return drone.Comp.SupportsCombatModule ||
+               MetaData(module).EntityPrototype?.ID != "CMUDroneModuleCombat";
     }
 
     private void InstallDroneModule(
@@ -848,6 +1038,21 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         }
 
         heldTool = default;
+        return false;
+    }
+
+    private bool TryGetHeldTablet(EntityUid user, out EntityUid tablet)
+    {
+        foreach (var held in _hands.EnumerateHeld(user))
+        {
+            if (!HasComp<CMUDroneControlTabletComponent>(held))
+                continue;
+
+            tablet = held;
+            return true;
+        }
+
+        tablet = default;
         return false;
     }
 
@@ -1281,6 +1486,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         CopyOperatorIFF(drone, user);
         SuppressSsdIndicator(drone);
         RefreshDroneDormantEffect((drone, droneComp));
+        RefreshDroneSkills((drone, droneComp));
 
         operatorComp.Drone = drone;
 
@@ -1305,6 +1511,29 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         {
             frame.Comp.PartStates.TryAdd(part, CMUDroneAssemblyPartState.Missing);
         }
+    }
+
+    private void UpdateFrameVisuals(Entity<CMUDroneFrameComponent> frame)
+    {
+        foreach (var part in frame.Comp.RequiredParts)
+        {
+            var shown = frame.Comp.PartStates.GetValueOrDefault(part) != CMUDroneAssemblyPartState.Missing;
+            if (FrameVisual(part) is { } visual)
+                _combatAppearance.SetData(frame.Owner, visual, shown);
+        }
+    }
+
+    private static CMUDroneFrameVisuals? FrameVisual(CMUDroneAssemblyPartSlot part)
+    {
+        return part switch
+        {
+            CMUDroneAssemblyPartSlot.Head => CMUDroneFrameVisuals.Head,
+            CMUDroneAssemblyPartSlot.LeftArm => CMUDroneFrameVisuals.LeftArm,
+            CMUDroneAssemblyPartSlot.RightArm => CMUDroneFrameVisuals.RightArm,
+            CMUDroneAssemblyPartSlot.LeftLeg => CMUDroneFrameVisuals.LeftLeg,
+            CMUDroneAssemblyPartSlot.RightLeg => CMUDroneFrameVisuals.RightLeg,
+            _ => null,
+        };
     }
 
     private bool TryGetFramePartWithState(
@@ -1705,7 +1934,8 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         Entity<CMUDroneControlTabletComponent> tablet,
         EntityUid user,
         EntityUid drone,
-        bool silent = false)
+        bool silent = false,
+        bool allowRelink = false)
     {
         if (!TryComp<CMUDroneOperatorComponent>(user, out var operatorComp))
         {
@@ -1719,6 +1949,16 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         {
             if (!silent)
                 _popup.PopupEntity(Loc.GetString("cmu-drone-link-invalid"), user, user, PopupType.SmallCaution);
+
+            return false;
+        }
+
+        // Repair-order units belong to the customer until they are delivered and
+        // cannot be commandeered through a control tablet.
+        if (HasComp<CMURoboticsOrderTargetComponent>(drone))
+        {
+            if (!silent)
+                _popup.PopupEntity(Loc.GetString("cmu-drone-repair-target-locked"), user, user, PopupType.SmallCaution);
 
             return false;
         }
@@ -1748,10 +1988,30 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
             Exists(existingDrone) &&
             !TerminatingOrDeleted(existingDrone))
         {
-            if (!silent)
-                _popup.PopupEntity(Loc.GetString("cmu-drone-assembly-existing"), user, user, PopupType.SmallCaution);
+            if (!allowRelink)
+            {
+                if (!silent)
+                    _popup.PopupEntity(Loc.GetString("cmu-drone-assembly-existing"), user, user, PopupType.SmallCaution);
 
-            return false;
+                return false;
+            }
+
+            // Multitool relink: drop the old drone and tablet binding first.
+            EndControlForDrone(existingDrone, Loc.GetString("cmu-drone-control-ended-manual"));
+
+            if (TryComp<CMUDroneAndroidComponent>(existingDrone, out var oldDrone))
+            {
+                if (oldDrone.Operator == user)
+                    oldDrone.Operator = null;
+                if (oldDrone.Tablet == tablet.Owner)
+                    oldDrone.Tablet = null;
+            }
+
+            if (tablet.Comp.LinkedDrone == existingDrone)
+                tablet.Comp.LinkedDrone = null;
+
+            operatorComp.Drone = null;
+            operatorComp.Tablet = null;
         }
 
         tablet.Comp.LinkedDrone = drone;
@@ -1778,6 +2038,9 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
 
     private void CopyOperatorIFF(EntityUid drone, EntityUid user)
     {
+        if (TryComp<CMUDroneAndroidComponent>(drone, out var droneComp) && droneComp.IffConfigured)
+            return;
+
         var factions = new HashSet<EntProtoId<IFFFactionComponent>>();
         _iff.TryGetFactions(user, factions);
         _iff.ClearUserFactions(drone);
@@ -1796,6 +2059,12 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         if (TerminatingOrDeleted(drone.Owner) || !_mobState.IsAlive(drone.Owner))
         {
             reason = Loc.GetString("cmu-drone-control-drone-dead");
+            return false;
+        }
+
+        if (HasComp<CMURoboticsOrderTargetComponent>(drone.Owner))
+        {
+            reason = Loc.GetString("cmu-drone-repair-target-locked");
             return false;
         }
 
@@ -2351,7 +2620,8 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
 
     private void RefreshDroneSkills(Entity<CMUDroneAndroidComponent> drone, bool includeOperator = true)
     {
-        // Keep the unmodified frame skills across module swaps and control sessions.
+        // Keep the unmodified frame skills across module swaps and control sessions. Operator skills are
+        // copied only onto frames that opt in; civilian drones rely on their module boards instead.
         drone.Comp.BaseSkills ??= TryComp<SkillsComponent>(drone.Owner, out var baseSkills)
             ? new Dictionary<EntProtoId<SkillDefinitionComponent>, int>(baseSkills.Skills)
             : new Dictionary<EntProtoId<SkillDefinitionComponent>, int>();
@@ -2359,6 +2629,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         var skills = new Dictionary<EntProtoId<SkillDefinitionComponent>, int>(drone.Comp.BaseSkills);
 
         if (includeOperator &&
+            drone.Comp.InheritsOperatorSkills &&
             TryComp<CMUDroneControlSessionComponent>(drone.Owner, out var session) &&
             !TerminatingOrDeleted(session.Operator) &&
             TryComp<SkillsComponent>(session.Operator, out var operatorSkills))

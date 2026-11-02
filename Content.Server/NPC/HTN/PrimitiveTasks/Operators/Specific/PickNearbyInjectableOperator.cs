@@ -1,21 +1,28 @@
+using System.Linq; // CMU14: faction filtering
 using System.Threading;
 using System.Threading.Tasks;
 using Content.Shared.NPC.Components;
 using Content.Server.NPC.Pathfinding;
+using Content.Shared.CMU14.DroneOperator; // CMU14
+using Content.Shared.CMU14.Robotics; // CMU14
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
+using Content.Shared.Humanoid;
 using Content.Shared.Interaction;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Silicons.Bots;
 using Content.Shared.Emag.Components;
 using Content.Shared.FixedPoint;
+using Content.Shared._RMC14.Synth;
+using Robust.Shared.Timing;
 
 namespace Content.Server.NPC.HTN.PrimitiveTasks.Operators.Specific;
 
 public sealed partial class PickNearbyInjectableOperator : HTNOperator
 {
     [Dependency] private IEntityManager _entManager = default!;
+    [Dependency] private IGameTiming _timing = default!; // CMU14: target reservations
     private MedibotSystem _medibot = default!;
     private PathfindingSystem _pathfinding = default!;
     private DamageableSystem _damageable = default!;
@@ -65,12 +72,29 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
         if (!_entManager.TryGetComponent<MedibotComponent>(owner, out var medibot))
             return (false, null);
 
+        // CMU14: CMU medibots only serve configured factions and need beaker content for the patient.
+        var isCmuMedibot = _entManager.TryGetComponent<CMUMedibotComponent>(owner, out var cmuMedibot);
 
         if (!blackboard.TryGetValue<IEnumerable<KeyValuePair<EntityUid, float>>>("TargetList", out var patients, _entManager))
             return (false, null);
 
         foreach (var (entity, _) in patients)
         {
+            if (isCmuMedibot &&
+                (!IsValidCmuPatient(entity, cmuMedibot!) ||
+                 !_medibot.ShouldInjectFromBeaker(cmuMedibot!, entity)))
+            {
+                continue;
+            }
+
+            // CMU14: do not plan for a patient another medibot already reserved.
+            if (_entManager.TryGetComponent<CMUMedibotReservationComponent>(entity, out var reservation) &&
+                reservation.Bot != owner &&
+                _timing.CurTime < reservation.Expires)
+            {
+                continue;
+            }
+
             if (_mobState.TryGetComponent(entity, out var state) &&
                 _injectQuery.HasComponent(entity) &&
                 _damageQuery.TryGetComponent(entity, out var damage) &&
@@ -93,6 +117,12 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
                 if (path.Result == PathResult.NoPath)
                     continue;
 
+                // CMU14: reserve the patient while this bot walks over. Without this,
+                // several medibots can plan the same target before the first injection lands.
+                var reserved = _entManager.EnsureComponent<CMUMedibotReservationComponent>(entity);
+                reserved.Bot = owner;
+                reserved.Expires = _timing.CurTime + TimeSpan.FromSeconds(30);
+
                 return (true, new Dictionary<string, object>()
                 {
                     {TargetKey, entity},
@@ -103,5 +133,20 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
         }
 
         return (false, null);
+    }
+
+    // CMU14 method
+    private bool IsValidCmuPatient(EntityUid entity, CMUMedibotComponent component)
+    {
+        if (!_entManager.TryGetComponent<NpcFactionMemberComponent>(entity, out var factions) ||
+            !factions.Factions.Any(faction => component.TreatFactions.Contains(faction.Id)) ||
+            !_entManager.HasComponent<HumanoidProfileComponent>(entity) ||
+            _entManager.HasComponent<CMUDroneAndroidComponent>(entity) ||
+            _entManager.HasComponent<SynthComponent>(entity))
+        {
+            return false;
+        }
+
+        return true;
     }
 }

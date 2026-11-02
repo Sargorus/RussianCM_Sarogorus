@@ -2010,8 +2010,7 @@ public abstract partial class SharedCMUSurgeryFlowSystem : EntitySystem
 
     public bool CanPatientAcceptLimb(EntityUid patient, EntityUid heldLimb)
     {
-        return !HasComp<CMUDroneAndroidComponent>(patient) ||
-               HasComp<CMURoboticLimbComponent>(heldLimb);
+        return CMULimbCompatibility.CanAttach(EntityManager, patient, heldLimb);
     }
 
     public bool ToolMatchesCategory(EntityUid tool, string? category)

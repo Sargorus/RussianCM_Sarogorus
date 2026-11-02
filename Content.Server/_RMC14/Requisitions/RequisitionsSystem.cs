@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic; // CMU14: elevator queue insertion helper
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
@@ -28,6 +29,8 @@ using Content.Shared._RMC14.Weapons.Ranged.IFF;
 using Content.Shared._RMC14.Xenonids;
 using Content.Shared.CMU14.CCVar;
 using Content.Shared.CMU14.ColonyEconomy;
+using Content.Shared.CMU14.DroneOperator;
+using Content.Shared.CMU14.Robotics;
 using Content.Shared.CMU14.util;
 using Content.Shared.Cargo.Components;
 using Content.Shared.Chasm;
@@ -38,6 +41,7 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Physics;
 using Content.Shared.Random.Helpers;
 using Content.Shared.Stacks;
+using Content.Shared.Storage.Components;
 using Content.Shared.UserInterface;
 using Robust.Server.Audio;
 using Robust.Server.GameObjects;
@@ -329,9 +333,22 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
             var mask = (int)(CollisionGroup.MobLayer | CollisionGroup.MobMask);
             foreach (var entity in _physics.GetEntitiesIntersectingBody(elevator, mask, false))
             {
-                if (HasComp<MobStateComponent>(entity))
+                // Drones are allowed on the platform: they are either an active
+                // robotics order or cargo the player deliberately lowered.
+                if (HasComp<MobStateComponent>(entity) &&
+                    !HasComp<CMUDroneAndroidComponent>(entity) &&
+                    !HasComp<CMURoboticsDamagedBodyComponent>(entity))
+                {
                     return;
+                }
             }
+
+            // Robotics repair/build orders are validated and paid when the
+            // platform is lowered with the target drones on it.
+            var orderAttempt = new CMURequisitionsElevatorLoweringAttemptEvent(elevator.Owner);
+            RaiseLocalEvent(elevator.Owner, ref orderAttempt);
+            if (orderAttempt.Cancelled)
+                return;
         }
 
         comp.ToggledAt = _timing.CurTime;
@@ -347,6 +364,41 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
 
     // Returns the first existing account matching faction, or creates a new one.
     // The original (no faction param) used a single global account, we replicate this.
+    /// <summary>
+    /// CMU14: credit a completed robotics contract to the corporate account.
+    /// </summary>
+    public void AddCorporateFunds(int amount)
+    {
+        var account = GetAccount("corporate");
+        account.Comp.Balance += amount;
+        Dirty(account, account.Comp);
+        SendUIStateAll();
+    }
+
+    // CMU14 method: robotics contracts add their transport crates to the same
+    // order queue as normal cargo purchases.
+    public int GetElevatorRemainingOrderSlots(Entity<RequisitionsElevatorComponent> elevator)
+    {
+        return Math.Max(0, GetElevatorCapacity(elevator) - elevator.Comp.Orders.Count);
+    }
+
+    // CMU14 method: all-or-nothing queue insertion used by robotics contracts.
+    public bool TryAddElevatorOrders(
+        Entity<RequisitionsElevatorComponent> elevator,
+        List<RequisitionsEntry> orders)
+    {
+        if (orders.Count == 0)
+            return true;
+
+        if (orders.Count > GetElevatorRemainingOrderSlots(elevator))
+            return false;
+
+        elevator.Comp.Orders.AddRange(orders);
+        Dirty(elevator);
+        SendUIStateAll();
+        return true;
+    }
+
     private Entity<RequisitionsAccountComponent> GetAccount(string? faction = null)
     {
         var factionKey = string.IsNullOrEmpty(faction) || faction == "none"
@@ -547,7 +599,12 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
         var comp = elevator.Comp;
         if (comp.Mode == Raised)
         {
-            var delivery = Comp<RequisitionsDeliveryComponent>(elevator);
+            if (!TryComp<RequisitionsDeliveryComponent>(elevator, out var delivery))
+            {
+                Log.Error($"[Requisitions] Raised elevator {ToPrettyString(elevator)} had no prepared delivery; spawning orders directly.");
+                delivery = EnsureComp<RequisitionsDeliveryComponent>(elevator);
+            }
+
             var coordinates = _transform.GetMoverCoordinates(elevator);
             var xOffset = comp.Radius;
             var yOffset = comp.Radius;
@@ -555,8 +612,36 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
             for (var orderIndex = 0; orderIndex < comp.Orders.Count; orderIndex++)
             {
                 var order = comp.Orders[orderIndex];
-                var crate = delivery.Roots[orderIndex];
-                _transform.SetCoordinates(crate, coordinates.Offset(new Vector2(xOffset, yOffset)));
+                var target = coordinates.Offset(new Vector2(xOffset, yOffset));
+                EntityUid crate;
+                var hasPreparedRoot = orderIndex < delivery.Roots.Count &&
+                                      Exists(delivery.Roots[orderIndex]) &&
+                                      !TerminatingOrDeleted(delivery.Roots[orderIndex]);
+                if (hasPreparedRoot)
+                {
+                    crate = delivery.Roots[orderIndex];
+                }
+                else
+                {
+                    // A missing prepared root must never turn a paid order into
+                    // an empty platform. Spawn the product directly at the lift.
+                    crate = Spawn(order.Crate, target);
+                    if (order.Entities.Count > 0 &&
+                        TryComp<EntityStorageComponent>(crate, out var storage))
+                    {
+                        foreach (var prototype in order.Entities)
+                        {
+                            var contained = Spawn(prototype, target);
+                            if (!_entityStorage.Insert(contained, crate, storage))
+                                _transform.SetParent(contained, crate);
+                        }
+                    }
+
+                    delivery.Roots.Add(crate);
+                    Log.Error($"[Requisitions] Missing prepared root for order {orderIndex} on {ToPrettyString(elevator)}; spawned {order.Crate} directly.");
+                }
+
+                _transform.SetCoordinates(crate, target);
                 remainingDeliveries--;
                 // cmu edit start: lets the colony firearm registry log the guns in it
                 var delivered = new Content.Server.CMU14.Requisitions.CMURequisitionsCrateDeliveredEvent(elevator, orderIndex, crate,
@@ -564,15 +649,20 @@ public sealed partial class RequisitionsSystem : SharedRequisitionsSystem
                 RaiseLocalEvent(ref delivered);
                 // cmu edit end
 
-                // If this order came from a department console, attach a department note
-                // instead of the generic invoice so it shows on the crate label.
-                if (order.DeptName != null)
+                // CMU14: robotics transport crates must keep their label slot for
+                // the player's robotics order slip instead of a cargo invoice.
+                if (!HasComp<CMURoboticsTransportCrateComponent>(crate))
                 {
-                    ApplyDepartmentCrateMetadata(crate, coordinates, order);
-                }
-                else
-                {
-                    PrintInvoice(crate, coordinates, PaperRequisitionInvoice, order.PackedWeight);
+                    // If this order came from a department console, attach a department note
+                    // instead of the generic invoice so it shows on the crate label.
+                    if (order.DeptName != null)
+                    {
+                        ApplyDepartmentCrateMetadata(crate, coordinates, order);
+                    }
+                    else
+                    {
+                        PrintInvoice(crate, coordinates, PaperRequisitionInvoice, order.PackedWeight);
+                    }
                 }
 
                 yOffset--;
