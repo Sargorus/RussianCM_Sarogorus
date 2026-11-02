@@ -189,6 +189,19 @@ public sealed partial class MedibotSystem : EntitySystem
         recentlyInjected.RemoveTime = TimeSpan.FromMinutes(1);
         recentlyInjected.Accumulator = 0;
 
+        if (TryComp<CMUMedibotHealingComponent>(medibot.Owner, out var healing))
+        {
+            var fieldTreatment = EnsureComp<CMUMedibotTreatmentComponent>(target);
+            fieldTreatment.Healer = medibot.Owner;
+            fieldTreatment.Position = Transform(target).LocalPosition;
+            fieldTreatment.StartDelay = healing.StartDelay;
+            fieldTreatment.Interval = healing.Interval;
+            fieldTreatment.NextHeal = _timing.CurTime + healing.StartDelay;
+            fieldTreatment.BruteHeal = healing.BruteHeal;
+            fieldTreatment.BurnHeal = healing.BurnHeal;
+            fieldTreatment.MaxPatientSpeed = healing.MaxPatientSpeed;
+        }
+
         return true;
     }
 

@@ -46,7 +46,7 @@ public sealed class CMURoboticsBotsTest : GameTest
             Assert.That(SEntMan.GetComponent<MedibotComponent>(bot).Treatments.Keys,
                 Does.Contain(Content.Shared.Mobs.MobState.Alive));
 
-            // Keep the bot in place so this test measures only the passive field treatment.
+            // Keep the bot in place so this test measures only the field treatment.
             SEntMan.GetComponent<HTNComponent>(bot).Enabled = false;
 
             patient = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(1, 0)));
@@ -60,6 +60,8 @@ public sealed class CMURoboticsBotsTest : GameTest
                 },
             };
             SEntMan.System<DamageableSystem>().TryChangeDamage(patient, damage, ignoreResistances: true);
+            Assert.That(SEntMan.System<MedibotSystem>().TryInject((bot, SComp<MedibotComponent>(bot)), patient),
+                Is.True, "The medibot must start field treatment by injecting this patient.");
         });
 
         await Pair.RunTicksSync(120);
