@@ -164,7 +164,7 @@
 - type: entity
   parent: CMUDroneBodyFrame
   id: CMUDroneBodyFrameUnarmed
-  name: unarmed humanoid drone body frame
+  name: civilian humanoid drone body frame
   description: A bare synthetic torso frame whose control bus is locked out of firearm use. Its limb ports are sealed and its activation socket is empty.
   components:
   - type: CMUDroneFrame
@@ -260,6 +260,19 @@
   - type: CMUDroneSynthKey
 
 - type: entity
+  parent: BaseItem
+  id: CMUDroneConfigurationKey
+  name: Wey-Yu drone configuration key
+  description: A Weyland-Yutani service key that rewrites a drone's faction, radio channels and access permissions from the holder's credentials.
+  components:
+  - type: Sprite
+    sprite: _RMC14/Objects/Devices/synth_reset_key.rsi
+    state: reset_key
+  - type: Item
+    size: Tiny
+  - type: CMUDroneConfigurationKey
+
+- type: entity
   abstract: true
   parent: BaseItem
   id: CMUDroneModuleBase
@@ -326,3 +339,4 @@
       RMCSkillPolice: 4
       RMCSkillEndurance: 4
       RMCSkillMeleeWeapons: 4
+      RMCSkillCqc: 4

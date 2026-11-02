@@ -38,6 +38,9 @@ public sealed partial class DetailedExamineWindow : DefaultWindow
         CharacterDescriptionRowBuilder.AddRow(ContentContainer, Loc.GetString("detailed-examine-origin"), state.Origin, Loc.GetString("detailed-examine-origin-tooltip"));
         CharacterDescriptionRowBuilder.AddRow(ContentContainer, Loc.GetString("detailed-examine-religion"), state.Religion, Loc.GetString("detailed-examine-religion-tooltip"));
 
+        if (state.LiaisonSafePin > 0)
+            CharacterDescriptionRowBuilder.AddRow(ContentContainer, Loc.GetString("detailed-examine-liaison-safe-pin"), state.LiaisonSafePin.ToString(), Loc.GetString("detailed-examine-liaison-safe-pin-tooltip"));
+
         CharacterDescriptionRowBuilder.AddSeparator(ContentContainer);
 
         CharacterDescriptionRowBuilder.AddParagraph(ContentContainer, Loc.GetString("detailed-examine-full-description"), state.FullDescription, Loc.GetString("detailed-examine-full-description-tooltip"));

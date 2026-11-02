@@ -37,7 +37,7 @@ ent-CMUDroneAndroidCombatRepair = damaged combat drone
 ent-CMUDroneAndroidCombat = combat drone
     .desc = A reinforced synthetic drone frame with a combat-rated control bus and weapon routines.
 
-ent-CMUDroneBodyFrameUnarmed = unarmed humanoid drone body frame
+ent-CMUDroneBodyFrameUnarmed = civilian humanoid drone body frame
     .desc = A bare synthetic torso frame whose control bus is locked out of firearm use. Its limb ports are sealed and its activation socket is empty.
 
 ent-CMUDroneBodyFrameCombat = combat humanoid drone body frame
@@ -53,10 +53,19 @@ ent-CMUDroneModuleEngineering = drone engineering module
     .desc = An engineering module loaded with construction, engineering, and power loader routines.
 
 ent-CMUDroneModulePolice = drone police module
-    .desc = A police module loaded with law enforcement, endurance, and melee routines. It does not grant firearm authorization.
+    .desc = A police module loaded with law enforcement, endurance, hand-to-hand, and melee routines. It does not grant firearm authorization.
 
 ent-CMUCrateCombatDroneFrame = combat drone body frame crate
     .desc = A sealed crate containing one combat humanoid drone body frame. Its limb ports are sealed and its activation socket is empty.
+
+ent-CMUCrateDroneOutfitEngineering = drone engineering outfit crate
+    .desc = A crate containing a Weyland-Yutani engineering jumpsuit, an engineer oversuit, a filled M276 toolbelt, and a PMC technician welderpack.
+ent-CMUCrateDroneOutfitMedical = drone medical outfit crate
+    .desc = A crate containing orange medical scrubs, a white lab coat, an empty medical belt, a medical backpack, and an orange surgical cap.
+ent-CMUCrateDroneOutfitPolice = drone police outfit crate
+    .desc = A crate containing a Weyland-Yutani corporate security uniform, a lightweight combat pack, and a corporate security rig loaded with non-lethal equipment.
+ent-CMUCrateDroneArmorM4 = corporate M4 vest crate
+    .desc = A crate containing one corporate-pattern M4 armor vest for a drone frame.
 
 ent-CMUCrateMagazineM96S = M96S magazine crate (1x)
     .desc = A crate containing one M96S sniper rifle magazine.

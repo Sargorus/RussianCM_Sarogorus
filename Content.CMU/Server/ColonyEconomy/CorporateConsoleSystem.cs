@@ -4,6 +4,7 @@ using Content.Server.CMU14.Round;
 using Content.Server.Chat.Systems;
 using Content.Server.Popups;
 using Content.Server.Stack;
+using Content.Shared.CMU14.Chemistry.Research;
 using Content.Shared.CMU14.ColonyEconomy;
 using Content.Shared.CMU14.Threats;
 using Content.Shared.Stacks;
@@ -19,6 +20,7 @@ namespace Content.Server.CMU14.ColonyEconomy;
 public sealed partial class CorporateConsoleSystem : EntitySystem
 {
     private static readonly EntProtoId CashPrototype = "RMCSpaceCash";
+    private const string WypmcPartyId = "WYPMCParty";
 
     [Dependency] private UserInterfaceSystem _ui = default!;
     [Dependency] private ChatSystem _chat = default!;
@@ -30,6 +32,7 @@ public sealed partial class CorporateConsoleSystem : EntitySystem
     [Dependency] private ColonyBudgetSystem _colonyBudget = default!;
     [Dependency] private TagSystem _tag = default!;
     [Dependency] private PopupSystem _popup = default!;
+    [Dependency] private SharedResearchDataTerminalSystem _research = default!;
     [Dependency] private Robust.Shared.Timing.IGameTiming _timing = default!;
 
     private static readonly ProtoId<TagPrototype> CurrencyTag = "Currency";
@@ -61,6 +64,9 @@ public sealed partial class CorporateConsoleSystem : EntitySystem
 
             comp.TransitTariffPercent = other.TransitTariffPercent;
             comp.CorporateBudget = other.CorporateBudget;
+            comp.CalledParties = new HashSet<string>(other.CalledParties);
+            comp.PartyCallCounts = new Dictionary<string, int>(other.PartyCallCounts);
+            comp.NextCallInAt = other.NextCallInAt;
             return;
         }
     }
@@ -130,9 +136,11 @@ public sealed partial class CorporateConsoleSystem : EntitySystem
     {
         if (!comp.CallableParties.TryGetValue(msg.ThirdPartyId, out var cost))
             return;
-        if (comp.CalledParties.Contains(msg.ThirdPartyId))
+
+        var callCount = comp.PartyCallCounts.GetValueOrDefault(msg.ThirdPartyId);
+        if (callCount >= GetPartyCallLimit(comp, msg.ThirdPartyId))
             return;
-        if (comp.CalledParties.Count >= comp.MaxCallIns || _timing.CurTime < comp.NextCallInAt)
+        if (GetTotalCalls(comp) >= comp.MaxCallIns || _timing.CurTime < comp.NextCallInAt)
             return;
         if (comp.CorporateBudget < cost)
             return;
@@ -145,14 +153,15 @@ public sealed partial class CorporateConsoleSystem : EntitySystem
 
         _thirdParty.SpawnThirdParty(partyProto, spawnProto, false);
 
-        // Deduct from ALL corporate consoles (they share one budget)
+        // Deduct from ALL corporate consoles (they share one budget and one call-in log)
         var nextCallIn = _timing.CurTime + comp.CallInCooldown;
         var q = EntityQueryEnumerator<CorporateConsoleComponent>();
         while (q.MoveNext(out _, out var c))
         {
             c.CorporateBudget -= cost;
-            c.CalledParties.Add(msg.ThirdPartyId);
+            c.PartyCallCounts[msg.ThirdPartyId] = c.PartyCallCounts.GetValueOrDefault(msg.ThirdPartyId) + 1;
             c.NextCallInAt = nextCallIn;
+            RefreshCalledParties(c);
         }
 
         UpdateAllUi();
@@ -223,8 +232,40 @@ public sealed partial class CorporateConsoleSystem : EntitySystem
 
     // ── UI helpers ───────────────────────────────────────────────────────────
 
+    private void RefreshCalledParties(CorporateConsoleComponent comp)
+    {
+        comp.CalledParties.Clear();
+        foreach (var (id, count) in comp.PartyCallCounts)
+        {
+            if (count >= GetPartyCallLimit(comp, id))
+                comp.CalledParties.Add(id);
+        }
+    }
+
+    private int GetPartyCallLimit(CorporateConsoleComponent comp, string partyId)
+    {
+        if (partyId == WypmcPartyId &&
+            _research.GetClearance("corporate") >= comp.WypmcSecondCallClearance)
+        {
+            return 2;
+        }
+
+        return 1;
+    }
+
+    private static int GetTotalCalls(CorporateConsoleComponent comp)
+    {
+        var total = 0;
+        foreach (var count in comp.PartyCallCounts.Values)
+            total += count;
+
+        return total;
+    }
+
     private void UpdateUiState(EntityUid uid, CorporateConsoleComponent comp)
     {
+        RefreshCalledParties(comp);
+
         var econ = _adminConsole.BuildEconomyStatus();
         _ui.SetUiState(uid, CorporateConsoleUi.Key,
             new CorporateConsoleBuiState(comp.TransitTariffPercent, comp.CorporateBudget, econ));
@@ -237,9 +278,9 @@ public sealed partial class CorporateConsoleSystem : EntitySystem
                 thirdParties[id] = (proto.DisplayName ?? proto.ID, cost);
         }
         _ui.SetUiState(uid, CorporateConsoleThirdPartyUi.Key,
-            new CorporateConsoleThirdPartyBuiState(comp.CorporateBudget, thirdParties, comp.CalledParties)
+            new CorporateConsoleThirdPartyBuiState(comp.CorporateBudget, thirdParties, new HashSet<string>(comp.CalledParties))
             {
-                CallsLeft = Math.Max(0, comp.MaxCallIns - comp.CalledParties.Count),
+                CallsLeft = Math.Max(0, comp.MaxCallIns - GetTotalCalls(comp)),
                 NextCallInAt = comp.NextCallInAt,
             });
     }

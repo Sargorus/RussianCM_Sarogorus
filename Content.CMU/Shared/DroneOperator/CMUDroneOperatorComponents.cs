@@ -1,4 +1,6 @@
 using Content.Shared.Dataset;
+using Content.Shared.Access;
+using Content.Shared.Radio;
 using Content.Shared._RMC14.Marines.Skills;
 using Content.Shared.StatusIcon;
 using Content.Shared.Tools;
@@ -88,6 +90,20 @@ public sealed partial class CMUDroneAndroidComponent : Component
     /// </summary>
     [DataField]
     public bool SupportsCombatModule = true;
+
+    /// <summary>
+    /// Whether the drone's IFF was explicitly configured with a Weyland-Yutani configuration key.
+    /// Linking or taking control must not overwrite it with the operator's IFF.
+    /// </summary>
+    [DataField]
+    public bool IffConfigured;
+
+    /// <summary>
+    /// Whether the controlling operator's skills are copied onto this drone while piloted.
+    /// Civilian drones leave this false so only their frame and module grant skills.
+    /// </summary>
+    [DataField]
+    public bool InheritsOperatorSkills = true;
 
     [DataField]
     public string ModuleContainerId = "cmu-drone-module";
@@ -200,6 +216,21 @@ public sealed partial class CMUDroneAssemblyPartComponent : Component
 [RegisterComponent]
 public sealed partial class CMUDroneSynthKeyComponent : Component
 {
+}
+
+[RegisterComponent]
+public sealed partial class CMUDroneConfigurationKeyComponent : Component
+{
+}
+
+[RegisterComponent]
+public sealed partial class CMUDroneConfigurationSessionComponent : Component
+{
+    public EntityUid Key;
+    public EntityUid User;
+    public bool HasIdCard;
+    public HashSet<ProtoId<RadioChannelPrototype>> AvailableChannels = new();
+    public HashSet<ProtoId<AccessLevelPrototype>> AvailableAccess = new();
 }
 
 [RegisterComponent]

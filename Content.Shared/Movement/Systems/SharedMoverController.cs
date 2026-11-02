@@ -24,7 +24,9 @@ using Robust.Shared.Map.Components;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Components;
 using Robust.Shared.Physics.Controllers;
+using Robust.Shared.Physics.Dynamics;
 using Robust.Shared.Physics.Events;
+using Robust.Shared.Physics.Systems;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
@@ -50,6 +52,7 @@ public abstract partial class SharedMoverController : VirtualController
     [Dependency] private SharedMapSystem _mapSystem = default!;
     [Dependency] private SharedGravitySystem _gravity = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
+    [Dependency] private RayCastSystem _rayCast = default!;
     [Dependency] private TagSystem _tags = default!;
 
     [Dependency] protected EntityQuery<CanMoveInAirComponent> CanMoveInAirQuery = default!;
@@ -904,8 +907,8 @@ public abstract partial class SharedMoverController : VirtualController
                     // After ending the slide, check for immediately starting a new slide.
                     if (StripWalk(inputMover.HeldMoveButtons) != MoveButtons.None)
                     {
-                        InitializeSlide(physicsUid, tileMovement, inputMover);
-                        UpdateSlide(physicsUid, physicsUid, tileMovement, inputMover);
+                        if (InitializeSlide(physicsUid, tileMovement, inputMover))
+                            UpdateSlide(physicsUid, physicsUid, tileMovement, inputMover);
                         tileMovement.FailureSlideActive = false;
                     }
                     // Otherwise if we failed to reach the destination, begin a "failure slide" back to the
@@ -960,8 +963,10 @@ public abstract partial class SharedMoverController : VirtualController
             // If we're not sliding, start slide.
             else
             {
-                InitializeSlide(physicsUid, tileMovement, inputMover);
-                UpdateSlide(physicsUid, physicsUid, tileMovement, inputMover);
+                if (InitializeSlide(physicsUid, tileMovement, inputMover))
+                    UpdateSlide(physicsUid, physicsUid, tileMovement, inputMover);
+                else
+                    EndSlide(physicsUid, tileMovement);
             }
 
             // Set WorldRotation so that our character is facing the way we're walking.
@@ -1054,14 +1059,91 @@ public abstract partial class SharedMoverController : VirtualController
     /// <param name="uid">UID of the entity that will be performing the slide.</param>
     /// <param name="tileMovement">CMUTileMovementComponent on the entity represented by UID.</param>
     /// <param name="inputMover">InputMoverComponent on the entity represented by UID.</param>
-    private void InitializeSlide(EntityUid uid, CMUTileMovementComponent tileMovement, InputMoverComponent inputMover)
+    private bool InitializeSlide(EntityUid uid, CMUTileMovementComponent tileMovement, InputMoverComponent inputMover)
     {
         var transform = Transform(uid);
         var localPosition = transform.LocalPosition;
         var offset = DirVecForButtons(inputMover.HeldMoveButtons);
         offset = inputMover.TargetRelativeRotation.RotateVec(offset);
+        var target = SnapCoordinatesToTile(localPosition + offset);
 
-        InitializeSlideToTarget(uid, tileMovement, localPosition + offset, StripWalk(inputMover.HeldMoveButtons));
+        // A tile slide must not drive the body through a solid object. The
+        // physics solver cannot stop a slide on its own because tile movement
+        // reapplies the destination velocity every tick, which lets a mob
+        // tunnel through crates, anchored machines, and similar obstacles.
+        if (IsTileSlideBlocked(uid, uid, transform, target))
+            return false;
+
+        InitializeSlideToTarget(uid, tileMovement, target, StripWalk(inputMover.HeldMoveButtons));
+        return true;
+    }
+
+    /// <summary>
+    /// Whether a tile slide from the current position to <paramref name="destination"/> would pass through a hard
+    /// fixture. Only fixtures that the moving body could collide with are considered, and a surface the body is
+    /// already resting against is ignored when the slide moves away from it.
+    /// </summary>
+    private bool IsTileSlideBlocked(
+        EntityUid uid,
+        EntityUid physicsUid,
+        TransformComponent xform,
+        Vector2 destination)
+    {
+        if (!TryComp<FixturesComponent>(physicsUid, out var fixtures))
+            return false;
+
+        Fixture? fixture = null;
+        foreach (var candidate in fixtures.Fixtures.Values)
+        {
+            if (!candidate.Hard)
+                continue;
+
+            fixture = candidate;
+            break;
+        }
+
+        if (fixture == null || !xform.ParentUid.IsValid())
+            return false;
+
+        var origin = _transform.GetWorldPosition(xform);
+        var destinationWorld = _transform.ToWorldPosition(new EntityCoordinates(xform.ParentUid, destination));
+        var translation = destinationWorld - origin;
+
+        // Too small to produce a meaningful sweep; the physics contacts can resolve it.
+        if (translation.LengthSquared() < 0.0001f)
+            return false;
+
+        var result = _rayCast.CastShape(
+            xform.MapID,
+            fixture.Shape,
+            new Robust.Shared.Physics.Transform(origin, _transform.GetWorldRotation(xform)),
+            translation,
+            new QueryFilter
+            {
+                LayerBits = fixture.CollisionLayer,
+                MaskBits = fixture.CollisionMask,
+                IsIgnored = entity => entity == uid || entity == physicsUid || entity == xform.ParentUid,
+            },
+            (FixtureProxy proxy, Vector2 point, Vector2 normal, float fraction, ref RayResult rayResult) =>
+            {
+                if (!proxy.Fixture.Hard ||
+                    proxy.Entity == uid ||
+                    proxy.Entity == physicsUid ||
+                    proxy.Entity == xform.ParentUid)
+                {
+                    return -1f;
+                }
+
+                // Already touching this surface while moving away from it. Do not let the initial overlap
+                // stop a slide out of a corner.
+                if (fraction <= 0.0001f && Vector2.Dot(normal, translation) >= 0f)
+                    return -1f;
+
+                rayResult.Results.Add(new RayHit(proxy.Entity, normal, fraction) { Point = point });
+                return 1f;
+            });
+
+        return result.Hit;
     }
 
     /// <summary>
@@ -1082,6 +1164,15 @@ public abstract partial class SharedMoverController : VirtualController
 
         if (PhysicsQuery.TryComp(physicsUid, out var physicsComponent))
         {
+            // Tile movement owns the velocity every tick, so a contact with a solid object cannot stop it.
+            // Re-check the destination each tick and abandon the slide before it can tunnel through.
+            if (tileMovement.CurrentSlideMoveButtons != MoveButtons.None &&
+                IsTileSlideBlocked(uid, physicsUid, targetTransform, tileMovement.Destination))
+            {
+                EndSlide(physicsUid, tileMovement);
+                return;
+            }
+
             // Gather some components and values.
             var moveSpeedComponent = ModifierQuery.CompOrNull(uid);
             var parentRotation = Angle.Zero;

@@ -105,3 +105,13 @@
         crate: CMUCrateTychoRadsuit
       - cost: 1500
         crate: CMUCrateGasMaskFilterWY
+    - name: Drone Equipment
+      entries:
+      - cost: 1500
+        crate: CMUCrateDroneOutfitEngineering
+      - cost: 2000
+        crate: CMUCrateDroneOutfitMedical
+      - cost: 2000
+        crate: CMUCrateDroneOutfitPolice
+      - cost: 500
+        crate: CMUCrateDroneArmorM4

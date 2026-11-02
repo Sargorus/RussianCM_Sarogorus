@@ -11,6 +11,11 @@
     nameDataset: CMUNamesDroneAndroid
     maxNameLength: 24
     followCloseRange: 1
+    inheritsOperatorSkills: false
+  - type: UserInterface
+    interfaces:
+      enum.CMUDroneConfigurationUi.Key:
+        type: CMUDroneConfigurationBui
   - type: RemoveComponents
     components:
     - type: WorkingJoeVoice
@@ -110,6 +115,8 @@
   components:
   - type: Synth
     canUseGuns: true
+  - type: CMUDroneAndroid
+    inheritsOperatorSkills: true
   - type: Skills
     skills:
       RMCSkillCqc: 4

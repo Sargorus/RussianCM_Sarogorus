@@ -112,6 +112,15 @@
   categories: [ CMURoboticsComponents ]
 
 - type: latheRecipe
+  id: CMURoboticsDroneConfigurationKey
+  result: CMUDroneConfigurationKey
+  completetime: 4
+  materials:
+    CMSteel: 3750
+    CMPlasteel: 3750
+  categories: [ CMURoboticsComponents ]
+
+- type: latheRecipe
   id: CMURoboticsSynthResetKey
   result: RMCSynthResetKey
   completetime: 5
@@ -397,6 +406,7 @@
   - CMURoboticsDroneLeftLeg
   - CMURoboticsDroneRightLeg
   - CMURoboticsSynthKey
+  - CMURoboticsDroneConfigurationKey
   - CMURoboticsSynthResetKey
   - CMURoboticsControlTablet
   - CMURoboticsModuleCombat

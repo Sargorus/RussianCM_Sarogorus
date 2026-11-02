@@ -1484,6 +1484,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         CopyOperatorIFF(drone, user);
         SuppressSsdIndicator(drone);
         RefreshDroneDormantEffect((drone, droneComp));
+        RefreshDroneSkills((drone, droneComp));
 
         operatorComp.Drone = drone;
 
@@ -2035,6 +2036,9 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
 
     private void CopyOperatorIFF(EntityUid drone, EntityUid user)
     {
+        if (TryComp<CMUDroneAndroidComponent>(drone, out var droneComp) && droneComp.IffConfigured)
+            return;
+
         var factions = new HashSet<EntProtoId<IFFFactionComponent>>();
         _iff.TryGetFactions(user, factions);
         _iff.ClearUserFactions(drone);
@@ -2614,7 +2618,8 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
 
     private void RefreshDroneSkills(Entity<CMUDroneAndroidComponent> drone, bool includeOperator = true)
     {
-        // Keep the unmodified frame skills across module swaps and control sessions.
+        // Keep the unmodified frame skills across module swaps and control sessions. Operator skills are
+        // copied only onto frames that opt in; civilian drones rely on their module boards instead.
         drone.Comp.BaseSkills ??= TryComp<SkillsComponent>(drone.Owner, out var baseSkills)
             ? new Dictionary<EntProtoId<SkillDefinitionComponent>, int>(baseSkills.Skills)
             : new Dictionary<EntProtoId<SkillDefinitionComponent>, int>();
@@ -2622,6 +2627,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         var skills = new Dictionary<EntProtoId<SkillDefinitionComponent>, int>(drone.Comp.BaseSkills);
 
         if (includeOperator &&
+            drone.Comp.InheritsOperatorSkills &&
             TryComp<CMUDroneControlSessionComponent>(drone.Owner, out var session) &&
             !TerminatingOrDeleted(session.Operator) &&
             TryComp<SkillsComponent>(session.Operator, out var operatorSkills))

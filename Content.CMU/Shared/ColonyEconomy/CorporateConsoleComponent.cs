@@ -31,6 +31,18 @@ public sealed partial class CorporateConsoleComponent : Component
     public HashSet<string> CalledParties = new();
 
     /// <summary>
+    ///     Number of times each third party has been called in this round. Most parties are limited to one
+    ///     call, but the WYPMC can be called twice once corporate research reaches X clearance.
+    /// </summary>
+    public Dictionary<string, int> PartyCallCounts = new();
+
+    /// <summary>
+    ///     Research clearance at which the WYPMC may be called a second time.
+    /// </summary>
+    [DataField("wypmcSecondCallClearance")]
+    public int WypmcSecondCallClearance = 6;
+
+    /// <summary>
     ///     How many third parties can be called in per round, across every console of this kind.
     /// </summary>
     [DataField("maxCallIns")]

@@ -96,6 +96,16 @@ cmu-drone-module-install-finish = Вы устанавливаете {$module} в
 cmu-drone-module-remove-start = Вы начинаете извлекать {$module} из {$drone}.
 cmu-drone-module-remove-finish = Вы извлекаете {$module} из {$drone}.
 
+ent-CMUDroneConfigurationKey = ключ настройки дронов Вей-Ю
+    .desc = Служебный ключ Weyland-Yutani для изменения фракции дрона, доступных ему радиочастот и уровней доступа по учётным данным владельца.
+cmu-drone-config-title = Настройка дрона
+cmu-drone-config-faction = Фракция
+cmu-drone-config-channels = Доступные частоты
+cmu-drone-config-access = Доступы
+cmu-drone-config-no-id = Во второй руке нет ID-карты: доступы не будут выданы.
+cmu-drone-config-apply = Применить
+cmu-drone-config-applied = Вы перенастраиваете дрона.
+
 cmu-name-drone-android-1 = Apex
 cmu-name-drone-android-2 = Argus
 cmu-name-drone-android-3 = Atlas

@@ -96,6 +96,16 @@ cmu-drone-module-install-finish = You install {$module} into {$drone}.
 cmu-drone-module-remove-start = You start removing {$module} from {$drone}.
 cmu-drone-module-remove-finish = You remove {$module} from {$drone}.
 
+ent-CMUDroneConfigurationKey = Wey-Yu drone configuration key
+    .desc = A Weyland-Yutani service key that rewrites a drone's faction, available radio channels, and access levels from the holder's credentials.
+cmu-drone-config-title = Drone Configuration
+cmu-drone-config-faction = Faction
+cmu-drone-config-channels = Available Channels
+cmu-drone-config-access = Access
+cmu-drone-config-no-id = No ID card in the other hand: no access levels will be granted.
+cmu-drone-config-apply = Apply
+cmu-drone-config-applied = You reconfigure the drone.
+
 cmu-name-drone-android-1 = Apex
 cmu-name-drone-android-2 = Argus
 cmu-name-drone-android-3 = Atlas
