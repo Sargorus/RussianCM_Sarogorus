@@ -4,7 +4,7 @@ using Content.Server.Destructible.Thresholds.Behaviors;
 using Content.Shared.Access;
 using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
-using Content.Shared.CMU14.Robotics;
+using Content.Shared.CMU14.Requisitions;
 using Content.Shared.Destructible;
 using Content.Shared.Destructible.Thresholds.Triggers;
 using Content.Shared.FixedPoint;
@@ -12,7 +12,7 @@ using Content.Shared.Physics;
 using Robust.Shared.Physics.Systems;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.CMU14.Robotics;
+namespace Content.Server.CMU14.Requisitions;
 
 /// <summary>
 /// Rewrites the corporate barrier's inherited access, fixture layers and health

@@ -1,4 +1,4 @@
-namespace Content.Shared.CMU14.Robotics;
+namespace Content.Shared.CMU14.Requisitions;
 
 /// <summary>
 /// Marks the corporate security barrier. A server system replaces the inherited
