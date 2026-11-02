@@ -1,5 +1,8 @@
 # КБ - корпоративная безопасность
 
+rank-AU14RankWYSecurityOfficerDirector = Глава службы безопасности КБ
+    .prefix = ГСБ
+
 rank-AU14RankWYSecurityOfficerChief = Ветеран-офицер КБ
     .prefix = Вет. КБ
 

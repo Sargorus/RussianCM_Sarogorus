@@ -8,11 +8,13 @@
     - AU14JobCivilianCorporateAdministrator
     - AU14JobCivilianCorporateAdminAssistant
     - AU14JobCivilianCorporateLiaison
+    - AU14JobWYGuardLeader
     - AU14JobWYGuard
     - AU14JobCivilianScientist
     - AU14JobCorporateSynthetic
     - AU14JobCivilianKellandWarden
     - AU14JobCivilianCorporateAssistant
+    - AU14JobCivilianCorporateHandyman
     - AU14JobColonyWorkingJoe
   departmentRadio: null
   headOfDepartment: AU14JobCivilianCorporateAdministrator

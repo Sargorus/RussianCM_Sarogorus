@@ -24,7 +24,7 @@ au14-spawn-role-name-colony-prisoner = Prisoner (CMU)
 au14-spawn-role-name-wy-liaison = WY Liaison (CMU)
 au14-spawn-role-name-wy-scientist = WY Scientist (CMU)
 au14-spawn-role-name-working-joe-colony = Working Joe (Colony)
-au14-spawn-role-name-wy-corporate-goon = WY Corporate Goon (CMU)
+au14-spawn-role-name-wy-corporate-goon = Complex Security Officer
 
 cmu-spawn-role-clf-cell-leader-cmu = CLF Cell Leader (CMU)
 cmu-spawn-role-clf-radio-operator-cmu = CLF Radio Operator (CMU)

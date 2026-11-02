@@ -36,6 +36,8 @@ au14-loadout-group-corporate-outerwear = Corporate Outerwear
 au14-loadout-group-corporate-jumpsuit = Corporate Uniforms
 au14-loadout-group-corporate-footwear = Corporate Shoes
 au14-loadout-group-corporate-headwear = Corporate Headwear
+au14-loadout-group-corporate-handyman-affiliation = ID card affiliation
+au14-loadout-group-corporate-handyman-jumpsuit = Work uniform
 
 au14-loadout-group-military-hats = Military hats
 au14-loadout-group-military-jumpsuit = Military fatigues
@@ -58,3 +60,5 @@ cmu-loadout-group-detective-coat = Coats and jackets
 cmu-loadout-group-detective-hat = Hats
 cmu-loadout-group-detective-glasses = Glasses
 cmu-loadout-group-detective-satchel = Satchels
+
+cmu-loadout-group-liaison-ties = Ties

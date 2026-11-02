@@ -2,6 +2,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Popups;
 using Content.Shared.Storage;
 using Content.Shared.Tools.Systems;
+using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 using Robust.Shared.Random;
@@ -20,6 +21,7 @@ public sealed partial class CrateOpenableSystem : EntitySystem
     public override void Initialize()
     {
         SubscribeLocalEvent<CrateOpenableComponent, InteractUsingEvent>(OnInteractUsing);
+        SubscribeLocalEvent<CrateOpenableComponent, AttackedEvent>(OnAttacked);
     }
 
     private void OnInteractUsing(Entity<CrateOpenableComponent> ent, ref InteractUsingEvent args)
@@ -34,7 +36,25 @@ public sealed partial class CrateOpenableSystem : EntitySystem
         }
 
         args.Handled = true;
-        _audio.PlayPredicted(ent.Comp.Sound, _transform.GetMoverCoordinates(ent), args.User);
+        Open(ent, args.User);
+    }
+
+    /// <summary>
+    /// A crowbar hit should unpack the crate as well as a use-interaction.
+    /// Cargo crates often sit closed on the platform, where attacking is the
+    /// natural way to apply the pry bar.
+    /// </summary>
+    private void OnAttacked(Entity<CrateOpenableComponent> ent, ref AttackedEvent args)
+    {
+        if (EntityManager.IsQueuedForDeletion(ent) || !_tool.HasQuality(args.Used, ent.Comp.Tool))
+            return;
+
+        Open(ent, args.User);
+    }
+
+    private void Open(Entity<CrateOpenableComponent> ent, EntityUid user)
+    {
+        _audio.PlayPredicted(ent.Comp.Sound, _transform.GetMoverCoordinates(ent), user);
 
         if (_net.IsClient)
             return;
