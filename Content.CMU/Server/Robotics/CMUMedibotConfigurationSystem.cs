@@ -45,12 +45,10 @@ public sealed partial class CMUMedibotConfigurationSystem : EntitySystem
 
     private void OnApply(Entity<CMUMedibotComponent> ent, ref CMUMedibotConfigurationApplyMsg msg)
     {
-        if (ent.Comp.ConfigUser != msg.Actor ||
-            ent.Comp.ConfigKey is not { } key ||
-            !_hands.IsHolding(msg.Actor, key))
-        {
+        if (ent.Comp.ConfigUser != msg.Actor
+            || ent.Comp.ConfigKey is not { } key
+            || !_hands.IsHolding(msg.Actor, key))
             return;
-        }
 
         ent.Comp.InjectAmount = FixedPoint2.New(Math.Clamp(msg.InjectAmount, 1, 50));
         ent.Comp.InjectOnBrute = msg.InjectOnBrute;
@@ -75,8 +73,8 @@ public sealed partial class CMUMedibotConfigurationSystem : EntitySystem
         var hasBeaker = false;
         var beakerVolume = FixedPoint2.Zero;
 
-        if (beaker is { } beakerUid &&
-            _solutions.TryGetSolution(beakerUid, component.BeakerSolution, out _, out var solution))
+        if (beaker is { } beakerUid
+            && _solutions.TryGetSolution(beakerUid, component.BeakerSolution, out _, out var solution))
         {
             hasBeaker = true;
             beakerVolume = solution.Volume;

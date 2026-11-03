@@ -43,11 +43,9 @@ public sealed partial class CMUBotSloganSystem : EntitySystem
 
             slogan.NextSpeak = now + NextInterval(slogan);
 
-            if (TryComp<MobStateComponent>(uid, out var mobState) &&
-                mobState.CurrentState == MobState.Dead)
-            {
+            if (TryComp<MobStateComponent>(uid, out var mobState)
+                && mobState.CurrentState == MobState.Dead)
                 continue;
-            }
 
             _chat.TrySendInGameICMessage(
                 uid,

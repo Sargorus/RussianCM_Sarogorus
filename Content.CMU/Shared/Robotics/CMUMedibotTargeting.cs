@@ -18,13 +18,11 @@ public static class CMUMedibotTargeting
         EntityUid target,
         CMUMedibotComponent component)
     {
-        if (!entities.TryGetComponent<NpcFactionMemberComponent>(target, out var factions) ||
-            !entities.HasComponent<HumanoidProfileComponent>(target) ||
-            entities.HasComponent<CMUDroneAndroidComponent>(target) ||
-            entities.HasComponent<SynthComponent>(target))
-        {
+        if (!entities.TryGetComponent<NpcFactionMemberComponent>(target, out var factions)
+            || !entities.HasComponent<HumanoidProfileComponent>(target)
+            || entities.HasComponent<CMUDroneAndroidComponent>(target)
+            || entities.HasComponent<SynthComponent>(target))
             return false;
-        }
 
         foreach (var faction in factions.Factions)
         {

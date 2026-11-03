@@ -78,12 +78,10 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
 
     private void OnAfterInteract(Entity<CMUDroneConfigurationKeyComponent> ent, ref AfterInteractEvent args)
     {
-        if (args.Handled ||
-            args.Target is not { } target ||
-            !IsHolding(args.User, ent.Owner))
-        {
+        if (args.Handled
+            || args.Target is not { } target
+            || !IsHolding(args.User, ent.Owner))
             return;
-        }
 
         if (TryComp<CMUMedibotComponent>(target, out var medibot))
         {
@@ -113,18 +111,14 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
 
     private void OnApply(Entity<CMUDroneAndroidComponent> ent, ref CMUDroneConfigurationApplyMsg msg)
     {
-        if (!TryComp<CMUDroneConfigurationSessionComponent>(ent, out var session) ||
-            session.User != msg.Actor ||
-            !IsHolding(session.User, session.Key))
-        {
+        if (!TryComp<CMUDroneConfigurationSessionComponent>(ent, out var session)
+            || session.User != msg.Actor
+            || !IsHolding(session.User, session.Key))
             return;
-        }
 
-        if (!_proto.TryIndex<NpcFactionPrototype>(msg.Faction, out var faction) ||
-            faction.Abstract)
-        {
+        if (!_proto.TryIndex<NpcFactionPrototype>(msg.Faction, out var faction)
+            || faction.Abstract)
             return;
-        }
 
         _npcFactions.ClearFactions(ent.Owner);
         _npcFactions.AddFaction(ent.Owner, msg.Faction);
@@ -271,11 +265,9 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
     private bool TryGetIffPrototype(string id, out EntProtoId<IFFFactionComponent> faction)
     {
         faction = default;
-        if (!_proto.TryIndex<EntityPrototype>(id, out var proto) ||
-            !proto.TryGetComponent<IFFFactionComponent>(out _, _factory))
-        {
+        if (!_proto.TryIndex<EntityPrototype>(id, out var proto)
+            || !proto.TryGetComponent<IFFFactionComponent>(out _, _factory))
             return false;
-        }
 
         faction = id;
         return true;
@@ -285,11 +277,9 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
     {
         var channels = new HashSet<ProtoId<RadioChannelPrototype>>();
 
-        if (TryComp<WearingHeadsetComponent>(user, out var wearing) &&
-            TryComp<EncryptionKeyHolderComponent>(wearing.Headset, out var keys))
-        {
+        if (TryComp<WearingHeadsetComponent>(user, out var wearing)
+            && TryComp<EncryptionKeyHolderComponent>(wearing.Headset, out var keys))
             channels.UnionWith(keys.Channels);
-        }
 
         if (TryComp<IntrinsicRadioTransmitterComponent>(user, out var intrinsic))
             channels.UnionWith(intrinsic.Channels);
@@ -306,12 +296,10 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
 
         foreach (var held in _hands.EnumerateHeld(user))
         {
-            if (held == key ||
-                !HasComp<IdCardComponent>(held) ||
-                !HasComp<AccessComponent>(held))
-            {
+            if (held == key
+                || !HasComp<IdCardComponent>(held)
+                || !HasComp<AccessComponent>(held))
                 continue;
-            }
 
             idCard = held;
             return true;

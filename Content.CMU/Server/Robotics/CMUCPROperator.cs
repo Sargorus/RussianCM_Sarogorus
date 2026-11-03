@@ -31,14 +31,12 @@ public sealed partial class CMUCPROperator : HTNOperator
     public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime)
     {
         var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
-        if (!blackboard.TryGetValue<EntityUid>(TargetKey, out var target, _entities) ||
-            target == EntityUid.Invalid ||
-            _entities.Deleted(target) ||
-            _entities.HasComponent<RottingComponent>(target) ||
-            _entities.HasComponent<UnrevivableComponent>(target))
-        {
+        if (!blackboard.TryGetValue<EntityUid>(TargetKey, out var target, _entities)
+            || target == EntityUid.Invalid
+            || _entities.Deleted(target)
+            || _entities.HasComponent<RottingComponent>(target)
+            || _entities.HasComponent<UnrevivableComponent>(target))
             return HTNOperatorStatus.Failed;
-        }
 
         if (!_cpr.TryStartCPR(owner, target))
             return HTNOperatorStatus.Failed;

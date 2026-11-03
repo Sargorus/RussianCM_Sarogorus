@@ -113,11 +113,9 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
                 continue;
             }
 
-            if (now < console.NextUiUpdate ||
-                !_ui.IsUiOpen(uid, CMURoboticsOrderConsoleUiKey.Key))
-            {
+            if (now < console.NextUiUpdate
+                || !_ui.IsUiOpen(uid, CMURoboticsOrderConsoleUiKey.Key))
                 continue;
-            }
 
             console.NextUiUpdate = now + TimeSpan.FromSeconds(1);
             UpdateUi((uid, console));
@@ -227,13 +225,11 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         var query = EntityQueryEnumerator<CMURoboticsOrderConsoleComponent>();
         while (query.MoveNext(out var consoleUid, out var console))
         {
-            if (console.ActiveOrder is not { } order ||
-                order.Elevator != args.Elevator.Owner ||
-                !TryComp<CMURoboticsTransportCrateComponent>(args.Crate, out var crate) ||
-                crate.OrderId != order.Id)
-            {
+            if (console.ActiveOrder is not { } order
+                || order.Elevator != args.Elevator.Owner
+                || !TryComp<CMURoboticsTransportCrateComponent>(args.Crate, out var crate)
+                || crate.OrderId != order.Id)
                 continue;
-            }
 
             MarkDeliveredCrate((consoleUid, console), order, args.Crate);
         }
@@ -374,8 +370,8 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             return false;
         }
 
-        if (order.Type == CMURoboticsOrderType.Build &&
-            crates.Any(crate => crate.Units.Count > 0 && !crate.HasControlTablet))
+        if (order.Type == CMURoboticsOrderType.Build
+            && crates.Any(crate => crate.Units.Count > 0 && !crate.HasControlTablet))
         {
             reason = Loc.GetString("cmu-robotics-console-reason-tablet");
             return false;
@@ -402,17 +398,15 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
 
         foreach (var entity in _lookup.GetEntitiesIntersecting(elevator))
         {
-            if (TryComp<CMURoboticsOrderSlipComponent>(entity, out var slip) &&
-                slip.OrderId == order.Id)
-            {
+            if (TryComp<CMURoboticsOrderSlipComponent>(entity, out var slip)
+                && slip.OrderId == order.Id)
                 looseSlip = true;
-            }
 
             if (!HasComp<CMURoboticsTransportCrateComponent>(entity))
                 continue;
 
-            var hasLabel = _labels.TryGetLabel<CMURoboticsOrderSlipComponent>(entity, out var label) &&
-                           label.Value.Comp.OrderId == order.Id;
+            var hasLabel = _labels.TryGetLabel<CMURoboticsOrderSlipComponent>(entity, out var label)
+                && label.Value.Comp.OrderId == order.Id;
 
             var units = new List<EntityUid>();
             var hasControlTablet = false;
@@ -438,12 +432,12 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     {
         if (order.Type == CMURoboticsOrderType.Repair)
         {
-            return TryComp<CMURoboticsOrderTargetComponent>(entity, out var marker) &&
-                   marker.OrderId == order.Id;
+            return TryComp<CMURoboticsOrderTargetComponent>(entity, out var marker)
+                && marker.OrderId == order.Id;
         }
 
-        return HasComp<CMUDroneAndroidComponent>(entity) &&
-               MetaData(entity).EntityPrototype?.ID == order.Target.Id;
+        return HasComp<CMUDroneAndroidComponent>(entity)
+            && MetaData(entity).EntityPrototype?.ID == order.Target.Id;
     }
 
     private void OnCancelOrder(Entity<CMURoboticsOrderConsoleComponent> ent, ref CMURoboticsCancelOrderMessage args)
@@ -533,9 +527,9 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             var repairBrute = 0;
             var repairMissing = 0;
 
-            if (!build &&
-                _prototypes.TryIndex<EntityPrototype>(GetRepairPrototype(target), out var repairPrototype) &&
-                repairPrototype.TryComp<CMURoboticsDamagedBodyComponent>(out var damaged, _compFactory))
+            if (!build
+                && _prototypes.TryIndex<EntityPrototype>(GetRepairPrototype(target), out var repairPrototype)
+                && repairPrototype.TryComp<CMURoboticsDamagedBodyComponent>(out var damaged, _compFactory))
             {
                 repairMissing = RollRange(damaged.MinSeveredLimbs, damaged.MaxSeveredLimbs);
                 repairBurn = RollRange(damaged.MinBurnDamage, damaged.MaxBurnDamage);
@@ -588,11 +582,9 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         var query = EntityQueryEnumerator<RequisitionsElevatorComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var elevator, out var xform))
         {
-            if (xform.MapID != map ||
-                !string.Equals(elevator.Faction, "corporate", StringComparison.OrdinalIgnoreCase))
-            {
+            if (xform.MapID != map
+                || !string.Equals(elevator.Faction, "corporate", StringComparison.OrdinalIgnoreCase))
                 continue;
-            }
 
             var distance = (origin - _transform.GetWorldPosition(uid)).LengthSquared();
             if (distance >= closestDistance)
@@ -646,8 +638,8 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             return false;
         }
 
-        if (!HasComp<DamageableComponent>(unit) ||
-            _damageable.GetTotalDamage(unit) > FixedPoint2.New(5))
+        if (!HasComp<DamageableComponent>(unit)
+            || _damageable.GetTotalDamage(unit) > FixedPoint2.New(5))
         {
             reason = Loc.GetString(
                 order.Type == CMURoboticsOrderType.Repair
@@ -661,9 +653,9 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
 
         if (order.RequiredModule is { } required)
         {
-            if (!TryComp<CMUDroneAndroidComponent>(unit, out var android) ||
-                android.InstalledModule is not { } module ||
-                MetaData(module).EntityPrototype?.ID != required.Id)
+            if (!TryComp<CMUDroneAndroidComponent>(unit, out var android)
+                || android.InstalledModule is not { } module
+                || MetaData(module).EntityPrototype?.ID != required.Id)
             {
                 reason = Loc.GetString(
                     "cmu-robotics-console-reason-module",

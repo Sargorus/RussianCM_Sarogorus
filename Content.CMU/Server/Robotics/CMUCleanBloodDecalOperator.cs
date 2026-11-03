@@ -43,11 +43,9 @@ public sealed partial class CMUCleanBloodDecalOperator : HTNOperator
     public override HTNOperatorStatus Update(NPCBlackboard blackboard, float frameTime)
     {
         var owner = blackboard.GetValue<EntityUid>(NPCBlackboard.Owner);
-        if (!blackboard.TryGetValue<EntityCoordinates>(TargetCoordinatesKey, out var coordinates, _entities) ||
-            !coordinates.IsValid(_entities))
-        {
+        if (!blackboard.TryGetValue<EntityCoordinates>(TargetCoordinatesKey, out var coordinates, _entities)
+            || !coordinates.IsValid(_entities))
             return HTNOperatorStatus.Failed;
-        }
 
         var grid = _transform.GetGrid(coordinates);
         if (grid is not { } gridUid)

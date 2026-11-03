@@ -33,11 +33,9 @@ public sealed partial class CMURoboticsTransportCrateSystem : EntitySystem
         Entity<CMURoboticsTransportCrateComponent> ent,
         ref EntityStorageInsertedIntoAttemptEvent args)
     {
-        if (!IsSyntheticOrDrone(args.ItemToInsert) ||
-            !TryComp<EntityStorageComponent>(ent, out var storage))
-        {
+        if (!IsSyntheticOrDrone(args.ItemToInsert)
+            || !TryComp<EntityStorageComponent>(ent, out var storage))
             return;
-        }
 
         if (storage.Contents.Contains(args.ItemToInsert))
             return;

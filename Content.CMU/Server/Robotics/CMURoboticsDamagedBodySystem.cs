@@ -55,8 +55,8 @@ public sealed partial class CMURoboticsDamagedBodySystem : EntitySystem
     /// </summary>
     public bool ApplyRepairProfile(EntityUid uid, int missingLimbs, int burn, int brute)
     {
-        if (!TryComp<CMURoboticsDamagedBodyComponent>(uid, out var damaged) ||
-            !TryComp<BodyComponent>(uid, out var body))
+        if (!TryComp<CMURoboticsDamagedBodyComponent>(uid, out var damaged)
+            || !TryComp<BodyComponent>(uid, out var body))
         {
             return false;
         }
@@ -121,12 +121,10 @@ public sealed partial class CMURoboticsDamagedBodySystem : EntitySystem
             var ev = new BodyPartSeverAttemptEvent(ent.Owner, limb.Part, limb.Type, Surgical: true);
             RaiseLocalEvent(limb.Part, ref ev);
 
-            if (ev.Succeeded &&
-                ev.DetachedBody is { } detached &&
-                !TerminatingOrDeleted(detached))
-            {
+            if (ev.Succeeded
+                && ev.DetachedBody is { } detached
+                && !TerminatingOrDeleted(detached))
                 QueueDel(detached);
-            }
         }
     }
 

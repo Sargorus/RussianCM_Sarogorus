@@ -28,8 +28,8 @@ public static class CMULimbCompatibility
 
         // The fabricator prints the frame assembly parts. Those same items are
         // body parts, so they can repair a drone without a second limb set.
-        return entMan.HasComponent<CMUDroneAssemblyPartComponent>(limb) &&
-               entMan.HasComponent<BodyPartComponent>(limb);
+        return entMan.HasComponent<CMUDroneAssemblyPartComponent>(limb)
+            && entMan.HasComponent<BodyPartComponent>(limb);
     }
 
     public static bool IsWorkingJoeLimb(IEntityManager entMan, EntityUid limb)

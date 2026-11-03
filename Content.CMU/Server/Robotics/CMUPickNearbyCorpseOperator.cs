@@ -54,22 +54,18 @@ public sealed partial class CMUPickNearbyCorpseOperator : HTNOperator
 
         foreach (var (entity, _) in patients)
         {
-            if (!_entities.TryGetComponent<MobStateComponent>(entity, out var mobState) ||
-                mobState.CurrentState != MobState.Dead ||
-                _entities.HasComponent<RottingComponent>(entity) ||
-                _entities.HasComponent<UnrevivableComponent>(entity) ||
-                _cpr.IsRecentlyCPRed(entity) ||
-                !CMUMedibotTargeting.IsValidPatient(_entities, entity, medibot))
-            {
+            if (!_entities.TryGetComponent<MobStateComponent>(entity, out var mobState)
+                || mobState.CurrentState != MobState.Dead
+                || _entities.HasComponent<RottingComponent>(entity)
+                || _entities.HasComponent<UnrevivableComponent>(entity)
+                || _cpr.IsRecentlyCPRed(entity)
+                || !CMUMedibotTargeting.IsValidPatient(_entities, entity, medibot))
                 continue;
-            }
 
-            if (_entities.TryGetComponent<CMUMedibotReservationComponent>(entity, out var reservation) &&
-                reservation.Bot != owner &&
-                _timing.CurTime < reservation.Expires)
-            {
+            if (_entities.TryGetComponent<CMUMedibotReservationComponent>(entity, out var reservation)
+                && reservation.Bot != owner
+                && _timing.CurTime < reservation.Expires)
                 continue;
-            }
 
             var ownerXform = _entities.GetComponent<TransformComponent>(owner);
             var targetXform = _entities.GetComponent<TransformComponent>(entity);
