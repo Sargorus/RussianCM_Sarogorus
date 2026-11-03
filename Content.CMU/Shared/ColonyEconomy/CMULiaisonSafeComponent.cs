@@ -7,10 +7,10 @@ namespace Content.Shared.CMU14.ColonyEconomy;
 public sealed partial class CMULiaisonSafeComponent : Component
 {
     /// <summary>
-    /// Round-scoped safe PIN, shared by every liaison safe and handed to the
-    /// corporate liaison when that role spawns.
+    /// The safe's PIN. An empty string means the safe has no PIN and works as a
+    /// normal open/close storage.
     /// </summary>
-    public int Pin;
+    public string Pin = string.Empty;
 
     /// <summary>
     /// Destruction threshold in damage points, applied over the inherited
@@ -20,11 +20,15 @@ public sealed partial class CMULiaisonSafeComponent : Component
     public int HitPoints = 2000;
 }
 
-[RegisterComponent]
-public sealed partial class CMULiaisonPinComponent : Component
+[Serializable, NetSerializable]
+public enum CMULiaisonSafePinAction : byte
 {
-    public int Pin;
+    Unlock,
+    Set,
 }
 
 [Serializable, NetSerializable]
-public sealed record CMULiaisonSafePinEvent(NetEntity Actor, string Message = "") : DialogInputEvent(Message);
+public sealed record CMULiaisonSafePinEvent(
+    NetEntity Actor,
+    CMULiaisonSafePinAction Action,
+    string Message = "") : DialogInputEvent(Message);

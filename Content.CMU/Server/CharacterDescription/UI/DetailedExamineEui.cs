@@ -3,7 +3,6 @@ using Content.Server.EUI;
 using Content.Server.Humanoid;
 using Content.Shared._RMC14.Chemistry.Reagent;
 using Content.Shared.CMU14.CharacterDescription;
-using Content.Shared.CMU14.ColonyEconomy;
 using Content.Shared.Eui;
 using Content.Shared.Humanoid;
 using JetBrains.Annotations;
@@ -80,14 +79,6 @@ public sealed partial class DetailedExamineEui : BaseEui
             {
                 state.HairColorName = NamedColorHelper.NearestColorName(hairMarkings[0].MarkingColors[0]);
             }
-        }
-
-        // The safe PIN is a private note; only the character themselves sees it.
-        if (Player.AttachedEntity == uid &&
-            _entManager.TryGetComponent(uid, out CMULiaisonPinComponent? pin) &&
-            pin.Pin > 0)
-        {
-            state.LiaisonSafePin = pin.Pin;
         }
 
         return state;

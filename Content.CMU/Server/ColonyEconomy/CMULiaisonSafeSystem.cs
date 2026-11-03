@@ -1,56 +1,52 @@
+using Content.Server.Access.Components;
 using Content.Server.Destructible;
 using Content.Server.Destructible.Thresholds;
 using Content.Server.Destructible.Thresholds.Behaviors;
-using Content.Server.GameTicking.Events;
+using Content.Shared.Access.Systems;
 using Content.Shared.CMU14.ColonyEconomy;
 using Content.Shared.Destructible;
 using Content.Shared.Destructible.Thresholds.Triggers;
 using Content.Shared.FixedPoint;
-using Content.Shared.GameTicking;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
+using Content.Shared.Inventory;
 using Content.Shared.Lock;
 using Content.Shared.Popups;
+using Content.Shared.Roles;
 using Content.Shared.Storage.Components;
 using Content.Shared.Storage.EntitySystems;
 using Content.Shared.Verbs;
 using Content.Shared._RMC14.Dialog;
 using Robust.Shared.Audio;
-using Robust.Shared.Random;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.CMU14.ColonyEconomy;
 
 /// <summary>
-/// Gives the liaison safe its reinforced health and a PIN that is handed to the
-/// corporate liaison's character notes when that role spawns.
+/// Gives the liaison safe its reinforced health and lets a character carrying
+/// the corporate liaison ID card set a PIN for that specific safe.
 /// </summary>
 public sealed partial class CMULiaisonSafeSystem : EntitySystem
 {
+    private static readonly ProtoId<JobPrototype> LiaisonJob = "AU14JobCivilianCorporateLiaison";
+
     [Dependency] private DestructibleSystem _destructible = default!;
     [Dependency] private DialogSystem _dialog = default!;
+    [Dependency] private SharedHandsSystem _hands = default!;
+    [Dependency] private SharedIdCardSystem _idCard = default!;
+    [Dependency] private InventorySystem _inventory = default!;
     [Dependency] private LockSystem _lock = default!;
-    [Dependency] private SharedEntityStorageSystem _storage = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
-    [Dependency] private IRobustRandom _random = default!;
-
-    private const string LiaisonJob = "AU14JobCivilianCorporateLiaison";
-
-    private int _roundPin;
+    [Dependency] private SharedEntityStorageSystem _storage = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<RoundStartingEvent>(OnRoundStarting);
         SubscribeLocalEvent<CMULiaisonSafeComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<CMULiaisonSafeComponent, ActivateInWorldEvent>(OnActivate, before: [typeof(LockSystem)]);
         SubscribeLocalEvent<CMULiaisonSafeComponent, GetVerbsEvent<AlternativeVerb>>(OnGetVerbs);
         SubscribeLocalEvent<CMULiaisonSafeComponent, CMULiaisonSafePinEvent>(OnPinEntered);
-        SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete);
-    }
-
-    private void OnRoundStarting(RoundStartingEvent args)
-    {
-        _roundPin = 0;
     }
 
     private void OnMapInit(Entity<CMULiaisonSafeComponent> ent, ref MapInitEvent args)
@@ -79,40 +75,29 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
                 },
             });
 
-        ent.Comp.Pin = GetOrCreatePin();
-    }
-
-    private void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent args)
-    {
-        if (args.JobId != LiaisonJob)
-            return;
-
-        EnsureComp<CMULiaisonPinComponent>(args.Mob).Pin = GetOrCreatePin();
-    }
-
-    private int GetOrCreatePin()
-    {
-        if (_roundPin <= 0)
-            _roundPin = _random.Next(1000, 10000);
-
-        return _roundPin;
+        // A safe without a PIN behaves as a normal locker.
+        ent.Comp.Pin = string.Empty;
+        if (TryComp<LockComponent>(ent.Owner, out var lockComp))
+            _lock.Unlock(ent.Owner, null, lockComp);
     }
 
     private void OnActivate(Entity<CMULiaisonSafeComponent> ent, ref ActivateInWorldEvent args)
     {
-        if (args.Handled || !args.Complex)
+        if (args.Handled
+            || !args.Complex
+            || string.IsNullOrEmpty(ent.Comp.Pin))
             return;
 
         args.Handled = true;
 
-        // An open safe closes on a normal left click. A closed safe always asks for the PIN.
+        // An open safe closes on a normal left click. A closed safe asks for the PIN.
         if (TryComp<EntityStorageComponent>(ent.Owner, out var storage) && storage.Open)
         {
             _storage.TryCloseStorage(ent.Owner, args.User);
             return;
         }
 
-        OpenPinDialog(ent, args.User);
+        OpenPinDialog(ent, args.User, CMULiaisonSafePinAction.Unlock);
     }
 
     private void OnGetVerbs(Entity<CMULiaisonSafeComponent> ent, ref GetVerbsEvent<AlternativeVerb> args)
@@ -120,10 +105,24 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
         if (!args.CanAccess || !args.CanInteract || !args.CanComplexInteract)
             return;
 
-        if (!TryComp<LockComponent>(ent.Owner, out var lockComp))
+        var user = args.User;
+        var hasPin = !string.IsNullOrEmpty(ent.Comp.Pin);
+
+        if (HasLiaisonIdCard(user))
+        {
+            args.Verbs.Add(new AlternativeVerb
+            {
+                Text = Loc.GetString(hasPin
+                    ? "cmu-liaison-safe-change-pin-verb"
+                    : "cmu-liaison-safe-set-pin-verb"),
+                Priority = 3,
+                Act = () => OpenPinDialog(ent, user, CMULiaisonSafePinAction.Set),
+            });
+        }
+
+        if (!hasPin || !TryComp<LockComponent>(ent.Owner, out var lockComp))
             return;
 
-        var user = args.User;
         var locked = lockComp.Locked;
         args.Verbs.Add(new AlternativeVerb
         {
@@ -134,23 +133,31 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
             Act = () =>
             {
                 if (locked)
-                    OpenPinDialog(ent, user);
+                    OpenPinDialog(ent, user, CMULiaisonSafePinAction.Unlock);
                 else
                     LockSafe(ent, user, lockComp);
             },
         });
     }
 
-    private void OpenPinDialog(Entity<CMULiaisonSafeComponent> ent, EntityUid user)
+    private void OpenPinDialog(
+        Entity<CMULiaisonSafeComponent> ent,
+        EntityUid user,
+        CMULiaisonSafePinAction action)
     {
+        var setting = action == CMULiaisonSafePinAction.Set;
         _dialog.OpenInput(
             ent.Owner,
             user,
-            Loc.GetString("cmu-liaison-safe-pin-prompt"),
-            new CMULiaisonSafePinEvent(GetNetEntity(user)),
+            Loc.GetString(setting
+                ? "cmu-liaison-safe-set-pin-prompt"
+                : "cmu-liaison-safe-pin-prompt"),
+            new CMULiaisonSafePinEvent(GetNetEntity(user), action),
             characterLimit: 4,
             minCharacterLimit: 4,
-            title: Loc.GetString("cmu-liaison-safe-pin-title"));
+            title: Loc.GetString(setting
+                ? "cmu-liaison-safe-set-pin-title"
+                : "cmu-liaison-safe-pin-title"));
     }
 
     private void LockSafe(Entity<CMULiaisonSafeComponent> ent, EntityUid user, LockComponent lockComp)
@@ -162,23 +169,27 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
 
     private void OnPinEntered(Entity<CMULiaisonSafeComponent> ent, ref CMULiaisonSafePinEvent args)
     {
-        if (!TryGetEntity(args.Actor, out var actor) ||
-            actor is not { } user ||
-            TerminatingOrDeleted(user))
-        {
+        if (!TryGetEntity(args.Actor, out var actor)
+            || actor is not { } user
+            || TerminatingOrDeleted(user))
             return;
-        }
 
         // If the dialog still exists, its owner is the only actor allowed to answer.
         // DialogSystem closes the dialog before raising the input event, so the
         // actor carried by the event is the authoritative check.
-        if (TryComp<DialogComponent>(ent.Owner, out var dialog) &&
-            dialog.Actor != user)
+        if (TryComp<DialogComponent>(ent.Owner, out var dialog) && dialog.Actor != user)
+            return;
+
+        if (args.Action == CMULiaisonSafePinAction.Set)
         {
+            SetPin(ent, user, args.Message);
             return;
         }
 
-        if (args.Message != ent.Comp.Pin.ToString())
+        if (string.IsNullOrEmpty(ent.Comp.Pin))
+            return;
+
+        if (args.Message != ent.Comp.Pin)
         {
             _popup.PopupEntity(
                 Loc.GetString("cmu-liaison-safe-pin-wrong"),
@@ -193,5 +204,67 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
 
         _popup.PopupEntity(Loc.GetString("cmu-liaison-safe-pin-accepted"), ent, user);
         _storage.TryOpenStorage(user, ent.Owner);
+    }
+
+    private void SetPin(Entity<CMULiaisonSafeComponent> ent, EntityUid user, string pin)
+    {
+        if (!HasLiaisonIdCard(user))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-liaison-safe-pin-no-card"),
+                ent,
+                user,
+                PopupType.SmallCaution);
+            return;
+        }
+
+        if (!IsValidPin(pin))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-liaison-safe-pin-invalid"),
+                ent,
+                user,
+                PopupType.SmallCaution);
+            return;
+        }
+
+        ent.Comp.Pin = pin;
+        _popup.PopupEntity(Loc.GetString("cmu-liaison-safe-pin-set"), ent, user);
+    }
+
+    private bool HasLiaisonIdCard(EntityUid user)
+    {
+        foreach (var held in _hands.EnumerateHeld(user))
+        {
+            if (IsLiaisonIdCard(held))
+                return true;
+        }
+
+        return _inventory.TryGetSlotEntity(user, "id", out var slot)
+            && slot is { } card
+            && IsLiaisonIdCard(card);
+    }
+
+    private bool IsLiaisonIdCard(EntityUid item)
+    {
+        if (!_idCard.TryGetIdCard(item, out var idCard))
+            return false;
+
+        return TryComp<PresetIdCardComponent>(idCard.Owner, out var preset)
+            && preset.JobName == LiaisonJob;
+    }
+
+    private static bool IsValidPin(string pin)
+    {
+        if (pin.Length != 4)
+            return false;
+
+        foreach (var character in pin)
+        {
+            if (!char.IsAsciiDigit(character))
+                return false;
+        }
+
+        return true;
     }
 }

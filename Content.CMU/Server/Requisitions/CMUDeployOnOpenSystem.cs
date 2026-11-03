@@ -56,13 +56,11 @@ public sealed partial class CMUDeployOnOpenSystem : EntitySystem
 
         // Do not spawn products on a map that is being cleaned up, and do not
         // materialize an off-map custom delivery crate that was cancelled.
-        if (!TryComp<TransformComponent>(ent.Owner, out var xform) ||
-            xform.MapUid is not { } map ||
-            TerminatingOrDeleted(map) ||
-            EntityManager.IsQueuedForDeletion(map))
-        {
+        if (!TryComp(ent.Owner, out TransformComponent? xform)
+            || xform.MapUid is not { } map
+            || TerminatingOrDeleted(map)
+            || EntityManager.IsQueuedForDeletion(map))
             return;
-        }
 
         ent.Comp.Deployed = true;
         var coordinates = xform.Coordinates;

@@ -3,8 +3,6 @@ cmu-humanoid-profile-editor-religion-tooltip = Your character's religion. It sho
 
 detailed-examine-religion = Religion
 detailed-examine-religion-tooltip = The character's religion.
-detailed-examine-liaison-safe-pin = Liaison safe PIN
-detailed-examine-liaison-safe-pin-tooltip = The corporate liaison's private safe PIN. Only the character's owner can see it.
 
 cmu-general-station-record-religion = Religion
 cmu-general-station-record-console-record-religion = Religion: {$religion}

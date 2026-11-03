@@ -3,8 +3,6 @@ cmu-humanoid-profile-editor-religion-tooltip = Религия вашего пе�
 
 detailed-examine-religion = Религия
 detailed-examine-religion-tooltip = Религия персонажа.
-detailed-examine-liaison-safe-pin = PIN сейфа связного
-detailed-examine-liaison-safe-pin-tooltip = Личный PIN-код сейфа корпоративного связного. Виден только владельцу персонажа.
 
 cmu-general-station-record-religion = Религия
 cmu-general-station-record-console-record-religion = Религия: {$religion}

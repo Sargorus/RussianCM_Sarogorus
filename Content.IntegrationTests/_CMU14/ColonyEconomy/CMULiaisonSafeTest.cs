@@ -4,11 +4,11 @@ using Content.Server.Destructible;
 using Content.Shared.CMU14.ColonyEconomy;
 using Content.Shared.Destructible.Thresholds.Triggers;
 using Content.Shared.FixedPoint;
-using Content.Shared.GameTicking;
 using Content.Shared.Hands.Components;
+using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
+using Content.Shared.Inventory;
 using Content.Shared.Lock;
-using Content.Shared.Preferences;
 using Content.Shared.Storage.Components;
 using Content.Shared.Verbs;
 using Content.Shared._RMC14.Dialog;
@@ -20,7 +20,7 @@ namespace Content.IntegrationTests.CMU14.ColonyEconomy;
 public sealed class CMULiaisonSafeTest : GameTest
 {
     [Test]
-    public async Task SafeHasReinforcedHealthAndLiaisonPinFlow()
+    public async Task SafeWithoutPinOpensAndLiaisonCardCanSetPin()
     {
         var map = await Pair.CreateTestMap();
 
@@ -28,6 +28,25 @@ public sealed class CMULiaisonSafeTest : GameTest
         {
             var safe = SEntMan.SpawnEntity("RMCLockerSecureSafeLiaison", map.GridCoords);
             var safeComp = SComp<CMULiaisonSafeComponent>(safe);
+            var lockComp = SComp<LockComponent>(safe);
+            var storage = SComp<EntityStorageComponent>(safe);
+
+            var liaison = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(1, 0)));
+            var hands = SComp<HandsComponent>(liaison);
+
+            // The safe starts without a PIN and behaves as a normal locker.
+            Assert.That(safeComp.Pin, Is.Empty);
+            Assert.That(lockComp.Locked, Is.False);
+
+            var openClick = new ActivateInWorldEvent(liaison, safe, true);
+            SEntMan.EventBus.RaiseLocalEvent(safe, openClick);
+            Assert.That(storage.Open, Is.True);
+            Assert.That(lockComp.Locked, Is.False);
+
+            var closeClick = new ActivateInWorldEvent(liaison, safe, true);
+            SEntMan.EventBus.RaiseLocalEvent(safe, closeClick);
+            Assert.That(storage.Open, Is.False);
+
             var destructible = SComp<DestructibleComponent>(safe);
             var thresholds = destructible.Thresholds
                 .Select(entry => entry.Trigger)
@@ -39,85 +58,112 @@ public sealed class CMULiaisonSafeTest : GameTest
             Assert.That(thresholds, Does.Not.Contain(FixedPoint2.New(100)),
                 "The inherited 100-damage closet threshold must be replaced.");
 
-            var liaison = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(1, 0)));
-            Server.PlayerMan.SetAttachedEntity(ServerSession, liaison);
+            var handsSystem = Server.System<SharedHandsSystem>();
+            var card = SEntMan.SpawnEntity("AU14IDCardColonyCorporateLiaison", map.GridCoords);
+            Assert.That(handsSystem.TryPickupAnyHand(liaison, card), Is.True);
 
-            var spawn = new PlayerSpawnCompleteEvent(
-                liaison,
-                ServerSession!,
-                "AU14JobCivilianCorporateLiaison",
-                false,
-                false,
-                1,
-                EntityUid.Invalid,
-                HumanoidCharacterProfile.Random());
-            SEntMan.EventBus.RaiseLocalEvent(liaison, spawn, true);
-
-            Assert.That(safeComp.Pin, Is.Not.Zero, "The safe always has a PIN.");
-            var pin = SComp<CMULiaisonPinComponent>(liaison).Pin;
-            Assert.That(pin, Is.Not.Zero);
-            Assert.That(safeComp.Pin, Is.EqualTo(pin));
-
-            // A safe created after the liaison spawned must share the same round PIN.
-            var lateSafe = SEntMan.SpawnEntity("RMCLockerSecureSafeLiaison", map.GridCoords.Offset(new(2, 0)));
-            Assert.That(SComp<CMULiaisonSafeComponent>(lateSafe).Pin, Is.EqualTo(pin));
-
-            var activate = new ActivateInWorldEvent(liaison, safe, true);
-            SEntMan.EventBus.RaiseLocalEvent(safe, activate);
-            Assert.That(activate.Handled, Is.True);
-            Assert.That(SEntMan.HasComponent<DialogComponent>(safe), Is.True);
-
-            // Another entity cannot answer a dialog opened for the liaison.
-            var intruder = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(3, 0)));
+            var setVerb = GetVerb(safe, liaison, hands, "cmu-liaison-safe-set-pin-verb");
+            setVerb.Act();
             SEntMan.EventBus.RaiseLocalEvent(safe,
-                new CMULiaisonSafePinEvent(SEntMan.GetNetEntity(intruder), pin.ToString()));
-            Assert.That(SComp<LockComponent>(safe).Locked, Is.True);
+                new CMULiaisonSafePinEvent(
+                    SEntMan.GetNetEntity(liaison),
+                    CMULiaisonSafePinAction.Set,
+                    "1234"));
+            Assert.That(safeComp.Pin, Is.EqualTo("1234"));
 
-            SEntMan.EventBus.RaiseLocalEvent(safe,
-                new CMULiaisonSafePinEvent(SEntMan.GetNetEntity(liaison), pin.ToString()));
-            Assert.That(SComp<LockComponent>(safe).Locked, Is.False);
-            Assert.That(SComp<EntityStorageComponent>(safe).Open, Is.True);
+            // The card may be worn in the ID slot instead of held.
+            var inventory = Server.System<InventorySystem>();
+            Assert.That(inventory.TryEquip(liaison, card, "id", silent: true), Is.True);
 
-            // Clicking an open safe closes it instead of opening the PIN dialog again.
-            var closeClick = new ActivateInWorldEvent(liaison, safe, true);
-            SEntMan.EventBus.RaiseLocalEvent(safe, closeClick);
-            Assert.That(closeClick.Handled, Is.True);
-            Assert.That(SComp<EntityStorageComponent>(safe).Open, Is.False);
+            // A character without the liaison card cannot set or change the PIN.
+            var intruder = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(2, 0)));
+            var intruderHands = SComp<HandsComponent>(intruder);
+            var intruderVerbs = GetVerbs(safe, intruder, intruderHands);
+            Assert.That(intruderVerbs.Verbs.Any(verb =>
+                    verb.Text == Loc.GetString("cmu-liaison-safe-set-pin-verb") ||
+                    verb.Text == Loc.GetString("cmu-liaison-safe-change-pin-verb")),
+                Is.False);
 
-            // Reopen it so the lock verb still has an open storage to close.
-            SEntMan.EventBus.RaiseLocalEvent(safe, new ActivateInWorldEvent(liaison, safe, true));
-            SEntMan.EventBus.RaiseLocalEvent(safe,
-                new CMULiaisonSafePinEvent(SEntMan.GetNetEntity(liaison), pin.ToString()));
-            Assert.That(SComp<EntityStorageComponent>(safe).Open, Is.True);
-
-            var hands = SComp<HandsComponent>(liaison);
-            var lockMenu = new GetVerbsEvent<AlternativeVerb>(
-                liaison, safe, null, hands, true, true, true, new List<VerbCategory>());
-            SEntMan.EventBus.RaiseLocalEvent(safe, lockMenu);
-            var lockVerb = lockMenu.Verbs.Single(verb =>
-                verb.Text == Loc.GetString("cmu-liaison-safe-lock-verb"));
+            // The card owner can lock the safe and then unlock it with the PIN.
+            var lockVerb = GetVerb(safe, liaison, hands, "cmu-liaison-safe-lock-verb");
             lockVerb.Act();
-            Assert.That(SComp<LockComponent>(safe).Locked, Is.True);
-            Assert.That(SComp<EntityStorageComponent>(safe).Open, Is.False);
+            Assert.That(lockComp.Locked, Is.True);
+            Assert.That(storage.Open, Is.False);
 
-            var unlockMenu = new GetVerbsEvent<AlternativeVerb>(
-                liaison, safe, null, hands, true, true, true, new List<VerbCategory>());
-            SEntMan.EventBus.RaiseLocalEvent(safe, unlockMenu);
-            var unlockVerb = unlockMenu.Verbs.Single(verb =>
-                verb.Text == Loc.GetString("cmu-liaison-safe-unlock-verb"));
-            unlockVerb.Act();
+            var unlockClick = new ActivateInWorldEvent(liaison, safe, true);
+            SEntMan.EventBus.RaiseLocalEvent(safe, unlockClick);
+            Assert.That(unlockClick.Handled, Is.True);
 
             SEntMan.EventBus.RaiseLocalEvent(safe,
-                new CMULiaisonSafePinEvent(SEntMan.GetNetEntity(liaison), pin.ToString()));
-            Assert.That(SComp<LockComponent>(safe).Locked, Is.False);
-            Assert.That(SComp<EntityStorageComponent>(safe).Open, Is.True);
+                new CMULiaisonSafePinEvent(
+                    SEntMan.GetNetEntity(liaison),
+                    CMULiaisonSafePinAction.Unlock,
+                    "0000"));
+            Assert.That(lockComp.Locked, Is.True);
 
-            // The late safe accepts the same PIN and can be opened independently.
-            var lateActivate = new ActivateInWorldEvent(liaison, lateSafe, true);
-            SEntMan.EventBus.RaiseLocalEvent(lateSafe, lateActivate);
-            SEntMan.EventBus.RaiseLocalEvent(lateSafe,
-                new CMULiaisonSafePinEvent(SEntMan.GetNetEntity(liaison), pin.ToString()));
-            Assert.That(SComp<EntityStorageComponent>(lateSafe).Open, Is.True);
+            SEntMan.EventBus.RaiseLocalEvent(safe,
+                new CMULiaisonSafePinEvent(
+                    SEntMan.GetNetEntity(liaison),
+                    CMULiaisonSafePinAction.Unlock,
+                    "1234"));
+            Assert.That(lockComp.Locked, Is.False);
+            Assert.That(storage.Open, Is.True);
+
+            // The card owner can change the PIN; the old code stops working.
+            var changeVerb = GetVerb(safe, liaison, hands, "cmu-liaison-safe-change-pin-verb");
+            changeVerb.Act();
+            SEntMan.EventBus.RaiseLocalEvent(safe,
+                new CMULiaisonSafePinEvent(
+                    SEntMan.GetNetEntity(liaison),
+                    CMULiaisonSafePinAction.Set,
+                    "4321"));
+            Assert.That(safeComp.Pin, Is.EqualTo("4321"));
+
+            var relockVerb = GetVerb(safe, liaison, hands, "cmu-liaison-safe-lock-verb");
+            relockVerb.Act();
+            Assert.That(lockComp.Locked, Is.True);
+
+            SEntMan.EventBus.RaiseLocalEvent(safe,
+                new CMULiaisonSafePinEvent(
+                    SEntMan.GetNetEntity(liaison),
+                    CMULiaisonSafePinAction.Unlock,
+                    "1234"));
+            Assert.That(lockComp.Locked, Is.True);
+
+            SEntMan.EventBus.RaiseLocalEvent(safe,
+                new CMULiaisonSafePinEvent(
+                    SEntMan.GetNetEntity(liaison),
+                    CMULiaisonSafePinAction.Unlock,
+                    "4321"));
+            Assert.That(lockComp.Locked, Is.False);
+            Assert.That(storage.Open, Is.True);
         });
+    }
+
+    private GetVerbsEvent<AlternativeVerb> GetVerbs(
+        EntityUid safe,
+        EntityUid user,
+        HandsComponent hands)
+    {
+        return new GetVerbsEvent<AlternativeVerb>(
+            user,
+            safe,
+            null,
+            hands,
+            true,
+            true,
+            true,
+            new List<VerbCategory>());
+    }
+
+    private AlternativeVerb GetVerb(
+        EntityUid safe,
+        EntityUid user,
+        HandsComponent hands,
+        string locId)
+    {
+        var verbs = GetVerbs(safe, user, hands);
+        SEntMan.EventBus.RaiseLocalEvent(safe, verbs);
+        return verbs.Verbs.Single(verb => verb.Text == Loc.GetString(locId));
     }
 }

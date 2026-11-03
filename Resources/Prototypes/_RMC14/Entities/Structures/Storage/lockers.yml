@@ -116,6 +116,7 @@
   - type: AccessReader
     access: [["AU14AccessCorporateWEYU"]]
   - type: Lock # CMU14: the liaison safe is opened through its PIN dialog
+    locked: false
     showLockVerbs: false
     unlockOnClick: false
   - type: CMULiaisonSafe # CMU14

@@ -23,5 +23,4 @@ public sealed class DetailedExamineEuiState : EuiStateBase
     public string? Allegiance;
     public string? Origin;
     public string? Religion;
-    public int LiaisonSafePin;
 }

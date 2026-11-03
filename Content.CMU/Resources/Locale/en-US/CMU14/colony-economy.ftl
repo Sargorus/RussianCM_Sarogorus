@@ -237,3 +237,19 @@ cmu-budget-footer = Transfers move money from the colony budget into a departmen
 # Cash vendor front
 cmu-cash-vendor-credit = CREDIT
 cmu-cash-vendor-other = Other
+
+# Corporate liaison safe
+cmu-liaison-safe-lock-verb = Lock safe
+cmu-liaison-safe-unlock-verb = Unlock safe
+cmu-liaison-safe-locked = The safe is locked.
+cmu-liaison-safe-pin-title = Safe PIN
+cmu-liaison-safe-pin-prompt = Enter the safe's PIN.
+cmu-liaison-safe-pin-wrong = Wrong PIN.
+cmu-liaison-safe-pin-accepted = PIN accepted.
+cmu-liaison-safe-set-pin-verb = Set PIN code
+cmu-liaison-safe-change-pin-verb = Change PIN code
+cmu-liaison-safe-set-pin-title = Set safe PIN
+cmu-liaison-safe-set-pin-prompt = Enter a new four-digit PIN for this safe.
+cmu-liaison-safe-pin-set = PIN code set.
+cmu-liaison-safe-pin-invalid = The PIN must be exactly four digits.
+cmu-liaison-safe-pin-no-card = You need a corporate liaison ID card to set the safe PIN.

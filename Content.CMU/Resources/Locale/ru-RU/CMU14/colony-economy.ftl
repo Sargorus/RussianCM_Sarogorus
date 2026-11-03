@@ -140,3 +140,19 @@ cmu-corporate-footer = Тарифные поступления идут в ко�
 cmu-ambassador-withdraw = СНЯТЬ ${ $amount }
 cmu-ambassador-economy = Экономика колонии
 cmu-ambassador-open-third-party = ОТКРЫТЬ МЕНЮ ПОДДЕРЖКИ
+
+# Corporate liaison safe
+cmu-liaison-safe-lock-verb = Закрыть сейф
+cmu-liaison-safe-unlock-verb = Открыть сейф
+cmu-liaison-safe-locked = Сейф закрыт.
+cmu-liaison-safe-pin-title = PIN сейфа
+cmu-liaison-safe-pin-prompt = Введите PIN-код сейфа.
+cmu-liaison-safe-pin-wrong = Неверный PIN-код.
+cmu-liaison-safe-pin-accepted = PIN-код принят.
+cmu-liaison-safe-set-pin-verb = Задать PIN-код
+cmu-liaison-safe-change-pin-verb = Изменить PIN-код
+cmu-liaison-safe-set-pin-title = Установка PIN-кода
+cmu-liaison-safe-set-pin-prompt = Введите новый четырёхзначный PIN-код для этого сейфа.
+cmu-liaison-safe-pin-set = PIN-код установлен.
+cmu-liaison-safe-pin-invalid = PIN-код должен состоять ровно из четырёх цифр.
+cmu-liaison-safe-pin-no-card = Для установки PIN-кода нужна ID-карта корпоративного связного.

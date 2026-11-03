@@ -32,12 +32,10 @@ public sealed class CMUWeYaSquadSystem : EntitySystem
     {
         foreach (var prototype in _prototypes.EnumeratePrototypes<EntityPrototype>())
         {
-            if (prototype.Abstract ||
-                !prototype.HasComp<SquadTeamComponent>(_compFactory) ||
-                !prototype.HasComp<CMUSquadTitleSuffixComponent>(_compFactory))
-            {
+            if (prototype.Abstract
+                || !prototype.HasComp<SquadTeamComponent>(_compFactory)
+                || !prototype.HasComp<CMUSquadTitleSuffixComponent>(_compFactory))
                 continue;
-            }
 
             _squad.TryEnsureSquad(prototype.ID, out _);
         }
