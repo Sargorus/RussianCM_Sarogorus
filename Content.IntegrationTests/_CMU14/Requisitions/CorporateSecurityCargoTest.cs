@@ -34,6 +34,15 @@ public sealed class CorporateSecurityCargoTest : GameTest
             Assert.That(crates, Does.Contain("CMUCrateMagazineM96S"));
             Assert.That(crates, Does.Contain("CMUCrateMagazineML66A"));
 
+            var gear = catalog.Categories.Single(category => category.Name == "WEYSEC Gear");
+            Assert.Multiple(() =>
+            {
+                Assert.That(gear.Entries.Single(entry => entry.Crate.Id == "RMCAttachmentLaserSight").Cost,
+                    Is.EqualTo(300));
+                Assert.That(gear.Entries.Single(entry => entry.Crate.Id == "RMCAttachmentU7UnderbarrelShotgun").Cost,
+                    Is.EqualTo(400));
+            });
+
             var crate = SEntMan.SpawnEntity("CMUCrateWYSecurityBarrier", map.GridCoords);
             Assert.That(SEntMan.HasComponent<CMUDeployOnOpenComponent>(crate), Is.True,
                 "the barrier crate must deploy its barrier when opened");
@@ -74,6 +83,10 @@ public sealed class CorporateSecurityCargoTest : GameTest
             Assert.That(SProtoMan.TryIndex<EntityPrototype>(weapon, out var prototype), Is.True);
             Assert.That(prototype!.TryComp<GunIDLockComponent>(out _, SEntMan.ComponentFactory), Is.True,
                 "the Head of Security's F44AA must support ID locking");
+            Assert.That(prototype.TryComp<AttachableHolderComponent>(out var holder, SEntMan.ComponentFactory), Is.True);
+            Assert.That(holder!.Slots["rmc-aslot-rail"].StartingAttachable?.Id,
+                Is.EqualTo("RMCAttachmentTwoPointSling"),
+                "the Head of Security's F44AA must keep its sling module");
         });
     }
 }

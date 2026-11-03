@@ -42,8 +42,12 @@
         crate: CMUWYSecurityBarrier
       - cost: 700
         crate: CMUCrateBiosuitWYTSSArmor
+      - cost: 300
+        crate: RMCAttachmentLaserSight
       - cost: 400
         crate: RMCAttachmentAngledGrip
+      - cost: 400
+        crate: RMCAttachmentU7UnderbarrelShotgun
       - cost: 700
         crate: RMCAttachmentS42xTelescopicMiniscope
     - name: WEYSEC Weapons
