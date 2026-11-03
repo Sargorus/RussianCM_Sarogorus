@@ -30,9 +30,11 @@ public sealed partial class CMUMedibotComponent : Component
 
     /// <summary>
     /// Faction ids whose humanoid members this bot is allowed to serve.
+    /// Normal humanoids inherit <c>AUColonist</c>, so that faction is served
+    /// out of the box alongside the Weyland-Yutani crew that builds the bot.
     /// </summary>
     [DataField]
-    public HashSet<string> TreatFactions = new() { "AUWeYu" };
+    public HashSet<string> TreatFactions = new() { "AUWeYu", "AUColonist" };
 
     public EntityUid? ConfigUser;
 

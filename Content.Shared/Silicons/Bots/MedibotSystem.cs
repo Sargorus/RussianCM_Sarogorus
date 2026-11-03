@@ -41,6 +41,10 @@ public sealed partial class MedibotSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<EmaggableMedibotComponent, GotEmaggedEvent>(OnEmagged);
+        // CMU14: run before the patient's interaction popup/stripping handlers.
+        // Otherwise a living patient consumes the activation and the medibot
+        // never reaches the injection do-after.
+        SubscribeLocalEvent<MedibotComponent, BeforeInteractHandEvent>(OnBeforeInteractHand);
         SubscribeLocalEvent<MedibotComponent, UserActivateInWorldEvent>(OnInteract);
         SubscribeLocalEvent<MedibotComponent, MedibotInjectDoAfterEvent>(OnInject);
     }
@@ -64,11 +68,27 @@ public sealed partial class MedibotSystem : EntitySystem
         args.Handled = true;
     }
 
+    private void OnBeforeInteractHand(Entity<MedibotComponent> medibot, ref BeforeInteractHandEvent args)
+    {
+        if (args.Handled)
+            return;
+
+        if (TryStartInjection(medibot, args.Target))
+            args.Handled = true;
+    }
+
     private void OnInteract(Entity<MedibotComponent> medibot, ref UserActivateInWorldEvent args)
     {
-        if (!CheckInjectable(medibot!, args.Target, true)) return;
+        TryStartInjection(medibot, args.Target);
+    }
 
-        _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, args.User, 2f, new MedibotInjectDoAfterEvent(), args.User, args.Target)
+    private bool TryStartInjection(Entity<MedibotComponent> medibot, EntityUid target)
+    {
+        if (!CheckInjectable(medibot!, target, true))
+            return false;
+
+        return _doAfter.TryStartDoAfter(new DoAfterArgs(EntityManager, medibot.Owner, 2f, new MedibotInjectDoAfterEvent(),
+            medibot.Owner, target)
         {
             BlockDuplicate = true,
             BreakOnMove = true,

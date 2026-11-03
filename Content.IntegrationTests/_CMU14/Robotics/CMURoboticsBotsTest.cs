@@ -132,6 +132,142 @@ public sealed class CMURoboticsBotsTest : GameTest
         });
     }
 
+    [TestCase("CMBeaker")]
+    [TestCase("CMBeakerLarge")]
+    [TestCase("RMCBeakerHighCapacity")]
+    public async Task MedibotInjectsRmcBeaker(string beakerPrototype)
+    {
+        var map = await Pair.CreateTestMap();
+
+        await Server.WaitAssertion(() =>
+        {
+            var user = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords);
+            var bot = SEntMan.SpawnEntity("CMUMedibot", map.GridCoords.Offset(new(1, 0)));
+            var patient = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(2, 0)));
+            SEntMan.EnsureComponent<NpcFactionMemberComponent>(patient).Factions.Add("AUWeYu");
+
+            OpenMedibotPanel(bot);
+            InsertTricordBeaker(bot, user, map.GridCoords, beakerPrototype);
+
+            var damage = new DamageSpecifier
+            {
+                DamageDict =
+                {
+                    ["Blunt"] = 20,
+                },
+            };
+            SEntMan.System<DamageableSystem>().TryChangeDamage(patient, damage, ignoreResistances: true);
+
+            var medibot = SComp<MedibotComponent>(bot);
+            Assert.That(SEntMan.System<MedibotSystem>().TryInject((bot, medibot), patient), Is.True,
+                "An RMC beaker must also work in the CMU medibot.");
+        });
+    }
+
+    [Test]
+    public async Task MedibotTreatsDefaultColonistPatient()
+    {
+        var map = await Pair.CreateTestMap();
+
+        await Server.WaitAssertion(() =>
+        {
+            var patient = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords);
+            var bot = SEntMan.SpawnEntity("CMUMedibot", map.GridCoords.Offset(new(1, 0)));
+
+            var factions = SComp<NpcFactionMemberComponent>(patient);
+            Assert.That(factions.Factions.Select(faction => faction.Id), Does.Contain("AUColonist"),
+                "A normal human must carry the default colonist faction.");
+
+            var component = SComp<CMUMedibotComponent>(bot);
+            Assert.That(CMUMedibotTargeting.IsValidPatient(SEntMan, patient, component), Is.True,
+                "The default medical bot must be able to treat a normal colonist.");
+        });
+    }
+
+    [TestCase("Beaker", "Blunt")]
+    [TestCase("Beaker", "Heat")]
+    [TestCase("CMBeaker", "Blunt")]
+    [TestCase("CMBeaker", "Heat")]
+    public async Task MedibotAutomaticInjectionUsesBeaker(string beakerPrototype, string damageType)
+    {
+        var map = await Pair.CreateTestMap();
+        EntityUid bot = default;
+        EntityUid patient = default;
+
+        await Server.WaitAssertion(() =>
+        {
+            var user = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords);
+            bot = SEntMan.SpawnEntity("CMUMedibot", map.GridCoords.Offset(new(1, 0)));
+            patient = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(2, 0)));
+
+            OpenMedibotPanel(bot);
+            InsertTricordBeaker(bot, user, map.GridCoords, beakerPrototype);
+
+            var damage = new DamageSpecifier
+            {
+                DamageDict =
+                {
+                    [damageType] = 20,
+                },
+            };
+            SEntMan.System<DamageableSystem>().TryChangeDamage(patient, damage, ignoreResistances: true);
+
+            var medibot = SComp<MedibotComponent>(bot);
+            Assert.That(SEntMan.System<MedibotSystem>().CheckInjectable((bot, medibot), patient, manual: true), Is.True,
+                "The automatic interaction path must accept an alive damaged patient.");
+
+            // This is the same empty-hand interaction the HTN InteractWithOperator
+            // uses. The patient is alive, so its interaction popup is also active.
+            SEntMan.System<SharedInteractionSystem>().InteractHand(bot, patient);
+        });
+
+        await Pair.RunSeconds(3);
+
+        await Server.WaitAssertion(() =>
+        {
+            var solutions = SEntMan.System<SharedSolutionContainerSystem>();
+            Assert.That(solutions.TryGetInjectableSolution(patient, out var injectable, out _), Is.True);
+            Assert.That(injectable!.Value.Comp.Solution.GetTotalPrototypeQuantity("CMTricordrazine"),
+                Is.GreaterThan(FixedPoint2.Zero),
+                "The medibot's automatic interaction must inject the beaker's contents.");
+        });
+    }
+
+    [TestCase("Beaker")]
+    [TestCase("CMBeaker")]
+    public async Task MedibotInjectsCriticalPatientFromBeaker(string beakerPrototype)
+    {
+        var map = await Pair.CreateTestMap();
+
+        await Server.WaitAssertion(() =>
+        {
+            var user = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords);
+            var bot = SEntMan.SpawnEntity("CMUMedibot", map.GridCoords.Offset(new(1, 0)));
+            var patient = SEntMan.SpawnEntity("CMMobHuman", map.GridCoords.Offset(new(2, 0)));
+
+            OpenMedibotPanel(bot);
+            InsertTricordBeaker(bot, user, map.GridCoords, beakerPrototype);
+
+            var cmu = SComp<CMUMedibotComponent>(bot);
+            cmu.InjectOnBrute = false;
+            cmu.InjectOnBurn = false;
+
+            var damage = new DamageSpecifier
+            {
+                DamageDict =
+                {
+                    ["Blunt"] = 220,
+                },
+            };
+            SEntMan.System<DamageableSystem>().TryChangeDamage(patient, damage, ignoreResistances: true);
+            Assert.That(SComp<MobStateComponent>(patient).CurrentState, Is.EqualTo(MobState.Critical));
+
+            var medibot = SComp<MedibotComponent>(bot);
+            Assert.That(SEntMan.System<MedibotSystem>().TryInject((bot, medibot), patient), Is.True,
+                "A critical patient must be injected when brute/burn triggers are disabled.");
+        });
+    }
+
     [Test]
     public async Task MedibotCanStartCPROnIntactCorpse()
     {
@@ -308,9 +444,13 @@ public sealed class CMURoboticsBotsTest : GameTest
         SEntMan.System<ItemSlotsSystem>().SetLock(bot, "cmu-medibot-beaker", false);
     }
 
-    private void InsertTricordBeaker(EntityUid bot, EntityUid user, EntityCoordinates coordinates)
+    private void InsertTricordBeaker(
+        EntityUid bot,
+        EntityUid user,
+        EntityCoordinates coordinates,
+        string prototype = "Beaker")
     {
-        var beaker = SEntMan.SpawnEntity("Beaker", coordinates);
+        var beaker = SEntMan.SpawnEntity(prototype, coordinates);
         var solutions = SEntMan.System<SharedSolutionContainerSystem>();
         Assert.That(solutions.TryGetSolution(beaker, "beaker", out var beakerSolution, out _), Is.True);
         solutions.TryAddReagent(beakerSolution!.Value, "CMTricordrazine", FixedPoint2.New(60), out _);
