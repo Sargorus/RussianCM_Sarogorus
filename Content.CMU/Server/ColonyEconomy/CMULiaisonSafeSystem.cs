@@ -77,6 +77,7 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
 
         // A safe without a PIN behaves as a normal locker.
         ent.Comp.Pin = string.Empty;
+        ClearPinChange(ent.Comp);
         if (TryComp<LockComponent>(ent.Owner, out var lockComp))
             _lock.Unlock(ent.Owner, null, lockComp);
     }
@@ -116,7 +117,12 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
                     ? "cmu-liaison-safe-change-pin-verb"
                     : "cmu-liaison-safe-set-pin-verb"),
                 Priority = 3,
-                Act = () => OpenPinDialog(ent, user, CMULiaisonSafePinAction.Set),
+                Act = () => OpenPinDialog(
+                    ent,
+                    user,
+                    hasPin
+                        ? CMULiaisonSafePinAction.VerifyCurrent
+                        : CMULiaisonSafePinAction.Set),
             });
         }
 
@@ -145,19 +151,30 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
         EntityUid user,
         CMULiaisonSafePinAction action)
     {
-        var setting = action == CMULiaisonSafePinAction.Set;
+        if (action != CMULiaisonSafePinAction.Set)
+            ClearPinChange(ent.Comp);
+
+        var (title, prompt) = action switch
+        {
+            CMULiaisonSafePinAction.Set => (
+                "cmu-liaison-safe-set-pin-title",
+                "cmu-liaison-safe-set-pin-prompt"),
+            CMULiaisonSafePinAction.VerifyCurrent => (
+                "cmu-liaison-safe-current-pin-title",
+                "cmu-liaison-safe-current-pin-prompt"),
+            _ => (
+                "cmu-liaison-safe-pin-title",
+                "cmu-liaison-safe-pin-prompt"),
+        };
+
         _dialog.OpenInput(
             ent.Owner,
             user,
-            Loc.GetString(setting
-                ? "cmu-liaison-safe-set-pin-prompt"
-                : "cmu-liaison-safe-pin-prompt"),
+            Loc.GetString(prompt),
             new CMULiaisonSafePinEvent(GetNetEntity(user), action),
             characterLimit: 4,
             minCharacterLimit: 4,
-            title: Loc.GetString(setting
-                ? "cmu-liaison-safe-set-pin-title"
-                : "cmu-liaison-safe-pin-title"));
+            title: Loc.GetString(title));
     }
 
     private void LockSafe(Entity<CMULiaisonSafeComponent> ent, EntityUid user, LockComponent lockComp)
@@ -186,6 +203,12 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
             return;
         }
 
+        if (args.Action == CMULiaisonSafePinAction.VerifyCurrent)
+        {
+            VerifyCurrentPin(ent, user, args.Message);
+            return;
+        }
+
         if (string.IsNullOrEmpty(ent.Comp.Pin))
             return;
 
@@ -206,12 +229,54 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
         _storage.TryOpenStorage(user, ent.Owner);
     }
 
+    private void VerifyCurrentPin(Entity<CMULiaisonSafeComponent> ent, EntityUid user, string pin)
+    {
+        if (!HasLiaisonIdCard(user))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-liaison-safe-pin-no-card"),
+                ent,
+                user,
+                PopupType.SmallCaution);
+            return;
+        }
+
+        if (string.IsNullOrEmpty(ent.Comp.Pin))
+            return;
+
+        if (pin != ent.Comp.Pin)
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-liaison-safe-pin-wrong"),
+                ent,
+                user,
+                PopupType.SmallCaution);
+            return;
+        }
+
+        ent.Comp.PinChangeUser = user;
+        ent.Comp.PinChangeVerified = true;
+        OpenPinDialog(ent, user, CMULiaisonSafePinAction.Set);
+    }
+
     private void SetPin(Entity<CMULiaisonSafeComponent> ent, EntityUid user, string pin)
     {
         if (!HasLiaisonIdCard(user))
         {
             _popup.PopupEntity(
                 Loc.GetString("cmu-liaison-safe-pin-no-card"),
+                ent,
+                user,
+                PopupType.SmallCaution);
+            return;
+        }
+
+        var changing = !string.IsNullOrEmpty(ent.Comp.Pin);
+        if (changing
+            && (!ent.Comp.PinChangeVerified || ent.Comp.PinChangeUser != user))
+        {
+            _popup.PopupEntity(
+                Loc.GetString("cmu-liaison-safe-pin-current-required"),
                 ent,
                 user,
                 PopupType.SmallCaution);
@@ -229,7 +294,14 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
         }
 
         ent.Comp.Pin = pin;
+        ClearPinChange(ent.Comp);
         _popup.PopupEntity(Loc.GetString("cmu-liaison-safe-pin-set"), ent, user);
+    }
+
+    private static void ClearPinChange(CMULiaisonSafeComponent component)
+    {
+        component.PinChangeUser = null;
+        component.PinChangeVerified = false;
     }
 
     private bool HasLiaisonIdCard(EntityUid user)

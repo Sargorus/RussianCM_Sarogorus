@@ -109,14 +109,36 @@ public sealed class CMULiaisonSafeTest : GameTest
             Assert.That(lockComp.Locked, Is.False);
             Assert.That(storage.Open, Is.True);
 
-            // The card owner can change the PIN; the old code stops working.
+            // Changing the PIN requires the current PIN first.
             var changeVerb = GetVerb(safe, liaison, hands, "cmu-liaison-safe-change-pin-verb");
             changeVerb.Act();
             SEntMan.EventBus.RaiseLocalEvent(safe,
                 new CMULiaisonSafePinEvent(
                     SEntMan.GetNetEntity(liaison),
+                    CMULiaisonSafePinAction.VerifyCurrent,
+                    "0000"));
+            Assert.That(safeComp.Pin, Is.EqualTo("1234"));
+
+            changeVerb = GetVerb(safe, liaison, hands, "cmu-liaison-safe-change-pin-verb");
+            changeVerb.Act();
+            SEntMan.EventBus.RaiseLocalEvent(safe,
+                new CMULiaisonSafePinEvent(
+                    SEntMan.GetNetEntity(liaison),
+                    CMULiaisonSafePinAction.VerifyCurrent,
+                    "1234"));
+            SEntMan.EventBus.RaiseLocalEvent(safe,
+                new CMULiaisonSafePinEvent(
+                    SEntMan.GetNetEntity(liaison),
                     CMULiaisonSafePinAction.Set,
                     "4321"));
+            Assert.That(safeComp.Pin, Is.EqualTo("4321"));
+
+            // A raw Set event without current-PIN verification must not change it.
+            SEntMan.EventBus.RaiseLocalEvent(safe,
+                new CMULiaisonSafePinEvent(
+                    SEntMan.GetNetEntity(liaison),
+                    CMULiaisonSafePinAction.Set,
+                    "9999"));
             Assert.That(safeComp.Pin, Is.EqualTo("4321"));
 
             var relockVerb = GetVerb(safe, liaison, hands, "cmu-liaison-safe-lock-verb");

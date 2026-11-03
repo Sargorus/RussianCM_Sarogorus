@@ -18,6 +18,16 @@ public sealed partial class CMULiaisonSafeComponent : Component
     /// </summary>
     [DataField]
     public int HitPoints = 2000;
+
+    /// <summary>
+    /// Actor that entered the current PIN and may now choose a new one.
+    /// </summary>
+    public EntityUid? PinChangeUser;
+
+    /// <summary>
+    /// Whether <see cref="PinChangeUser"/> successfully verified the current PIN.
+    /// </summary>
+    public bool PinChangeVerified;
 }
 
 [Serializable, NetSerializable]
@@ -25,6 +35,7 @@ public enum CMULiaisonSafePinAction : byte
 {
     Unlock,
     Set,
+    VerifyCurrent,
 }
 
 [Serializable, NetSerializable]
