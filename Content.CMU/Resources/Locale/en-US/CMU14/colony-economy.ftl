@@ -237,3 +237,18 @@ cmu-budget-footer = Transfers move money from the colony budget into a departmen
 # Cash vendor front
 cmu-cash-vendor-credit = CREDIT
 cmu-cash-vendor-other = Other
+
+# Safe PIN
+cmu-safe-pin-title = Safe PIN
+cmu-safe-pin-prompt = Enter the safe's PIN.
+cmu-safe-current-pin-title = Change safe PIN
+cmu-safe-current-pin-prompt = Enter the current safe PIN.
+cmu-safe-pin-current-required = Enter the current PIN before changing it.
+cmu-safe-pin-wrong = Wrong PIN.
+cmu-safe-pin-accepted = PIN accepted.
+cmu-safe-set-pin-verb = Set PIN code
+cmu-safe-change-pin-verb = Change PIN code
+cmu-safe-set-pin-title = Set safe PIN
+cmu-safe-set-pin-prompt = Enter a new four-digit PIN for this safe.
+cmu-safe-pin-set = PIN code set.
+cmu-safe-pin-invalid = The PIN must be exactly four digits.

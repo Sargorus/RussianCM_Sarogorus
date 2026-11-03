@@ -1,10 +1,10 @@
-# Этот вид белого списка не используется Russian Marine Corps
-# - type: job
-#   parent: CMJobBase
-#   id: CMUJobSyntheticWhitelist
-#   playTimeTracker: CMUJobSyntheticWhitelist
-#   whitelisted: true
-#   hidden: true
+# Synthetic whitelist parent used by the UPP Line Squad synthetic job.
+- type: job
+  parent: CMJobBase
+  id: CMUJobSyntheticWhitelist
+  playTimeTracker: CMUJobSyntheticWhitelist
+  whitelisted: true
+  hidden: true
 
-# - type: playTimeTracker
-#   id: CMUJobSyntheticWhitelist
+- type: playTimeTracker
+  id: CMUJobSyntheticWhitelist

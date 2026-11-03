@@ -106,3 +106,18 @@ admin-console-trade-tax-section = -- Налог на продажу посыло
 admin-console-current-trade-tax = Текущий налог на продажу посылок: { $percent }%
 admin-console-trade-tax-description = Берётся из суммы, которую дрон платит за посылку, проданную на торговой платформе. Эта доля уходит в бюджет колонии, остальное получает продавец.
 admin-console-trade-tax-announcement = Налог колонии на продажу посылок установлен в { $percent }%. Эта доля от каждой посылки, проданной на торговой платформе, уходит колонии.
+
+# Safe PIN
+cmu-safe-pin-title = PIN сейфа
+cmu-safe-pin-prompt = Введите PIN-код сейфа.
+cmu-safe-current-pin-title = Смена PIN-кода сейфа
+cmu-safe-current-pin-prompt = Введите текущий PIN-код сейфа.
+cmu-safe-pin-current-required = Перед сменой PIN-кода введите текущий PIN-код.
+cmu-safe-pin-wrong = Неверный PIN-код.
+cmu-safe-pin-accepted = PIN-код принят.
+cmu-safe-set-pin-verb = Задать PIN-код
+cmu-safe-change-pin-verb = Изменить PIN-код
+cmu-safe-set-pin-title = Установка PIN-кода
+cmu-safe-set-pin-prompt = Введите новый четырёхзначный PIN-код для этого сейфа.
+cmu-safe-pin-set = PIN-код установлен.
+cmu-safe-pin-invalid = PIN-код должен состоять ровно из четырёх цифр.
