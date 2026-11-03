@@ -234,10 +234,12 @@ public sealed class CMURoboticsContractTest : GameTest
     public async Task ExpiredOrderChargesQuarterOfRewardAsFine()
     {
         var map = await Pair.CreateTestMap();
+        EntityUid console = default;
+
         await Server.WaitAssertion(() =>
         {
             SEntMan.SpawnEntity("AU14CorporateConsole", map.GridCoords);
-            var console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
+            console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
             var consoleComp = SEntMan.GetComponent<CMURoboticsOrderConsoleComponent>(console);
             var timing = Server.ResolveDependency<IGameTiming>();
 
@@ -251,14 +253,17 @@ public sealed class CMURoboticsContractTest : GameTest
                 Reward = 4000,
                 Deadline = timing.CurTime - TimeSpan.FromSeconds(1),
             };
+        });
 
-            Server.System<CMURoboticsOrderConsoleSystem>().Update(0f);
+        await Pair.RunSeconds(2);
 
+        await Server.WaitAssertion(() =>
+        {
             var corporate = SEntMan.EntityQueryEnumerator<CorporateConsoleComponent>();
             Assert.That(corporate.MoveNext(out _, out var budget), Is.True);
             Assert.That(budget.CorporateBudget, Is.EqualTo(-1000),
                 "an expired order must charge 25% of its reward");
-            Assert.That(consoleComp.ActiveOrder, Is.Null);
+            Assert.That(SEntMan.GetComponent<CMURoboticsOrderConsoleComponent>(console).ActiveOrder, Is.Null);
         });
     }
 
