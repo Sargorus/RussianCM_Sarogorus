@@ -61,6 +61,16 @@ public sealed class CMURoboticsOrderConsoleWindow : DefaultWindow
 
         _body.RemoveAllChildren();
 
+        _body.AddChild(_kit.Field(
+            Loc.GetString("cmu-robotics-console-penalty"),
+            state.LastPenalty > 0
+                ? Loc.GetString(
+                    "cmu-robotics-console-penalty-value",
+                    ("penalty", CrtConsoleKit.Money(state.LastPenalty)),
+                    ("missing", state.LastMissingElements))
+                : Loc.GetString("cmu-robotics-console-penalty-none"),
+            state.LastPenalty > 0 ? CrtTerminalPalette.Caution : CrtTerminalPalette.TextDim));
+
         BuildActive(state.Active);
         BuildAvailable(state);
     }

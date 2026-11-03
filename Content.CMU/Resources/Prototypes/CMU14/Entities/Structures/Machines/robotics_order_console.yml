@@ -43,6 +43,45 @@
       reward: 2050
       repairPrototype: CMUWorkingJoeRepairOrder
       workingJoe: true
+      outfits:
+      - equipment:
+          jumpsuit: CMJumpsuitAverageJoe
+          shoes: CMBootsBlack
+          head: RuMCSeegsonCap
+          gloves: CMHandsBlackInsulated
+      - equipment:
+          jumpsuit: CMJumpsuitAverageJoe
+          shoes: AU14BootsUSArmy
+          head: RuMCSeegsonCap
+          gloves: CMHandsBlackInsulated
+      - equipment:
+          jumpsuit: AU14JoeHazmat
+          shoes: AU14BootsCBRN
+          head: RMCHoodBioGeneral
+          gloves: RMCHandsVeteranCBRN
+      - equipment:
+          jumpsuit: CMJumpsuitAverageJoe
+          shoes: RMCShoesTychoBoots
+          head: RMCHeadTychoRadiationHood
+          gloves: RMCHandsTychoGloves
+          outerClothing: RMCSuitTychoRadiationSuit
+      - equipment:
+          jumpsuit: CMJumpsuitAverageJoe
+          shoes: AU14BootsCBRN
+          head: RMCHoodBioGeneral
+          gloves: RMCHandsVeteranCBRN
+          outerClothing: AU14SuitBioWeYu
+      - equipment:
+          jumpsuit: CMJumpsuitAverageJoe
+          shoes: AU14BootsCBRN
+          head: RMCHoodBioGeneral
+          gloves: RMCHandsVeteranCBRN
+          outerClothing: CMUSuitBioWYSec
+      - equipment:
+          jumpsuit: CMJumpsuitSyntheticOutdated
+          shoes: RMCShoesBlack
+          head: RuMCSeegsonCap
+          gloves: CMHandsBlackInsulated
   - type: ActivatableUI
     key: enum.CMURoboticsOrderConsoleUiKey.Key
   - type: ActivatableUIRequiresAccess

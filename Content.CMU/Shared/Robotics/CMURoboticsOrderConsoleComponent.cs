@@ -37,6 +37,18 @@ public sealed partial class CMURoboticsOrderConsoleComponent : Component
     [ViewVariables]
     public string Status = string.Empty;
 
+    /// <summary>
+    /// Missing-element penalty applied to the last delivered order.
+    /// </summary>
+    [ViewVariables]
+    public int LastPenalty;
+
+    /// <summary>
+    /// Number of missing elements that produced <see cref="LastPenalty"/>.
+    /// </summary>
+    [ViewVariables]
+    public int LastMissingElements;
+
     [ViewVariables]
     public TimeSpan NextUiUpdate;
 }
@@ -76,6 +88,22 @@ public sealed partial class CMURoboticsOrderTarget
     /// </summary>
     [DataField]
     public bool WorkingJoe;
+
+    /// <summary>
+    /// Outfits a Working Joe repair target can arrive in. One is picked per unit.
+    /// </summary>
+    [DataField]
+    public List<CMURoboticsOrderOutfit> Outfits = new();
+}
+
+[DataDefinition]
+public sealed partial class CMURoboticsOrderOutfit
+{
+    /// <summary>
+    /// Inventory slots and the clothing prototypes equipped in them.
+    /// </summary>
+    [DataField]
+    public Dictionary<string, EntProtoId> Equipment = new();
 }
 
 public sealed class CMURoboticsOrder
@@ -90,6 +118,8 @@ public sealed class CMURoboticsOrder
     public string TargetNameLocId = string.Empty;
     public EntProtoId RepairTarget = string.Empty;
     public bool WorkingJoe;
+    public List<CMURoboticsOrderOutfit> Outfits = new();
+    public List<int> UsedOutfitIndices = new();
 
     /// <summary>Pre-rolled repair profile, applied to each unit when its crate arrives.</summary>
     public int RepairBurnDamage;

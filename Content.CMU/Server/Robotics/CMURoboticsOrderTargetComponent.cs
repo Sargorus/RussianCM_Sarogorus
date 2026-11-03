@@ -1,5 +1,6 @@
 using Content.Shared.FixedPoint;
 using Robust.Shared.GameStates;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.CMU14.Robotics;
 
@@ -19,4 +20,10 @@ public sealed partial class CMURoboticsOrderTargetComponent : Component
 
     [DataField]
     public int InitialMissingLimbs;
+
+    /// <summary>
+    /// Clothing elements the unit arrived with, keyed by inventory slot.
+    /// </summary>
+    [DataField]
+    public Dictionary<string, EntProtoId> Outfit = new();
 }

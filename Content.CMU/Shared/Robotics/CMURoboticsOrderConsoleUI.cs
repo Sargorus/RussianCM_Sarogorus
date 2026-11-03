@@ -52,15 +52,21 @@ public sealed class CMURoboticsOrderConsoleState : BoundUserInterfaceState
     public List<CMURoboticsOrderInfo> Available { get; }
     public CMURoboticsOrderInfo? Active { get; }
     public string Status { get; }
+    public int LastPenalty { get; }
+    public int LastMissingElements { get; }
 
     public CMURoboticsOrderConsoleState(
         List<CMURoboticsOrderInfo> available,
         CMURoboticsOrderInfo? active,
-        string status)
+        string status,
+        int lastPenalty,
+        int lastMissingElements)
     {
         Available = available;
         Active = active;
         Status = status;
+        LastPenalty = lastPenalty;
+        LastMissingElements = lastMissingElements;
     }
 }
 

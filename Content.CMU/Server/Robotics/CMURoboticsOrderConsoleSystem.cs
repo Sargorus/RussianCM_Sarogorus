@@ -18,6 +18,7 @@ using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.FixedPoint;
 using Content.Shared.Hands.EntitySystems;
+using Content.Shared.Inventory;
 using Content.Shared.Labels.EntitySystems;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Paper;
@@ -48,6 +49,7 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     [Dependency] private CMURoboticsDamagedBodySystem _damagedBody = default!;
     [Dependency] private SharedBodySystem _body = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
+    [Dependency] private InventorySystem _inventory = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private MetaDataSystem _meta = default!;
@@ -58,6 +60,7 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     private const int RepairRewardPerDamage = 1;
     private const int RepairRewardPerMissingLimb = 20;
     private const float RepairFailureFineMultiplier = 0.25f;
+    private const float MissingElementPenaltyFraction = 0.05f;
 
     private static readonly EntProtoId TransportCrate = "CMUCrateSyntheticTransport";
 
@@ -178,6 +181,8 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
 
         ent.Comp.AvailableOrders.Remove(order);
         ent.Comp.ActiveOrder = order;
+        ent.Comp.LastPenalty = 0;
+        ent.Comp.LastMissingElements = 0;
         ent.Comp.Status = Loc.GetString(
             order.Type == CMURoboticsOrderType.Repair
                 ? "cmu-robotics-console-accepted-repair"
@@ -269,6 +274,42 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
 
             marker.InitialDamage = FixedPoint2.New(order.RepairBurnDamage + order.RepairBruteDamage);
             marker.InitialMissingLimbs = order.RepairMissingLimbs;
+            ApplyWorkingJoeOutfit(contained, marker, order, Transform(crate).Coordinates);
+        }
+    }
+
+    private void ApplyWorkingJoeOutfit(
+        EntityUid unit,
+        CMURoboticsOrderTargetComponent marker,
+        CMURoboticsOrder order,
+        EntityCoordinates spawnCoordinates)
+    {
+        if (!order.WorkingJoe || order.Outfits.Count == 0)
+            return;
+
+        var available = Enumerable.Range(0, order.Outfits.Count)
+            .Where(index => !order.UsedOutfitIndices.Contains(index))
+            .ToList();
+        if (available.Count == 0)
+        {
+            order.UsedOutfitIndices.Clear();
+            available = Enumerable.Range(0, order.Outfits.Count).ToList();
+        }
+
+        var outfitIndex = _random.Pick(available);
+        order.UsedOutfitIndices.Add(outfitIndex);
+        var outfit = order.Outfits[outfitIndex];
+
+        foreach (var (slot, prototype) in outfit.Equipment)
+        {
+            var item = Spawn(prototype, spawnCoordinates);
+            if (!_inventory.TryEquip(unit, item, slot, silent: true, force: true))
+            {
+                QueueDel(item);
+                continue;
+            }
+
+            marker.Outfit[slot] = prototype;
         }
     }
 
@@ -309,7 +350,12 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             if (console.ActiveOrder is not { } order || order.Elevator != ent.Owner)
                 continue;
 
-            var success = TryEvaluateSubmission(ent.Owner, order, out var attempted, out var reason);
+            var success = TryEvaluateSubmission(
+                ent.Owner,
+                order,
+                out var missingElements,
+                out var attempted,
+                out var reason);
             if (!attempted)
                 continue;
 
@@ -320,13 +366,24 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
                 continue;
             }
 
-            PayCorporateBudget(order.Reward);
+            var penalty = CalculatePenalty(order.Reward, missingElements);
+            var paid = order.Reward - penalty;
+            PayCorporateBudget(paid);
             DeleteOrderSlips(order.Id);
             console.ActiveOrder = null;
-            console.Status = Loc.GetString(
-                "cmu-robotics-console-delivered",
-                ("target", order.TargetName),
-                ("reward", order.Reward));
+            console.LastPenalty = penalty;
+            console.LastMissingElements = missingElements;
+            console.Status = penalty > 0
+                ? Loc.GetString(
+                    "cmu-robotics-console-delivered-penalty",
+                    ("target", order.TargetName),
+                    ("reward", paid),
+                    ("penalty", penalty),
+                    ("missing", missingElements))
+                : Loc.GetString(
+                    "cmu-robotics-console-delivered",
+                    ("target", order.TargetName),
+                    ("reward", order.Reward));
             FillOrders(consoleEnt);
             UpdateUi(consoleEnt);
         }
@@ -335,18 +392,20 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
     private bool TryEvaluateSubmission(
         EntityUid elevator,
         CMURoboticsOrder order,
+        out int missingElements,
         out bool attempted,
         out string reason)
     {
+        missingElements = 0;
         attempted = false;
         reason = string.Empty;
 
         var (crates, looseSlip) = GetOrderDeliverySnapshot(elevator, order);
+        var units = crates.SelectMany(crate => crate.Units).ToList();
         var hasAnyLabel = looseSlip || crates.Any(crate => crate.HasOrderLabel);
         var labeledWithUnit = crates.Any(crate => crate.HasOrderLabel && crate.Units.Count > 0);
-        var unitCount = crates.Sum(crate => crate.Units.Count);
 
-        attempted = hasAnyLabel || unitCount > 0;
+        attempted = hasAnyLabel || units.Count > 0;
         if (!attempted)
             return false;
 
@@ -362,31 +421,43 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
             return false;
         }
 
-        if (unitCount < order.Amount)
-        {
-            reason = Loc.GetString(
-                "cmu-robotics-console-reason-missing-units",
-                ("amount", order.Amount));
-            return false;
-        }
+        if (units.Count < order.Amount)
+            missingElements += order.Amount - units.Count;
 
-        if (order.Type == CMURoboticsOrderType.Build
-            && crates.Any(crate => crate.Units.Count > 0 && !crate.HasControlTablet))
-        {
-            reason = Loc.GetString("cmu-robotics-console-reason-tablet");
-            return false;
-        }
+        if (order.Type == CMURoboticsOrderType.Build)
+            missingElements += crates.Count(crate => crate.Units.Count > 0 && !crate.HasControlTablet);
 
-        foreach (var crate in crates)
+        foreach (var unit in units.Take(order.Amount))
         {
-            foreach (var unit in crate.Units)
+            if (!_mobState.IsAlive(unit)
+                || !TryComp<DamageableComponent>(unit, out var damageable))
             {
-                if (!ValidateDelivery(unit, order, out reason))
-                    return false;
+                reason = Loc.GetString("cmu-robotics-console-reason-broken");
+                return false;
             }
+
+            if (_damageable.GetTotalDamage((unit, damageable)) > FixedPoint2.New(5))
+                missingElements++;
+
+            missingElements += CountMissingLimbs(unit, order);
+
+            if (order.RequiredModule is { } required && !HasRequiredModule(unit, required))
+                missingElements++;
+
+            if (TryComp<CMURoboticsOrderTargetComponent>(unit, out var marker))
+                missingElements += CountMissingOutfitElements(unit, marker);
         }
 
         return true;
+    }
+
+    private static int CalculatePenalty(int reward, int missingElements)
+    {
+        if (reward <= 0 || missingElements <= 0)
+            return 0;
+
+        var penalty = (int) Math.Ceiling(reward * MissingElementPenaltyFraction * missingElements);
+        return Math.Min(reward, penalty);
     }
 
     private (List<OrderCrateInfo> Crates, bool LooseSlip) GetOrderDeliverySnapshot(
@@ -450,6 +521,8 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         DeleteOrderSlips(order.Id);
 
         ent.Comp.ActiveOrder = null;
+        ent.Comp.LastPenalty = 0;
+        ent.Comp.LastMissingElements = 0;
         ent.Comp.Status = Loc.GetString("cmu-robotics-console-cancelled");
         FillOrders(ent);
         UpdateUi(ent);
@@ -547,6 +620,7 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
                 Target = target.Prototype,
                 RepairTarget = build ? default : GetRepairPrototype(target),
                 WorkingJoe = target.WorkingJoe,
+                Outfits = target.Outfits,
                 RequiredModule = requiredModule,
                 Reward = reward,
                 Amount = amount,
@@ -613,6 +687,8 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         // A failed or expired contract does not delete its customer units.
         DeleteOrderSlips(order.Id);
         console.Comp.ActiveOrder = null;
+        console.Comp.LastPenalty = 0;
+        console.Comp.LastMissingElements = 0;
         console.Comp.Status = reason == null
             ? Loc.GetString("cmu-robotics-console-failed-timeout", ("fine", fineAmount))
             : Loc.GetString("cmu-robotics-console-rejected", ("reason", reason));
@@ -630,77 +706,51 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         }
     }
 
-    private bool ValidateDelivery(EntityUid unit, CMURoboticsOrder order, out string reason)
-    {
-        if (!_mobState.IsAlive(unit))
-        {
-            reason = Loc.GetString("cmu-robotics-console-reason-broken");
-            return false;
-        }
-
-        if (!HasComp<DamageableComponent>(unit)
-            || _damageable.GetTotalDamage(unit) > FixedPoint2.New(5))
-        {
-            reason = Loc.GetString(
-                order.Type == CMURoboticsOrderType.Repair
-                    ? "cmu-robotics-console-reason-not-repaired"
-                    : "cmu-robotics-console-reason-broken");
-            return false;
-        }
-
-        if (!HasAllLimbs(unit, order, out reason))
-            return false;
-
-        if (order.RequiredModule is { } required)
-        {
-            if (!TryComp<CMUDroneAndroidComponent>(unit, out var android)
-                || android.InstalledModule is not { } module
-                || MetaData(module).EntityPrototype?.ID != required.Id)
-            {
-                reason = Loc.GetString(
-                    "cmu-robotics-console-reason-module",
-                    ("module", GetPrototypeName(required)));
-                return false;
-            }
-        }
-
-        reason = string.Empty;
-        return true;
-    }
-
-    private bool HasAllLimbs(EntityUid unit, CMURoboticsOrder order, out string reason)
+    private int CountMissingLimbs(EntityUid unit, CMURoboticsOrder order)
     {
         if (!TryComp<BodyComponent>(unit, out var body))
-        {
-            reason = Loc.GetString("cmu-robotics-console-reason-limbs");
-            return false;
-        }
+            return ExternalLimbTypes.Length * 2;
 
+        var missing = 0;
         foreach (var type in ExternalLimbTypes)
         {
-            var count = 0;
+            var valid = 0;
             foreach (var part in _body.GetBodyChildrenOfType(unit, type, body))
             {
-                count++;
-                var valid = order.WorkingJoe
+                if (order.WorkingJoe
                     ? CMULimbCompatibility.IsWorkingJoeLimb(EntityManager, part.Id)
-                    : CMULimbCompatibility.IsDroneLimb(EntityManager, part.Id);
-                if (!valid)
+                    : CMULimbCompatibility.IsDroneLimb(EntityManager, part.Id))
                 {
-                    reason = Loc.GetString("cmu-robotics-console-reason-wrong-limb");
-                    return false;
+                    valid++;
                 }
             }
 
-            if (count < 2)
+            missing += Math.Max(0, 2 - valid);
+        }
+
+        return missing;
+    }
+
+    private bool HasRequiredModule(EntityUid unit, EntProtoId required)
+    {
+        return TryComp<CMUDroneAndroidComponent>(unit, out var android)
+            && android.InstalledModule is { } module
+            && MetaData(module).EntityPrototype?.ID == required.Id;
+    }
+
+    private int CountMissingOutfitElements(EntityUid unit, CMURoboticsOrderTargetComponent marker)
+    {
+        var missing = 0;
+        foreach (var (slot, expected) in marker.Outfit)
+        {
+            if (!_inventory.TryGetSlotEntity(unit, slot, out var equipped)
+                || MetaData(equipped.Value).EntityPrototype?.ID != expected.Id)
             {
-                reason = Loc.GetString("cmu-robotics-console-reason-limbs");
-                return false;
+                missing++;
             }
         }
 
-        reason = string.Empty;
-        return true;
+        return missing;
     }
 
     private void PayCorporateBudget(int amount)
@@ -719,7 +769,12 @@ public sealed partial class CMURoboticsOrderConsoleSystem : EntitySystem
         _ui.SetUiState(
             ent.Owner,
             CMURoboticsOrderConsoleUiKey.Key,
-            new CMURoboticsOrderConsoleState(available, active, ent.Comp.Status));
+            new CMURoboticsOrderConsoleState(
+                available,
+                active,
+                ent.Comp.Status,
+                ent.Comp.LastPenalty,
+                ent.Comp.LastMissingElements));
     }
 
     private CMURoboticsOrderInfo ToInfo(CMURoboticsOrder order)

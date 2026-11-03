@@ -17,6 +17,7 @@ using Content.Shared.CMU14.Medical.Anatomy.BodyParts;
 using Content.Shared.CMU14.Requisitions;
 using Content.Shared.CMU14.Robotics;
 using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Inventory;
 using Content.Shared.Labels.EntitySystems;
 using Content.Shared.Lathe.Prototypes;
 using Content.Shared.Lock;
@@ -418,6 +419,87 @@ public sealed class CMURoboticsContractTest : GameTest
     }
 
     [Test]
+    public async Task WorkingJoeRepairCrateArrivesWithOutfit()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
+            var elevator = SEntMan.SpawnEntity(
+                "AU14CorporateASRSElevator",
+                map.GridCoords.Offset(new System.Numerics.Vector2(2, 0)));
+            var consoleComp = SComp<CMURoboticsOrderConsoleComponent>(console);
+            var elevatorComp = SComp<RequisitionsElevatorComponent>(elevator);
+            var repairTarget = consoleComp.RepairTargets.Single(target => target.WorkingJoe);
+
+            Assert.That(repairTarget.Outfits, Has.Count.GreaterThan(1),
+                "Working Joe repair orders must have more than one outfit to choose from.");
+
+            var order = new CMURoboticsOrder
+            {
+                Id = 991,
+                Type = CMURoboticsOrderType.Repair,
+                Target = repairTarget.Prototype,
+                RepairTarget = repairTarget.RepairPrototype!.Value,
+                WorkingJoe = true,
+                Outfits = repairTarget.Outfits,
+                Amount = 1,
+                TargetName = "test joe",
+                Reward = 1000,
+                Elevator = elevator,
+            };
+            consoleComp.ActiveOrder = order;
+
+            var requisitions = Server.System<RequisitionsSystem>();
+            var entry = new RequisitionsEntry
+            {
+                Crate = "CMUCrateSyntheticTransport",
+                CMUOrderId = order.Id,
+                Entities = { "CMUWorkingJoeRepairOrder" },
+            };
+            Assert.That(
+                requisitions.TryAddElevatorOrders((elevator, elevatorComp), new List<RequisitionsEntry> { entry }),
+                Is.True);
+
+            var timing = Server.ResolveDependency<IGameTiming>();
+            elevatorComp.Mode = RequisitionsElevatorMode.Raising;
+            elevatorComp.NextMode = null;
+            elevatorComp.Busy = true;
+            elevatorComp.RaiseDelay = TimeSpan.Zero;
+            elevatorComp.LowerDelay = TimeSpan.Zero;
+            elevatorComp.ToggledAt = timing.CurTime - TimeSpan.FromSeconds(1);
+
+            var steps = 0;
+            while (elevatorComp.Mode != RequisitionsElevatorMode.Raised && steps++ < 100)
+                requisitions.Update(0f);
+
+            Assert.That(elevatorComp.Mode, Is.EqualTo(RequisitionsElevatorMode.Raised));
+
+            EntityUid? joe = null;
+            var query = SEntMan.EntityQueryEnumerator<CMURoboticsTransportCrateComponent, EntityStorageComponent>();
+            while (query.MoveNext(out _, out _, out var storage))
+            {
+                if (storage.Contents.ContainedEntities.Count > 0)
+                    joe = storage.Contents.ContainedEntities[0];
+            }
+
+            Assert.That(joe, Is.Not.Null);
+            var marker = SComp<CMURoboticsOrderTargetComponent>(joe!.Value);
+            Assert.That(marker.Outfit, Is.Not.Empty, "the Joe must arrive wearing an outfit");
+
+            var inventory = Server.System<InventorySystem>();
+            foreach (var (slot, prototype) in marker.Outfit)
+            {
+                Assert.That(inventory.TryGetSlotEntity(joe.Value, slot, out var equipped), Is.True,
+                    $"the Joe must keep {prototype} in the {slot} slot");
+                Assert.That(
+                    SEntMan.GetComponent<MetaDataComponent>(equipped!.Value).EntityPrototype?.ID,
+                    Is.EqualTo(prototype.Id));
+            }
+        });
+    }
+
+    [Test]
     public async Task RepairOrderPaysWhenPaperIsAttachedToLoadedCrate()
     {
         var map = await Pair.CreateTestMap();
@@ -462,6 +544,104 @@ public sealed class CMURoboticsContractTest : GameTest
                 "submitting a contract must not delete the repaired unit");
             Assert.That(budget.CorporateBudget, Is.EqualTo(before + 1000),
                 "a valid submission must pay the corporate affairs console account");
+        });
+    }
+
+    [Test]
+    public async Task MissingOutfitElementsReduceRepairReward()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var elevator = SEntMan.SpawnEntity("AU14CorporateASRSElevator", map.GridCoords);
+            var console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
+            var crate = SEntMan.SpawnEntity("CMUCrateSyntheticTransport", map.GridCoords);
+            var joe = SEntMan.SpawnEntity("CMUWorkingJoeRepairOrder", map.GridCoords);
+            var marker = SEntMan.AddComponent<CMURoboticsOrderTargetComponent>(joe);
+            marker.OrderId = 556;
+            marker.Outfit["jumpsuit"] = "CMJumpsuitAverageJoe";
+            marker.Outfit["shoes"] = "CMBootsBlack";
+
+            Assert.That(Server.System<SharedEntityStorageSystem>().Insert(joe, crate), Is.True);
+
+            var slip = SEntMan.SpawnEntity("CMURoboticsOrderSlip", map.GridCoords);
+            SComp<CMURoboticsOrderSlipComponent>(slip).OrderId = 556;
+            Assert.That(Server.System<ItemSlotsSystem>().TryInsert(crate, "paper_label", slip, null), Is.True);
+
+            var consoleComp = SComp<CMURoboticsOrderConsoleComponent>(console);
+            consoleComp.ActiveOrder = new CMURoboticsOrder
+            {
+                Id = 556,
+                Type = CMURoboticsOrderType.Repair,
+                Target = "CMUWorkingJoeRepair",
+                RepairTarget = "CMUWorkingJoeRepairOrder",
+                Amount = 1,
+                TargetName = "test joe",
+                Reward = 1000,
+                Elevator = elevator,
+                WorkingJoe = true,
+            };
+
+            var budget = SComp<CorporateConsoleComponent>(
+                SEntMan.SpawnEntity("AU14CorporateConsole", map.GridCoords));
+            var before = budget.CorporateBudget;
+            var attempt = new CMURequisitionsElevatorLoweringAttemptEvent(elevator);
+            SEntMan.EventBus.RaiseLocalEvent(elevator, ref attempt);
+
+            Assert.That(consoleComp.ActiveOrder, Is.Null);
+            Assert.That(budget.CorporateBudget, Is.EqualTo(before + 900),
+                "two missing outfit elements must deduct 10% of the reward");
+            Assert.That(consoleComp.LastPenalty, Is.EqualTo(100));
+            Assert.That(consoleComp.LastMissingElements, Is.EqualTo(2));
+        });
+    }
+
+    [Test]
+    public async Task OutfitPenaltyCanConsumeEntireReward()
+    {
+        var map = await Pair.CreateTestMap();
+        await Server.WaitAssertion(() =>
+        {
+            var elevator = SEntMan.SpawnEntity("AU14CorporateASRSElevator", map.GridCoords);
+            var console = SEntMan.SpawnEntity("CMURoboticsOrderConsole", map.GridCoords);
+            var crate = SEntMan.SpawnEntity("CMUCrateSyntheticTransport", map.GridCoords);
+            var joe = SEntMan.SpawnEntity("CMUWorkingJoeRepairOrder", map.GridCoords);
+            var marker = SEntMan.AddComponent<CMURoboticsOrderTargetComponent>(joe);
+            marker.OrderId = 557;
+            for (var i = 0; i < 20; i++)
+                marker.Outfit[$"missing-slot-{i}"] = "CMJumpsuitAverageJoe";
+
+            Assert.That(Server.System<SharedEntityStorageSystem>().Insert(joe, crate), Is.True);
+
+            var slip = SEntMan.SpawnEntity("CMURoboticsOrderSlip", map.GridCoords);
+            SComp<CMURoboticsOrderSlipComponent>(slip).OrderId = 557;
+            Assert.That(Server.System<ItemSlotsSystem>().TryInsert(crate, "paper_label", slip, null), Is.True);
+
+            var consoleComp = SComp<CMURoboticsOrderConsoleComponent>(console);
+            consoleComp.ActiveOrder = new CMURoboticsOrder
+            {
+                Id = 557,
+                Type = CMURoboticsOrderType.Repair,
+                Target = "CMUWorkingJoeRepair",
+                RepairTarget = "CMUWorkingJoeRepairOrder",
+                Amount = 1,
+                TargetName = "test joe",
+                Reward = 1000,
+                Elevator = elevator,
+                WorkingJoe = true,
+            };
+
+            var budget = SComp<CorporateConsoleComponent>(
+                SEntMan.SpawnEntity("AU14CorporateConsole", map.GridCoords));
+            var before = budget.CorporateBudget;
+            var attempt = new CMURequisitionsElevatorLoweringAttemptEvent(elevator);
+            SEntMan.EventBus.RaiseLocalEvent(elevator, ref attempt);
+
+            Assert.That(consoleComp.ActiveOrder, Is.Null);
+            Assert.That(budget.CorporateBudget, Is.EqualTo(before),
+                "the penalty must be capped at the full reward");
+            Assert.That(consoleComp.LastPenalty, Is.EqualTo(1000));
+            Assert.That(consoleComp.LastMissingElements, Is.EqualTo(20));
         });
     }
 
