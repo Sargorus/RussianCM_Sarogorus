@@ -36,6 +36,7 @@ public sealed class CMULiaisonSafeTest : GameTest
 
             // The safe starts without a PIN and behaves as a normal locker.
             Assert.That(safeComp.Pin, Is.Empty);
+            Assert.That(safeComp.PinProtected, Is.False);
             Assert.That(lockComp.Locked, Is.False);
 
             var openClick = new ActivateInWorldEvent(liaison, safe, true);
@@ -70,6 +71,7 @@ public sealed class CMULiaisonSafeTest : GameTest
                     CMULiaisonSafePinAction.Set,
                     "1234"));
             Assert.That(safeComp.Pin, Is.EqualTo("1234"));
+            Assert.That(safeComp.PinProtected, Is.True);
 
             // The card may be worn in the ID slot instead of held.
             var inventory = Server.System<InventorySystem>();

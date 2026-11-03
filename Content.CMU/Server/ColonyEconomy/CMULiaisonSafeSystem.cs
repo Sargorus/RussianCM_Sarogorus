@@ -77,6 +77,7 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
 
         // A safe without a PIN behaves as a normal locker.
         ent.Comp.Pin = string.Empty;
+        ent.Comp.PinProtected = false;
         ClearPinChange(ent.Comp);
         if (TryComp<LockComponent>(ent.Owner, out var lockComp))
             _lock.Unlock(ent.Owner, null, lockComp);
@@ -294,7 +295,9 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
         }
 
         ent.Comp.Pin = pin;
+        ent.Comp.PinProtected = true;
         ClearPinChange(ent.Comp);
+        Dirty(ent.Owner, ent.Comp);
         _popup.PopupEntity(Loc.GetString("cmu-liaison-safe-pin-set"), ent, user);
     }
 

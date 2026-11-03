@@ -1,9 +1,10 @@
 using Content.Shared._RMC14.Dialog;
+using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.CMU14.ColonyEconomy;
 
-[RegisterComponent]
+[RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class CMULiaisonSafeComponent : Component
 {
     /// <summary>
@@ -11,6 +12,13 @@ public sealed partial class CMULiaisonSafeComponent : Component
     /// normal open/close storage.
     /// </summary>
     public string Pin = string.Empty;
+
+    /// <summary>
+    /// Networked indicator that the safe requires a PIN. The PIN itself stays
+    /// server-only.
+    /// </summary>
+    [AutoNetworkedField]
+    public bool PinProtected;
 
     /// <summary>
     /// Destruction threshold in damage points, applied over the inherited
