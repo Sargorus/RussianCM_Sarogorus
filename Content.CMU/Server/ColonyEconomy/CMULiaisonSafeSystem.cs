@@ -110,40 +110,21 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
         var user = args.User;
         var hasPin = !string.IsNullOrEmpty(ent.Comp.Pin);
 
-        if (HasLiaisonIdCard(user))
-        {
-            args.Verbs.Add(new AlternativeVerb
-            {
-                Text = Loc.GetString(hasPin
-                    ? "cmu-liaison-safe-change-pin-verb"
-                    : "cmu-liaison-safe-set-pin-verb"),
-                Priority = 3,
-                Act = () => OpenPinDialog(
-                    ent,
-                    user,
-                    hasPin
-                        ? CMULiaisonSafePinAction.VerifyCurrent
-                        : CMULiaisonSafePinAction.Set),
-            });
-        }
-
-        if (!hasPin || !TryComp<LockComponent>(ent.Owner, out var lockComp))
+        if (!HasLiaisonIdCard(user))
             return;
 
-        var locked = lockComp.Locked;
         args.Verbs.Add(new AlternativeVerb
         {
-            Text = Loc.GetString(locked
-                ? "cmu-liaison-safe-unlock-verb"
-                : "cmu-liaison-safe-lock-verb"),
-            Priority = 2,
-            Act = () =>
-            {
-                if (locked)
-                    OpenPinDialog(ent, user, CMULiaisonSafePinAction.Unlock);
-                else
-                    LockSafe(ent, user, lockComp);
-            },
+            Text = Loc.GetString(hasPin
+                ? "cmu-liaison-safe-change-pin-verb"
+                : "cmu-liaison-safe-set-pin-verb"),
+            Priority = 3,
+            Act = () => OpenPinDialog(
+                ent,
+                user,
+                hasPin
+                    ? CMULiaisonSafePinAction.VerifyCurrent
+                    : CMULiaisonSafePinAction.Set),
         });
     }
 
@@ -176,13 +157,6 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
             characterLimit: 4,
             minCharacterLimit: 4,
             title: Loc.GetString(title));
-    }
-
-    private void LockSafe(Entity<CMULiaisonSafeComponent> ent, EntityUid user, LockComponent lockComp)
-    {
-        _storage.TryCloseStorage(ent.Owner, user);
-        _lock.Lock(ent.Owner, user, lockComp);
-        _popup.PopupEntity(Loc.GetString("cmu-liaison-safe-locked"), ent, user);
     }
 
     private void OnPinEntered(Entity<CMULiaisonSafeComponent> ent, ref CMULiaisonSafePinEvent args)

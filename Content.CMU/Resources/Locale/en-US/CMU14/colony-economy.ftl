@@ -239,9 +239,6 @@ cmu-cash-vendor-credit = CREDIT
 cmu-cash-vendor-other = Other
 
 # Corporate liaison safe
-cmu-liaison-safe-lock-verb = Lock safe
-cmu-liaison-safe-unlock-verb = Unlock safe
-cmu-liaison-safe-locked = The safe is locked.
 cmu-liaison-safe-pin-title = Safe PIN
 cmu-liaison-safe-pin-prompt = Enter the safe's PIN.
 cmu-liaison-safe-current-pin-title = Change safe PIN

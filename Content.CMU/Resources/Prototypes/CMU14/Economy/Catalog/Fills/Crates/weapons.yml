@@ -71,11 +71,11 @@
   id: CMUCrateNSG23
   parent: RMCCrateWeapons
   name: NSG-23 assault rifle crate
-  description: A crate containing one NSG-23 assault rifle with one magazine.
+  description: A crate containing one NSG-23 assault rifle with an installed underbarrel flamethrower and one magazine.
   components:
   - type: StorageFill
     contents:
-    - id: RMCWeaponRifleSSG45NoLockStripped
+    - id: RMCWeaponRifleSSG45NoLock
       amount: 1
 
 - type: entity

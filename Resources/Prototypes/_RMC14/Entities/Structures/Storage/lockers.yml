@@ -115,6 +115,8 @@
     sprite: _RMC14/Structures/Storage/Lockers/safe.rsi
   - type: AccessReader
     access: [["AU14AccessCorporateWEYU"]]
+  - type: EntityStorage # CMU14: left click toggles the safe; hide the redundant context-menu verb
+    showOpenVerb: false
   - type: Lock # CMU14: the liaison safe is opened through its PIN dialog
     locked: false
     showLockVerbs: false

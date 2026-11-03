@@ -193,7 +193,7 @@
     back: RMCSatchelLightpackBlack
     ears: AU14ColonyWeylandHeadset
     ears2: RMCM5CameraGear
-    suitstorage: AU14WeaponRifleF44AA
+    suitstorage: AU14WeaponRifleF44AALock
   storage:
     back:
     - RMCMREWeYa

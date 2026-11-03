@@ -142,9 +142,6 @@ cmu-ambassador-economy = Экономика колонии
 cmu-ambassador-open-third-party = ОТКРЫТЬ МЕНЮ ПОДДЕРЖКИ
 
 # Corporate liaison safe
-cmu-liaison-safe-lock-verb = Закрыть сейф
-cmu-liaison-safe-unlock-verb = Открыть сейф
-cmu-liaison-safe-locked = Сейф закрыт.
 cmu-liaison-safe-pin-title = PIN сейфа
 cmu-liaison-safe-pin-prompt = Введите PIN-код сейфа.
 cmu-liaison-safe-current-pin-title = Смена PIN-кода сейфа
