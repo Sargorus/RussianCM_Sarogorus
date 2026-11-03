@@ -47,7 +47,7 @@ public sealed partial class CMUWYSecurityBarrierSystem : EntitySystem
                 (ent.Owner, access),
                 new List<HashSet<ProtoId<AccessLevelPrototype>>>
                 {
-                    new() { "CMU14AccessWYSecurityBarrier" },
+                    new() { ent.Comp.Access },
                 },
                 updateOriginal: true);
         }
@@ -60,18 +60,19 @@ public sealed partial class CMUWYSecurityBarrierSystem : EntitySystem
         _fixtures.DestroyFixture(ent.Owner, "fix1");
 
         // Replace the inherited CMDeployableBarrier 100-damage threshold.
-        RemComp<DestructibleComponent>(ent.Owner);
-        var destructible = AddComp<DestructibleComponent>(ent.Owner);
-        _destructible.AddThreshold(
+        var destructible = EnsureComp<DestructibleComponent>(ent.Owner);
+        _destructible.ReplaceThresholds(
             (ent.Owner, destructible),
-            new DamageThreshold
+            new List<DamageThreshold>
             {
-                Trigger = new DamageTrigger { Damage = FixedPoint2.New(2250) },
-                Behaviors = new List<IThresholdBehavior>
+                new()
                 {
-                    new DoActsBehavior { Acts = ThresholdActs.Destruction },
+                    Trigger = new DamageTrigger { Damage = FixedPoint2.New(ent.Comp.HitPoints) },
+                    Behaviors = new List<IThresholdBehavior>
+                    {
+                        new DoActsBehavior { Acts = ThresholdActs.Destruction },
+                    },
                 },
-            },
-            null);
+            });
     }
 }

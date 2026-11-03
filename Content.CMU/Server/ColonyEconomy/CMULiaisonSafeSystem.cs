@@ -1,6 +1,7 @@
 using Content.Server.Destructible;
 using Content.Server.Destructible.Thresholds;
 using Content.Server.Destructible.Thresholds.Behaviors;
+using Content.Server.GameTicking.Events;
 using Content.Shared.CMU14.ColonyEconomy;
 using Content.Shared.Destructible;
 using Content.Shared.Destructible.Thresholds.Triggers;
@@ -32,12 +33,14 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
     [Dependency] private IRobustRandom _random = default!;
 
     private const string LiaisonJob = "AU14JobCivilianCorporateLiaison";
-    private const int SafeHitPoints = 2000;
+
+    private int _roundPin;
 
     public override void Initialize()
     {
         base.Initialize();
 
+        SubscribeLocalEvent<RoundStartingEvent>(OnRoundStarting);
         SubscribeLocalEvent<CMULiaisonSafeComponent, MapInitEvent>(OnMapInit);
         SubscribeLocalEvent<CMULiaisonSafeComponent, ActivateInWorldEvent>(OnActivate, before: [typeof(LockSystem)]);
         SubscribeLocalEvent<CMULiaisonSafeComponent, GetVerbsEvent<AlternativeVerb>>(OnGetVerbs);
@@ -45,43 +48,38 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
         SubscribeLocalEvent<PlayerSpawnCompleteEvent>(OnPlayerSpawnComplete);
     }
 
+    private void OnRoundStarting(RoundStartingEvent args)
+    {
+        _roundPin = 0;
+    }
+
     private void OnMapInit(Entity<CMULiaisonSafeComponent> ent, ref MapInitEvent args)
     {
-        // Replace the inherited 100-damage closet threshold with the reinforced safe threshold.
-        RemComp<DestructibleComponent>(ent.Owner);
-        var destructible = AddComp<DestructibleComponent>(ent.Owner);
-        _destructible.AddThreshold(
+        // List-valued YAML inheritance appends the parent's 100-damage closet
+        // threshold, so replace the inherited thresholds instead of adding another.
+        var destructible = EnsureComp<DestructibleComponent>(ent.Owner);
+        _destructible.ReplaceThresholds(
             (ent.Owner, destructible),
-            new DamageThreshold
+            new List<DamageThreshold>
             {
-                Trigger = new DamageTrigger { Damage = FixedPoint2.New(SafeHitPoints) },
-                Behaviors = new List<IThresholdBehavior>
+                new()
                 {
-                    new DoActsBehavior { Acts = ThresholdActs.Destruction },
-                    new PlaySoundBehavior
+                    Trigger = new DamageTrigger { Damage = FixedPoint2.New(ent.Comp.HitPoints) },
+                    Behaviors = new List<IThresholdBehavior>
                     {
-                        Sound = new SoundCollectionSpecifier("MetalBreak")
+                        new DoActsBehavior { Acts = ThresholdActs.Destruction },
+                        new PlaySoundBehavior
                         {
-                            Params = new AudioParams { Volume = -6 },
+                            Sound = new SoundCollectionSpecifier("MetalBreak")
+                            {
+                                Params = new AudioParams { Volume = -6 },
+                            },
                         },
                     },
                 },
-            },
-            null);
+            });
 
-        // All liaison safes share one PIN. A liaison receives it when they spawn.
-        var pin = 0;
-        var query = EntityQueryEnumerator<CMULiaisonSafeComponent>();
-        while (query.MoveNext(out var uid, out var other))
-        {
-            if (uid == ent.Owner || other.Pin <= 0)
-                continue;
-
-            pin = other.Pin;
-            break;
-        }
-
-        ent.Comp.Pin = pin > 0 ? pin : _random.Next(1000, 10000);
+        ent.Comp.Pin = GetOrCreatePin();
     }
 
     private void OnPlayerSpawnComplete(PlayerSpawnCompleteEvent args)
@@ -89,15 +87,15 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
         if (args.JobId != LiaisonJob)
             return;
 
-        var query = EntityQueryEnumerator<CMULiaisonSafeComponent>();
-        while (query.MoveNext(out _, out var safe))
-        {
-            if (safe.Pin <= 0)
-                continue;
+        EnsureComp<CMULiaisonPinComponent>(args.Mob).Pin = GetOrCreatePin();
+    }
 
-            EnsureComp<CMULiaisonPinComponent>(args.Mob).Pin = safe.Pin;
-            return;
-        }
+    private int GetOrCreatePin()
+    {
+        if (_roundPin <= 0)
+            _roundPin = _random.Next(1000, 10000);
+
+        return _roundPin;
     }
 
     private void OnActivate(Entity<CMULiaisonSafeComponent> ent, ref ActivateInWorldEvent args)
@@ -145,13 +143,11 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
 
     private void OpenPinDialog(Entity<CMULiaisonSafeComponent> ent, EntityUid user)
     {
-        ent.Comp.PendingUser = user;
-
         _dialog.OpenInput(
             ent.Owner,
             user,
             Loc.GetString("cmu-liaison-safe-pin-prompt"),
-            new CMULiaisonSafePinEvent(),
+            new CMULiaisonSafePinEvent(GetNetEntity(user)),
             characterLimit: 4,
             minCharacterLimit: 4,
             title: Loc.GetString("cmu-liaison-safe-pin-title"));
@@ -166,26 +162,36 @@ public sealed partial class CMULiaisonSafeSystem : EntitySystem
 
     private void OnPinEntered(Entity<CMULiaisonSafeComponent> ent, ref CMULiaisonSafePinEvent args)
     {
-        var user = ent.Comp.PendingUser;
-        ent.Comp.PendingUser = null;
-
-        if (user is not { } actor || TerminatingOrDeleted(actor))
+        if (!TryGetEntity(args.Actor, out var actor) ||
+            actor is not { } user ||
+            TerminatingOrDeleted(user))
+        {
             return;
+        }
+
+        // If the dialog still exists, its owner is the only actor allowed to answer.
+        // DialogSystem closes the dialog before raising the input event, so the
+        // actor carried by the event is the authoritative check.
+        if (TryComp<DialogComponent>(ent.Owner, out var dialog) &&
+            dialog.Actor != user)
+        {
+            return;
+        }
 
         if (args.Message != ent.Comp.Pin.ToString())
         {
             _popup.PopupEntity(
                 Loc.GetString("cmu-liaison-safe-pin-wrong"),
                 ent,
-                actor,
+                user,
                 PopupType.SmallCaution);
             return;
         }
 
         if (TryComp<LockComponent>(ent.Owner, out var lockComp))
-            _lock.Unlock(ent.Owner, actor, lockComp);
+            _lock.Unlock(ent.Owner, user, lockComp);
 
-        _popup.PopupEntity(Loc.GetString("cmu-liaison-safe-pin-accepted"), ent, actor);
-        _storage.TryOpenStorage(actor, ent.Owner);
+        _popup.PopupEntity(Loc.GetString("cmu-liaison-safe-pin-accepted"), ent, user);
+        _storage.TryOpenStorage(user, ent.Owner);
     }
 }

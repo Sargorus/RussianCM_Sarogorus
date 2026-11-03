@@ -7,12 +7,17 @@ namespace Content.Shared.CMU14.ColonyEconomy;
 public sealed partial class CMULiaisonSafeComponent : Component
 {
     /// <summary>
-    /// The safe's PIN. Zero until a corporate liaison spawns, so the safe remains
-    /// access-only when nobody can receive the code.
+    /// Round-scoped safe PIN, shared by every liaison safe and handed to the
+    /// corporate liaison when that role spawns.
     /// </summary>
     public int Pin;
 
-    public EntityUid? PendingUser;
+    /// <summary>
+    /// Destruction threshold in damage points, applied over the inherited
+    /// locker threshold.
+    /// </summary>
+    [DataField]
+    public int HitPoints = 2000;
 }
 
 [RegisterComponent]
@@ -22,4 +27,4 @@ public sealed partial class CMULiaisonPinComponent : Component
 }
 
 [Serializable, NetSerializable]
-public sealed record CMULiaisonSafePinEvent(string Message = "") : DialogInputEvent(Message);
+public sealed record CMULiaisonSafePinEvent(NetEntity Actor, string Message = "") : DialogInputEvent(Message);

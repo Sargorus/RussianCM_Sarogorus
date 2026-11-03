@@ -1,3 +1,6 @@
+using Content.Shared.Access;
+using Robust.Shared.Prototypes;
+
 namespace Content.Shared.CMU14.Requisitions;
 
 /// <summary>
@@ -7,4 +10,17 @@ namespace Content.Shared.CMU14.Requisitions;
 /// replacing them.
 /// </summary>
 [RegisterComponent]
-public sealed partial class CMUWYSecurityBarrierComponent : Component;
+public sealed partial class CMUWYSecurityBarrierComponent : Component
+{
+    /// <summary>
+    /// Access level required to lock or unlock the deployed barrier.
+    /// </summary>
+    [DataField]
+    public ProtoId<AccessLevelPrototype> Access = "CMU14AccessWYSecurityBarrier";
+
+    /// <summary>
+    /// Destruction threshold in damage points.
+    /// </summary>
+    [DataField]
+    public int HitPoints = 2250;
+}

@@ -119,6 +119,7 @@
     showLockVerbs: false
     unlockOnClick: false
   - type: CMULiaisonSafe # CMU14
+    hitPoints: 2000
   - type: UserInterface # CMU14: PIN dialog
     interfaces:
       enum.DialogUiKey.Key:

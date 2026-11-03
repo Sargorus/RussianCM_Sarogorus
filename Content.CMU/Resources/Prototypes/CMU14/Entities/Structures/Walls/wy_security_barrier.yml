@@ -12,8 +12,8 @@
   description: A reinforced deployable barrier used by Weyland-Yutani security. Swipe an authorized ID card to lock or unlock it.
   components:
   - type: CMUWYSecurityBarrier
-  - type: AccessReader
-    access: [["CMU14AccessWYSecurityBarrier"]]
+    access: CMU14AccessWYSecurityBarrier
+    hitPoints: 2250
   - type: Lock
     locked: false
     lockOnClick: true
@@ -37,14 +37,3 @@
         - MidImpassable
         - LowImpassable
         - BulletImpassable
-  - type: Destructible
-    thresholds:
-    - trigger:
-        !type:DamageTrigger
-        damage: 2250 # ~0.75 of CMWallMetal (3000)
-      behaviors:
-      - !type:PlaySoundBehavior
-        sound:
-          collection: MetalBreak
-      - !type:DoActsBehavior
-        acts: [ "Destruction" ]

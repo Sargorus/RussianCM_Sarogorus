@@ -11,6 +11,8 @@ namespace Content.Server.CMU14.Requisitions;
 /// </summary>
 public sealed partial class CMUDeployOnOpenSystem : EntitySystem
 {
+    private const string PryingQuality = "Prying";
+
     [Dependency] private SharedToolSystem _tool = default!;
 
     public override void Initialize()
@@ -35,7 +37,7 @@ public sealed partial class CMUDeployOnOpenSystem : EntitySystem
 
     private void OnPried(Entity<CMUDeployOnOpenComponent> ent, ref InteractUsingEvent args)
     {
-        if (args.Handled || !_tool.HasQuality(args.Used, "Prying"))
+        if (args.Handled || !_tool.HasQuality(args.Used, PryingQuality))
             return;
 
         args.Handled = true;
@@ -52,8 +54,6 @@ public sealed partial class CMUDeployOnOpenSystem : EntitySystem
         if (ent.Comp.Deployed)
             return;
 
-        ent.Comp.Deployed = true;
-
         // Do not spawn products on a map that is being cleaned up, and do not
         // materialize an off-map custom delivery crate that was cancelled.
         if (!TryComp<TransformComponent>(ent.Owner, out var xform) ||
@@ -64,6 +64,7 @@ public sealed partial class CMUDeployOnOpenSystem : EntitySystem
             return;
         }
 
+        ent.Comp.Deployed = true;
         var coordinates = xform.Coordinates;
         foreach (var prototype in ent.Comp.Spawn)
             Spawn(prototype, coordinates);
