@@ -49,6 +49,7 @@
   id: CMUPartWorkingJoeVisual
   abstract: true
   components:
+  - type: CMUWorkingJoeLimb
   - type: Sprite
     sprite: CMU14/Mobs/WorkingJoe/parts.rsi
   - type: VisualOrgan

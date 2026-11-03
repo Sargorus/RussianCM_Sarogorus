@@ -14,9 +14,6 @@ namespace Content.Shared.CMU14.Robotics;
 public sealed partial class CMURoboticsOrderConsoleComponent : Component
 {
     [DataField]
-    public float DeliveryRadius = 2f;
-
-    [DataField]
     public int MaxAvailableOrders = 3;
 
     [DataField]
@@ -66,6 +63,19 @@ public sealed partial class CMURoboticsOrderTarget
     /// </summary>
     [DataField]
     public List<EntProtoId> RequiredModules = new();
+
+    /// <summary>
+    /// Prototype spawned inside a repair crate. Required for repair targets; build
+    /// targets leave it empty.
+    /// </summary>
+    [DataField]
+    public EntProtoId? RepairPrototype;
+
+    /// <summary>
+    /// Whether the target uses the Working Joe limb family instead of drone limbs.
+    /// </summary>
+    [DataField]
+    public bool WorkingJoe;
 }
 
 public sealed class CMURoboticsOrder
@@ -77,6 +87,9 @@ public sealed class CMURoboticsOrder
     public int Reward;
     public int Amount = 1;
     public string TargetName = string.Empty;
+    public string TargetNameLocId = string.Empty;
+    public EntProtoId RepairTarget = string.Empty;
+    public bool WorkingJoe;
 
     /// <summary>Pre-rolled repair profile, applied to each unit when its crate arrives.</summary>
     public int RepairBurnDamage;
@@ -85,10 +98,4 @@ public sealed class CMURoboticsOrder
 
     public TimeSpan Deadline;
     public EntityUid? Elevator;
-
-    /// <summary>Index of the first transport crate this order added to the elevator queue.</summary>
-    public int FirstOrderIndex;
-
-    /// <summary>How many transport crates were queued for this order.</summary>
-    public int CrateCount;
 }

@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Numerics;
+using Content.Shared.CMU14.Configuration;
 using Content.Shared.CMU14.DroneOperator;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
@@ -19,7 +20,7 @@ public sealed class CMUDroneConfigurationWindow : DefaultWindow
 
     private readonly Dictionary<string, CheckBox> _channelChecks = new();
     private readonly Dictionary<string, CheckBox> _accessChecks = new();
-    private List<CMUDroneConfigurationOption> _factions = new();
+    private List<CMUConfigurationOption> _factions = new();
     private string _selectedFaction = string.Empty;
 
     public CMUDroneConfigurationWindow()
@@ -78,7 +79,7 @@ public sealed class CMUDroneConfigurationWindow : DefaultWindow
         _factions = state.Factions;
         _faction.Clear();
         foreach (var faction in _factions)
-            _faction.AddItem(faction.Name);
+            _faction.AddItem(Loc.GetString(faction.Name));
 
         var factionIndex = _factions.FindIndex(faction => faction.Id == _selectedFaction);
         if (factionIndex < 0)

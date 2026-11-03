@@ -73,25 +73,25 @@ public sealed partial class CMURoboticsDamagedBodySystem : EntitySystem
         int brute)
     {
         SeverLimbs(ent, body, missingLimbs);
-        ApplyDamage(ent.Owner, burn, brute);
+        ApplyDamage(ent, burn, brute);
     }
 
-    private void ApplyDamage(EntityUid uid, int burn, int brute)
+    private void ApplyDamage(Entity<CMURoboticsDamagedBodyComponent> ent, int burn, int brute)
     {
         if (burn > 0)
         {
-            var heat = _prototypes.Index<DamageTypePrototype>("Heat");
+            var heat = _prototypes.Index(ent.Comp.BurnDamageType);
             _damageable.TryChangeDamage(
-                uid,
+                ent.Owner,
                 new DamageSpecifier(heat, FixedPoint2.New(burn)),
                 ignoreResistances: true);
         }
 
         if (brute > 0)
         {
-            var blunt = _prototypes.Index<DamageTypePrototype>("Blunt");
+            var blunt = _prototypes.Index(ent.Comp.BruteDamageType);
             _damageable.TryChangeDamage(
-                uid,
+                ent.Owner,
                 new DamageSpecifier(blunt, FixedPoint2.New(brute)),
                 ignoreResistances: true);
         }

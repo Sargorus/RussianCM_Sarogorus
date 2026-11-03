@@ -28,17 +28,21 @@
     - prototype: CMUDroneAndroidUnarmed
       name: cmu-robotics-target-civilian-drone
       reward: 2400
+      repairPrototype: CMUDroneAndroidUnarmedRepairOrder
       requiredModules:
       - CMUDroneModuleMedical
     - prototype: CMUDroneAndroidCombat
       name: cmu-robotics-target-combat-drone
       reward: 2500
+      repairPrototype: CMUDroneAndroidCombatRepairOrder
       requiredModules:
       - CMUDroneModuleCombat
       - CMUDroneModuleMedical
     - prototype: CMUWorkingJoeRepair
       name: cmu-robotics-target-working-joe
       reward: 2050
+      repairPrototype: CMUWorkingJoeRepairOrder
+      workingJoe: true
   - type: ActivatableUI
     key: enum.CMURoboticsOrderConsoleUiKey.Key
   - type: ActivatableUIRequiresAccess

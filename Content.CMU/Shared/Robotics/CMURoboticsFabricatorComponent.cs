@@ -1,6 +1,7 @@
 using System;
 using Content.Shared._RMC14.Marines.Skills;
 using Content.Shared.DoAfter;
+using Content.Shared.Lathe.Prototypes;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
@@ -29,6 +30,9 @@ public sealed partial class CMURoboticsFabricatorComponent : Component
 
     [DataField]
     public TimeSpan RemoveDelay = TimeSpan.FromSeconds(3);
+
+    [DataField]
+    public ProtoId<LatheRecipePackPrototype> ProductionRecipePack = "CMURoboticsFabricatorRecipes";
 }
 
 [Serializable, NetSerializable]

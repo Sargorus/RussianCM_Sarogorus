@@ -814,7 +814,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
             return;
         }
 
-        if (_combatDamage.GetTotalDamage(drone.Owner) > FixedPoint2.New(5))
+        if (_combatDamage.GetTotalDamage(drone.Owner) > drone.Comp.ReviveDamageLimit)
         {
             _popup.PopupEntity(
                 Loc.GetString("cmu-drone-revive-repair-first", ("drone", drone.Owner)),
@@ -827,7 +827,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         var doAfter = new DoAfterArgs(
             EntityManager,
             user,
-            TimeSpan.FromSeconds(5),
+            drone.Comp.ReviveDelay,
             new CMUDroneReviveDoAfterEvent(),
             drone.Owner,
             used: key)
@@ -839,7 +839,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
             ExtraCheck = () =>
                 _hands.IsHolding(user, key) &&
                 _mobState.IsDead(drone.Owner) &&
-                _combatDamage.GetTotalDamage(drone.Owner) <= FixedPoint2.New(5),
+                _combatDamage.GetTotalDamage(drone.Owner) <= drone.Comp.ReviveDamageLimit,
         };
 
         if (!_doAfter.TryStartDoAfter(doAfter))
@@ -861,7 +861,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
         if (TerminatingOrDeleted(key) ||
             !HasComp<CMUDroneSynthKeyComponent>(key) ||
             !_mobState.IsDead(ent.Owner) ||
-            _combatDamage.GetTotalDamage(ent.Owner) > FixedPoint2.New(5))
+            _combatDamage.GetTotalDamage(ent.Owner) > ent.Comp.ReviveDamageLimit)
         {
             return;
         }
@@ -932,7 +932,7 @@ public sealed partial class CMUDroneOperatorSystem : EntitySystem
     private bool CanUseDroneModule(Entity<CMUDroneAndroidComponent> drone, EntityUid module)
     {
         return drone.Comp.SupportsCombatModule ||
-               MetaData(module).EntityPrototype?.ID != "CMUDroneModuleCombat";
+               MetaData(module).EntityPrototype?.ID != drone.Comp.CombatModule.Id;
     }
 
     private void InstallDroneModule(

@@ -17,11 +17,18 @@ public sealed partial class CMUBotSloganSystem : EntitySystem
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private IGameTiming _timing = default!;
 
+    private TimeSpan _nextUpdate;
+
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
         var now = _timing.CurTime;
+        if (now < _nextUpdate)
+            return;
+
+        _nextUpdate = now + TimeSpan.FromSeconds(1);
+
         var query = EntityQueryEnumerator<CMUBotSloganComponent>();
         while (query.MoveNext(out var uid, out var slogan))
         {

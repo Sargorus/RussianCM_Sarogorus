@@ -1,20 +1,16 @@
-using System.Linq; // CMU14: faction filtering
 using System.Threading;
 using System.Threading.Tasks;
 using Content.Shared.NPC.Components;
 using Content.Server.NPC.Pathfinding;
-using Content.Shared.CMU14.DroneOperator; // CMU14
 using Content.Shared.CMU14.Robotics; // CMU14
 using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
-using Content.Shared.Humanoid;
 using Content.Shared.Interaction;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Silicons.Bots;
 using Content.Shared.Emag.Components;
 using Content.Shared.FixedPoint;
-using Content.Shared._RMC14.Synth;
 using Robust.Shared.Timing;
 
 namespace Content.Server.NPC.HTN.PrimitiveTasks.Operators.Specific;
@@ -81,7 +77,7 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
         foreach (var (entity, _) in patients)
         {
             if (isCmuMedibot &&
-                (!IsValidCmuPatient(entity, cmuMedibot!) ||
+                (!CMUMedibotTargeting.IsValidPatient(_entManager, entity, cmuMedibot!) ||
                  !_medibot.ShouldInjectFromBeaker(cmuMedibot!, entity)))
             {
                 continue;
@@ -133,20 +129,5 @@ public sealed partial class PickNearbyInjectableOperator : HTNOperator
         }
 
         return (false, null);
-    }
-
-    // CMU14 method
-    private bool IsValidCmuPatient(EntityUid entity, CMUMedibotComponent component)
-    {
-        if (!_entManager.TryGetComponent<NpcFactionMemberComponent>(entity, out var factions) ||
-            !factions.Factions.Any(faction => component.TreatFactions.Contains(faction.Id)) ||
-            !_entManager.HasComponent<HumanoidProfileComponent>(entity) ||
-            _entManager.HasComponent<CMUDroneAndroidComponent>(entity) ||
-            _entManager.HasComponent<SynthComponent>(entity))
-        {
-            return false;
-        }
-
-        return true;
     }
 }

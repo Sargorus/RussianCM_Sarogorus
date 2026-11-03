@@ -84,7 +84,9 @@ public sealed class CMUMedibotConfigurationWindow : DefaultWindow
 
     public void UpdateState(CMUMedibotConfigurationBuiState state)
     {
-        _beaker.Text = state.BeakerText;
+        _beaker.Text = state.HasBeaker
+            ? Loc.GetString("cmu-medibot-config-beaker", ("volume", state.BeakerVolume))
+            : Loc.GetString("cmu-medibot-config-no-beaker");
         _amount.OverrideValue(state.InjectAmount);
         _brute.Pressed = state.InjectOnBrute;
         _burn.Pressed = state.InjectOnBurn;
@@ -96,7 +98,7 @@ public sealed class CMUMedibotConfigurationWindow : DefaultWindow
         {
             var check = new CheckBox
             {
-                Text = faction.Name,
+                Text = Loc.GetString(faction.Name),
                 Pressed = state.SelectedFactions.Contains(faction.Id),
             };
             _factionChecks[faction.Id] = check;

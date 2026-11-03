@@ -1,4 +1,5 @@
-using Content.Shared.CMU14.DroneOperator;
+using Content.Shared.CMU14.Configuration;
+using Content.Shared.FixedPoint;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.CMU14.Robotics;
@@ -17,8 +18,8 @@ public sealed class CMUMedibotConfigurationBuiState : BoundUserInterfaceState
     public bool InjectOnBurn { get; }
     public bool InjectOnCritical { get; }
     public bool HasBeaker { get; }
-    public string BeakerText { get; }
-    public List<CMUDroneConfigurationOption> Factions { get; }
+    public FixedPoint2 BeakerVolume { get; }
+    public List<CMUConfigurationOption> Factions { get; }
     public HashSet<string> SelectedFactions { get; }
 
     public CMUMedibotConfigurationBuiState(
@@ -27,8 +28,8 @@ public sealed class CMUMedibotConfigurationBuiState : BoundUserInterfaceState
         bool injectOnBurn,
         bool injectOnCritical,
         bool hasBeaker,
-        string beakerText,
-        List<CMUDroneConfigurationOption> factions,
+        FixedPoint2 beakerVolume,
+        List<CMUConfigurationOption> factions,
         HashSet<string> selectedFactions)
     {
         InjectAmount = injectAmount;
@@ -36,7 +37,7 @@ public sealed class CMUMedibotConfigurationBuiState : BoundUserInterfaceState
         InjectOnBurn = injectOnBurn;
         InjectOnCritical = injectOnCritical;
         HasBeaker = hasBeaker;
-        BeakerText = beakerText;
+        BeakerVolume = beakerVolume;
         Factions = factions;
         SelectedFactions = selectedFactions;
     }

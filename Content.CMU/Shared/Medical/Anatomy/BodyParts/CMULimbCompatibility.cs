@@ -1,4 +1,3 @@
-using System;
 using Content.Shared.Body.Part;
 using Content.Shared.CMU14.DroneOperator;
 using Robust.Shared.GameObjects;
@@ -14,15 +13,17 @@ namespace Content.Shared.CMU14.Medical.Anatomy.BodyParts;
 /// the drone, Working Joe, synth and human limb sets separate without a runtime
 /// family component.
 /// </summary>
+[RegisterComponent]
+public sealed partial class CMUDroneLimbComponent : Component;
+
+[RegisterComponent]
+public sealed partial class CMUWorkingJoeLimbComponent : Component;
+
 public static class CMULimbCompatibility
 {
-    public const string DroneLimbPrefix = "CMUPartDroneAndroid";
-    public const string WorkingJoeLimbPrefix = "CMUPartWorkingJoe";
-
     public static bool IsDroneLimb(IEntityManager entMan, EntityUid limb)
     {
-        var id = entMan.GetComponent<MetaDataComponent>(limb).EntityPrototype?.ID;
-        if (id?.StartsWith(DroneLimbPrefix, StringComparison.Ordinal) == true)
+        if (entMan.HasComponent<CMUDroneLimbComponent>(limb))
             return true;
 
         // The fabricator prints the frame assembly parts. Those same items are
@@ -33,8 +34,7 @@ public static class CMULimbCompatibility
 
     public static bool IsWorkingJoeLimb(IEntityManager entMan, EntityUid limb)
     {
-        var id = entMan.GetComponent<MetaDataComponent>(limb).EntityPrototype?.ID;
-        return id?.StartsWith(WorkingJoeLimbPrefix, StringComparison.Ordinal) == true;
+        return entMan.HasComponent<CMUWorkingJoeLimbComponent>(limb);
     }
 
     /// <summary>

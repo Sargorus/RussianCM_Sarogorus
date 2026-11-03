@@ -2,6 +2,7 @@ using Content.Shared.Dataset;
 using Content.Shared.Access;
 using Content.Shared.Radio;
 using Content.Shared._RMC14.Marines.Skills;
+using Content.Shared.FixedPoint;
 using Content.Shared.StatusIcon;
 using Content.Shared.Tools;
 using Robust.Shared.Containers;
@@ -114,6 +115,15 @@ public sealed partial class CMUDroneAndroidComponent : Component
 
     [DataField]
     public string ModuleContainerId = "cmu-drone-module";
+
+    [DataField]
+    public EntProtoId CombatModule = "CMUDroneModuleCombat";
+
+    [DataField]
+    public TimeSpan ReviveDelay = TimeSpan.FromSeconds(5);
+
+    [DataField]
+    public FixedPoint2 ReviveDamageLimit = 5;
 
     [DataField]
     public EntityUid? Operator;

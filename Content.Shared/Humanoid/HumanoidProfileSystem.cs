@@ -96,11 +96,9 @@ public sealed partial class HumanoidProfileSystem : EntitySystem
             ? "humanoid-appearance-component-examine-synthetic"
             : "humanoid-appearance-component-examine";
 
-        if (args.Examiner == args.Examined &&
-            !HasComp<CMUDroneAndroidComponent>(ent.Owner))
-        {
+        if (args.Examiner == args.Examined
+            && !HasComp<CMUDroneAndroidComponent>(ent.Owner))
             locale += "-selfaware";
-        }
 
         args.PushText(Loc.GetString(locale, ("user", identity), ("age", age), ("species", species)), 100);
         // AU14 end

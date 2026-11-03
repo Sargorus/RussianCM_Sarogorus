@@ -49,6 +49,7 @@
   id: CMUPartDroneAndroidVisual
   abstract: true
   components:
+  - type: CMUDroneLimb
   - type: Sprite
     sprite: CMU14/Mobs/DroneAndroid/parts.rsi
   - type: VisualOrgan

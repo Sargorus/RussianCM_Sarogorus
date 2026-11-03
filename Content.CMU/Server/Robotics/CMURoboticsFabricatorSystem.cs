@@ -22,6 +22,8 @@ namespace Content.Server.CMU14.Robotics;
 /// </summary>
 public sealed partial class CMURoboticsFabricatorSystem : EntitySystem
 {
+    private const string PryingQuality = "Prying";
+
     [Dependency] private SharedContainerSystem _container = default!;
     [Dependency] private SharedDoAfterSystem _doAfter = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
@@ -59,7 +61,7 @@ public sealed partial class CMURoboticsFabricatorSystem : EntitySystem
         if (TryComp<LatheComponent>(ent.Owner, out var lathe))
         {
             lathe.StaticPacks.Clear();
-            lathe.StaticPacks.Add("CMURoboticsFabricatorRecipes");
+            lathe.StaticPacks.Add(ent.Comp.ProductionRecipePack);
             lathe.DynamicPacks.Clear();
         }
 
@@ -113,7 +115,7 @@ public sealed partial class CMURoboticsFabricatorSystem : EntitySystem
             return;
         }
 
-        if (_tool.HasQuality(args.Used, "Prying") && container.ContainedEntity != null)
+        if (_tool.HasQuality(args.Used, PryingQuality) && container.ContainedEntity != null)
         {
             args.Handled = true;
             StartRemoveCell(ent, args.User, args.Used);

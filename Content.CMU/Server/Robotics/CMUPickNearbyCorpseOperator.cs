@@ -1,21 +1,16 @@
-﻿using System.Linq;
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 using Content.Server.NPC;
 using Content.Server.NPC.HTN;
 using Content.Server.NPC.HTN.PrimitiveTasks;
 using Content.Server.NPC.Pathfinding;
 using Content.Shared.Atmos.Rotting;
-using Content.Shared.CMU14.DroneOperator;
 using Content.Shared.CMU14.Robotics;
-using Content.Shared.Humanoid;
 using Content.Shared.Interaction;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
-using Content.Shared.NPC.Components;
 using Content.Shared.Traits.Assorted;
 using Content.Shared._RMC14.Medical.CPR;
-using Content.Shared._RMC14.Synth;
 using Robust.Shared.GameObjects;
 using Robust.Shared.Timing;
 
@@ -64,7 +59,7 @@ public sealed partial class CMUPickNearbyCorpseOperator : HTNOperator
                 _entities.HasComponent<RottingComponent>(entity) ||
                 _entities.HasComponent<UnrevivableComponent>(entity) ||
                 _cpr.IsRecentlyCPRed(entity) ||
-                !IsValidCorpse(entity, medibot))
+                !CMUMedibotTargeting.IsValidPatient(_entities, entity, medibot))
             {
                 continue;
             }
@@ -101,19 +96,5 @@ public sealed partial class CMUPickNearbyCorpseOperator : HTNOperator
         }
 
         return (false, null);
-    }
-
-    private bool IsValidCorpse(EntityUid entity, CMUMedibotComponent medibot)
-    {
-        if (!_entities.TryGetComponent<NpcFactionMemberComponent>(entity, out var factions) ||
-            !factions.Factions.Any(faction => medibot.TreatFactions.Contains(faction.Id)) ||
-            !_entities.HasComponent<HumanoidProfileComponent>(entity) ||
-            _entities.HasComponent<CMUDroneAndroidComponent>(entity) ||
-            _entities.HasComponent<SynthComponent>(entity))
-        {
-            return false;
-        }
-
-        return true;
     }
 }

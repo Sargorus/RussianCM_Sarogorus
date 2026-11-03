@@ -2,22 +2,22 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Serialization;
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared.CMU14.Robotics; // CMU14
-using Content.Shared.Chemistry.Components;
+using Content.Shared.Chemistry.Components; // CMU14
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Containers.ItemSlots;
-using Content.Shared.Damage;
+using Content.Shared.Containers.ItemSlots; // CMU14
+using Content.Shared.Damage; // CMU14
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.DoAfter;
 using Content.Shared.Emag.Components;
 using Content.Shared.Emag.Systems;
-using Content.Shared.FixedPoint;
+using Content.Shared.FixedPoint; // CMU14
 using Content.Shared.Interaction;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.NPC.Components;
 using Content.Shared.Popups;
-using Robust.Shared.Timing;
+using Robust.Shared.Timing; // CMU14
 
 namespace Content.Shared.Silicons.Bots;
 
@@ -154,7 +154,7 @@ public sealed partial class MedibotSystem : EntitySystem
         if (_itemSlots.GetItemOrNull(medibot, component.BeakerSlotId) is not { } beaker)
             return false;
 
-        return _solutionContainer.TryGetSolution(beaker, "beaker", out _, out var solution) &&
+        return _solutionContainer.TryGetSolution(beaker, component.BeakerSolution, out _, out var solution) &&
                solution.Volume > FixedPoint2.Zero;
     }
 
@@ -210,7 +210,7 @@ public sealed partial class MedibotSystem : EntitySystem
         if (_itemSlots.GetItemOrNull(medibot, component.BeakerSlotId) is not { } beaker)
             return false;
 
-        if (!_solutionContainer.TryGetSolution(beaker, "beaker", out var beakerSolution, out var solution))
+        if (!_solutionContainer.TryGetSolution(beaker, component.BeakerSolution, out var beakerSolution, out var solution))
             return false;
 
         var amount = FixedPoint2.Min(component.InjectAmount, solution.Volume);

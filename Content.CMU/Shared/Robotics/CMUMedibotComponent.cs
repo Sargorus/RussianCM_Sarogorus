@@ -14,6 +14,9 @@ public sealed partial class CMUMedibotComponent : Component
     public string BeakerSlotId = "cmu-medibot-beaker";
 
     [DataField]
+    public string BeakerSolution = "beaker";
+
+    [DataField]
     public FixedPoint2 InjectAmount = 15;
 
     [DataField]

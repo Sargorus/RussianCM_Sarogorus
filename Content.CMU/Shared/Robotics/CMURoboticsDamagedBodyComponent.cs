@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Content.Shared.Body.Part;
+using Content.Shared.Damage.Prototypes;
+using Robust.Shared.Prototypes;
 
 namespace Content.Shared.CMU14.Robotics;
 
@@ -43,4 +45,10 @@ public sealed partial class CMURoboticsDamagedBodyComponent : Component
 
     [DataField]
     public int MaxBruteDamage = 70;
+
+    [DataField]
+    public ProtoId<DamageTypePrototype> BurnDamageType = "Heat";
+
+    [DataField]
+    public ProtoId<DamageTypePrototype> BruteDamageType = "Blunt";
 }

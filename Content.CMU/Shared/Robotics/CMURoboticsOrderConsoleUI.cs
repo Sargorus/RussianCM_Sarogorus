@@ -1,3 +1,4 @@
+using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.CMU14.Robotics;
@@ -20,8 +21,8 @@ public sealed class CMURoboticsOrderInfo
 {
     public int Id { get; }
     public CMURoboticsOrderType Type { get; }
-    public string TargetName { get; }
-    public string? RequiredModuleName { get; }
+    public string TargetNameLocId { get; }
+    public EntProtoId? RequiredModule { get; }
     public int Reward { get; }
     public int Amount { get; }
     public int SecondsRemaining { get; }
@@ -29,16 +30,16 @@ public sealed class CMURoboticsOrderInfo
     public CMURoboticsOrderInfo(
         int id,
         CMURoboticsOrderType type,
-        string targetName,
-        string? requiredModuleName,
+        string targetNameLocId,
+        EntProtoId? requiredModule,
         int reward,
         int amount,
         int secondsRemaining)
     {
         Id = id;
         Type = type;
-        TargetName = targetName;
-        RequiredModuleName = requiredModuleName;
+        TargetNameLocId = targetNameLocId;
+        RequiredModule = requiredModule;
         Reward = reward;
         Amount = amount;
         SecondsRemaining = secondsRemaining;

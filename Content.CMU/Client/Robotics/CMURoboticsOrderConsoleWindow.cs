@@ -5,6 +5,7 @@ using Content.Shared.CMU14.Robotics;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
+using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
 namespace Content.Client.CMU14.Robotics;
@@ -118,7 +119,7 @@ public sealed class CMURoboticsOrderConsoleWindow : DefaultWindow
                     Loc.GetString(
                         "cmu-robotics-console-order-heading",
                         ("type", TypeName(order.Type)),
-                        ("target", order.TargetName)),
+                        ("target", Loc.GetString(order.TargetNameLocId))),
                     out var details);
 
                 AddOrderFields(details, order);
@@ -153,17 +154,17 @@ public sealed class CMURoboticsOrderConsoleWindow : DefaultWindow
 
         column.AddChild(_kit.Field(
             Loc.GetString("cmu-robotics-console-target"),
-            order.TargetName));
+            Loc.GetString(order.TargetNameLocId)));
 
         column.AddChild(_kit.Field(
             Loc.GetString("cmu-robotics-console-amount"),
             order.Amount.ToString()));
 
-        if (order.RequiredModuleName is { } module)
+        if (order.RequiredModule is { } module)
         {
             column.AddChild(_kit.Field(
                 Loc.GetString("cmu-robotics-console-module"),
-                module));
+                GetPrototypeName(module)));
         }
 
         if (order.SecondsRemaining > 0)
@@ -184,5 +185,12 @@ public sealed class CMURoboticsOrderConsoleWindow : DefaultWindow
         return Loc.GetString(type == CMURoboticsOrderType.Build
             ? "cmu-robotics-console-type-build"
             : "cmu-robotics-console-type-repair");
+    }
+
+    private static string GetPrototypeName(EntProtoId prototype)
+    {
+        return Loc.TryGetString($"ent-{prototype.Id}", out var name)
+            ? name
+            : prototype.Id;
     }
 }

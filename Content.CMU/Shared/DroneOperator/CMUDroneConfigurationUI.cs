@@ -1,3 +1,4 @@
+using Content.Shared.CMU14.Configuration;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.CMU14.DroneOperator;
@@ -9,35 +10,22 @@ public enum CMUDroneConfigurationUi : byte
 }
 
 [Serializable, NetSerializable]
-public sealed class CMUDroneConfigurationOption
-{
-    public string Id { get; }
-    public string Name { get; }
-
-    public CMUDroneConfigurationOption(string id, string name)
-    {
-        Id = id;
-        Name = name;
-    }
-}
-
-[Serializable, NetSerializable]
 public sealed class CMUDroneConfigurationBuiState : BoundUserInterfaceState
 {
-    public List<CMUDroneConfigurationOption> Factions { get; }
+    public List<CMUConfigurationOption> Factions { get; }
     public string CurrentFaction { get; }
-    public List<CMUDroneConfigurationOption> Channels { get; }
+    public List<CMUConfigurationOption> Channels { get; }
     public HashSet<string> SelectedChannels { get; }
-    public List<CMUDroneConfigurationOption> Access { get; }
+    public List<CMUConfigurationOption> Access { get; }
     public HashSet<string> SelectedAccess { get; }
     public bool HasIdCard { get; }
 
     public CMUDroneConfigurationBuiState(
-        List<CMUDroneConfigurationOption> factions,
+        List<CMUConfigurationOption> factions,
         string currentFaction,
-        List<CMUDroneConfigurationOption> channels,
+        List<CMUConfigurationOption> channels,
         HashSet<string> selectedChannels,
-        List<CMUDroneConfigurationOption> access,
+        List<CMUConfigurationOption> access,
         HashSet<string> selectedAccess,
         bool hasIdCard)
     {

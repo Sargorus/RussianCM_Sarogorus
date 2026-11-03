@@ -1,16 +1,14 @@
 using System.Linq;
+using Content.Server.CMU14.Robotics;
 using Content.Shared._RMC14.Sentry;
 using Content.Shared._RMC14.Weapons.Ranged.IFF;
 using Content.Shared.Access;
 using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
+using Content.Shared.CMU14.Configuration;
 using Content.Shared.CMU14.DroneOperator;
 using Content.Shared.CMU14.Robotics;
-using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Containers.ItemSlots;
-using Content.Shared.FixedPoint;
 using Content.Shared.Hands;
-using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Interaction;
 using Content.Shared.NPC.Components;
@@ -31,15 +29,14 @@ namespace Content.Server.CMU14.DroneOperator;
 public sealed partial class CMUDroneConfigurationSystem : EntitySystem
 {
     [Dependency] private SharedAccessSystem _access = default!;
+    [Dependency] private IComponentFactory _factory = default!;
     [Dependency] private SharedHandsSystem _hands = default!;
     [Dependency] private GunIFFSystem _iff = default!;
-    [Dependency] private ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private CMUMedibotConfigurationSystem _medibotConfig = default!;
     [Dependency] private NpcFactionSystem _npcFactions = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private IPrototypeManager _proto = default!;
-    [Dependency] private SharedSolutionContainerSystem _solutions = default!;
     [Dependency] private SharedUserInterfaceSystem _ui = default!;
-    [Dependency] private IComponentFactory _factory = default!;
 
     public override void Initialize()
     {
@@ -52,10 +49,6 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
         Subs.BuiEvents<CMUDroneAndroidComponent>(CMUDroneConfigurationUi.Key, subs =>
         {
             subs.Event<CMUDroneConfigurationApplyMsg>(OnApply);
-        });
-        Subs.BuiEvents<CMUMedibotComponent>(CMUMedibotConfigurationUi.Key, subs =>
-        {
-            subs.Event<CMUMedibotConfigurationApplyMsg>(OnMedibotApply);
         });
     }
 
@@ -95,10 +88,7 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
         if (TryComp<CMUMedibotComponent>(target, out var medibot))
         {
             args.Handled = true;
-            medibot.ConfigUser = args.User;
-            medibot.ConfigKey = ent.Owner;
-            UpdateMedibotUi(target, medibot);
-            _ui.TryOpenUi(target, CMUMedibotConfigurationUi.Key, args.User);
+            _medibotConfig.Open((target, medibot), args.User, ent.Owner);
             return;
         }
 
@@ -180,75 +170,6 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
         _popup.PopupEntity(Loc.GetString("cmu-drone-config-applied"), ent, session.User);
     }
 
-    private void OnMedibotApply(Entity<CMUMedibotComponent> ent, ref CMUMedibotConfigurationApplyMsg msg)
-    {
-        if (ent.Comp.ConfigUser != msg.Actor ||
-            ent.Comp.ConfigKey is not { } key ||
-            !IsHolding(msg.Actor, key))
-        {
-            return;
-        }
-
-        ent.Comp.InjectAmount = FixedPoint2.New(Math.Clamp(msg.InjectAmount, 1, 50));
-        ent.Comp.InjectOnBrute = msg.InjectOnBrute;
-        ent.Comp.InjectOnBurn = msg.InjectOnBurn;
-        ent.Comp.InjectOnCritical = msg.InjectOnCritical;
-
-        var factions = new HashSet<string>();
-        foreach (var id in msg.Factions)
-        {
-            if (_proto.TryIndex<NpcFactionPrototype>(id, out var faction) && !faction.Abstract)
-                factions.Add(faction.ID);
-        }
-        ent.Comp.TreatFactions = factions;
-
-        UpdateMedibotUi(ent.Owner, ent.Comp);
-        _popup.PopupEntity(Loc.GetString("cmu-medibot-config-applied"), ent, msg.Actor);
-    }
-
-    private void UpdateMedibotUi(EntityUid medibot, CMUMedibotComponent component)
-    {
-        var beaker = _itemSlots.GetItemOrNull(medibot, component.BeakerSlotId);
-        var hasBeaker = false;
-        string beakerText;
-
-        if (beaker is { } beakerUid &&
-            _solutions.TryGetSolution(beakerUid, "beaker", out _, out var solution))
-        {
-            hasBeaker = true;
-            beakerText = Loc.GetString("cmu-medibot-config-beaker", ("volume", solution.Volume));
-        }
-        else
-        {
-            beakerText = Loc.GetString("cmu-medibot-config-no-beaker");
-        }
-
-        var factions = new List<CMUDroneConfigurationOption>();
-        foreach (var faction in _proto.EnumeratePrototypes<NpcFactionPrototype>())
-        {
-            if (faction.Abstract)
-                continue;
-
-            var name = string.IsNullOrEmpty(faction.Name)
-                ? faction.ID
-                : Loc.GetString(faction.Name);
-            factions.Add(new CMUDroneConfigurationOption(faction.ID, name));
-        }
-        factions.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
-
-        var state = new CMUMedibotConfigurationBuiState(
-            component.InjectAmount.Int(),
-            component.InjectOnBrute,
-            component.InjectOnBurn,
-            component.InjectOnCritical,
-            hasBeaker,
-            beakerText,
-            factions,
-            component.TreatFactions);
-
-        _ui.SetUiState(medibot, CMUMedibotConfigurationUi.Key, state);
-    }
-
     private void UpdateUi(EntityUid drone, CMUDroneConfigurationSessionComponent session)
     {
         var factions = BuildFactionOptions(session.User);
@@ -257,13 +178,13 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
         if (TryComp<NpcFactionMemberComponent>(drone, out var member))
             currentFaction = member.Factions.FirstOrDefault().Id ?? string.Empty;
 
-        var channels = new List<CMUDroneConfigurationOption>();
+        var channels = new List<CMUConfigurationOption>();
         foreach (var channelId in session.AvailableChannels)
         {
             if (!_proto.TryIndex(channelId, out RadioChannelPrototype? channel))
                 continue;
 
-            channels.Add(new CMUDroneConfigurationOption(channelId.Id, channel.LocalizedName));
+            channels.Add(new CMUConfigurationOption(channelId.Id, channel.LocalizedName));
         }
         channels.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
 
@@ -273,13 +194,13 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
         if (TryComp<IntrinsicRadioTransmitterComponent>(drone, out var transmitter))
             selectedChannels.UnionWith(transmitter.Channels.Select(channel => channel.Id));
 
-        var access = new List<CMUDroneConfigurationOption>();
+        var access = new List<CMUConfigurationOption>();
         foreach (var accessId in session.AvailableAccess)
         {
             if (!_proto.TryIndex(accessId, out AccessLevelPrototype? level))
                 continue;
 
-            access.Add(new CMUDroneConfigurationOption(accessId.Id, level.GetAccessLevelName()));
+            access.Add(new CMUConfigurationOption(accessId.Id, level.GetAccessLevelName()));
         }
         access.Sort((a, b) => string.Compare(a.Name, b.Name, StringComparison.CurrentCultureIgnoreCase));
 
@@ -299,9 +220,9 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
         _ui.SetUiState(drone, CMUDroneConfigurationUi.Key, state);
     }
 
-    private List<CMUDroneConfigurationOption> BuildFactionOptions(EntityUid user)
+    private List<CMUConfigurationOption> BuildFactionOptions(EntityUid user)
     {
-        var factions = new List<CMUDroneConfigurationOption>();
+        var factions = new List<CMUConfigurationOption>();
         var seen = new HashSet<string>();
 
         AddFactionOption(factions, seen, "AUWeYu");
@@ -319,7 +240,7 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
     }
 
     private void AddFactionOption(
-        List<CMUDroneConfigurationOption> factions,
+        List<CMUConfigurationOption> factions,
         HashSet<string> seen,
         string id)
     {
@@ -328,8 +249,8 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
 
         var name = string.IsNullOrEmpty(faction.Name)
             ? faction.ID
-            : Loc.GetString(faction.Name);
-        factions.Add(new CMUDroneConfigurationOption(faction.ID, name));
+            : faction.Name;
+        factions.Add(new CMUConfigurationOption(faction.ID, name));
     }
 
     private bool TryFindIffFaction(string npcFaction, out EntProtoId<IFFFactionComponent> faction)
@@ -383,21 +304,16 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
     {
         idCard = default;
 
-        if (!TryComp(user, out HandsComponent? hands))
-            return false;
-
-        foreach (var hand in _hands.EnumerateHands((user, hands)))
+        foreach (var held in _hands.EnumerateHeld(user))
         {
-            if (!_hands.TryGetHeldItem((user, hands), hand, out var held) ||
-                held is not { } heldUid ||
-                heldUid == key ||
-                !HasComp<IdCardComponent>(heldUid) ||
-                !HasComp<AccessComponent>(heldUid))
+            if (held == key ||
+                !HasComp<IdCardComponent>(held) ||
+                !HasComp<AccessComponent>(held))
             {
                 continue;
             }
 
-            idCard = heldUid;
+            idCard = held;
             return true;
         }
 
@@ -406,15 +322,6 @@ public sealed partial class CMUDroneConfigurationSystem : EntitySystem
 
     private bool IsHolding(EntityUid user, EntityUid item)
     {
-        if (!TryComp(user, out HandsComponent? hands))
-            return false;
-
-        foreach (var hand in _hands.EnumerateHands((user, hands)))
-        {
-            if (_hands.TryGetHeldItem((user, hands), hand, out var held) && held == item)
-                return true;
-        }
-
-        return false;
+        return _hands.IsHolding(user, item);
     }
 }
