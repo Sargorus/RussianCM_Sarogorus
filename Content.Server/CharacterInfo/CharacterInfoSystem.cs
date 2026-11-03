@@ -109,6 +109,8 @@ public sealed partial class CharacterInfoSystem : EntitySystem
         PopulateLorePrimerLines(lorePrimerLines, jobId, isThreatRole);
         AddCLFStandingOrders(lorePrimerLines, entity);
         AddAtmCardLines(lorePrimerLines, entity); // CMU14: ATM card details in character notes
+        // CMU14 removed: liaison safe PINs are now player-managed per safe.
+        // AddLiaisonSafePin(lorePrimerLines, entity);
 
         // Check inventory and hands for JobTitleChangerComponent
         if (TryComp(entity, out InventoryComponent? _))

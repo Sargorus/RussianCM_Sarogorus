@@ -80,8 +80,8 @@ public sealed class CMULiaisonSafeTest : GameTest
             var intruderHands = SComp<HandsComponent>(intruder);
             var intruderVerbs = GetVerbs(safe, intruder, intruderHands);
             Assert.That(intruderVerbs.Verbs.Any(verb =>
-                    verb.Text == Loc.GetString("cmu-liaison-safe-set-pin-verb") ||
-                    verb.Text == Loc.GetString("cmu-liaison-safe-change-pin-verb")),
+                    verb.Text == Loc.GetString("cmu-liaison-safe-set-pin-verb")
+                    || verb.Text == Loc.GetString("cmu-liaison-safe-change-pin-verb")),
                 Is.False);
 
             // The card owner can lock the safe and then unlock it with the PIN.
