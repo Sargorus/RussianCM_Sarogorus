@@ -1,6 +1,7 @@
 using System.Numerics;
 using Content.Client._RMC14.Storage;
 using Content.Client.Items.Systems;
+using Content.Client.Stylesheets; // CMU14: use the existing CRT mode preference.
 using Content.Shared.Item;
 using Content.Shared.Storage;
 using Robust.Client.GameObjects;
@@ -119,11 +120,12 @@ public sealed partial class ItemGridPiece : Control, IEntityControl // CMU14: co
             return;
         }
 
-        var adjustedShape = _entityManager.System<ItemSystem>().GetAdjustedItemShape((container.Owner, storageComp), (Entity, itemComponent), Location.Rotation, Vector2i.Zero);
+        var adjustedShape = CMUGetDrawShape((container.Owner, storageComp), (Entity, itemComponent)); // CMU14
         var boundingGrid = adjustedShape.GetBoundingBox();
         var size = _centerTexture!.Size * 2 * UIScale;
 
         var hovering = !_storageController.IsDragging && UserInterfaceManager.CurrentlyHovered == this;
+        var crt = StyleNano.CrtUiEnabled && Theme.ID == "SS14DefaultTheme"; // CMU14: preserve other themes.
         //yeah, this coloring is kinda hardcoded. deal with it. B)
         Color? colorModulate = hovering  ? null : Color.FromHex("#a8a8a8");
 
@@ -141,28 +143,49 @@ public sealed partial class ItemGridPiece : Control, IEntityControl // CMU14: co
                 var offset = size * 2 * new Vector2(x - boundingGrid.Left, y - boundingGrid.Bottom);
                 var topLeft = PixelPosition + offset.Floored();
 
-                if (GetTexture(adjustedShape, new Vector2i(x, y), Direction.NorthEast) is {} neTexture)
-                {
-                    var neOffset = new Vector2(size.X, 0);
-                    handle.DrawTextureRect(neTexture, new UIBox2(topLeft + neOffset, topLeft + neOffset + size), colorModulate);
-                }
-                if (GetTexture(adjustedShape, new Vector2i(x, y), Direction.NorthWest) is {} nwTexture)
-                {
-                    _texturesPositions.Add((nwTexture, Position + offset / UIScale));
-                    handle.DrawTextureRect(nwTexture, new UIBox2(topLeft, topLeft + size), colorModulate);
+                // CMU14 Begin: share neighbor tests between the four corners.
+                var position = new Vector2i(x, y);
+                var top = !adjustedShape.Contains(position - Vector2i.Up);
+                var bottom = !adjustedShape.Contains(position - Vector2i.Down);
+                var left = !adjustedShape.Contains(position + Vector2i.Left);
+                var right = !adjustedShape.Contains(position + Vector2i.Right);
+                // CMU14 End
 
+                // CMU14 Storage Begin: CRT silhouettes share native cell hit geometry.
+                var nwTexture = GetTexture(top, bottom, left, right, Direction.NorthWest);
+                if (nwTexture != null)
+                {
+                    // Hit testing uses the native cell dimensions even when its texture is not drawn.
+                    _texturesPositions.Add((nwTexture, Position + offset / UIScale));
                     if (marked && nwTexture == _topLeftTexture)
                     {
                         maybeMarkedPos = topLeft;
                         marked = false;
                     }
                 }
-                if (GetTexture(adjustedShape, new Vector2i(x, y), Direction.SouthEast) is {} seTexture)
+
+                if (crt)
+                {
+                    CMUDrawPieceCell(handle, new UIBox2(topLeft, topLeft + size * 2),
+                        top, bottom, left, right, hovering, UIScale);
+                    continue;
+                }
+
+                if (GetTexture(top, bottom, left, right, Direction.NorthEast) is {} neTexture) // CMU14
+                {
+                    var neOffset = new Vector2(size.X, 0);
+                    handle.DrawTextureRect(neTexture, new UIBox2(topLeft + neOffset, topLeft + neOffset + size), colorModulate);
+                }
+                if (nwTexture != null)
+                    handle.DrawTextureRect(nwTexture, new UIBox2(topLeft, topLeft + size), colorModulate);
+                // CMU14 End
+
+                if (GetTexture(top, bottom, left, right, Direction.SouthEast) is {} seTexture) // CMU14
                 {
                     var seOffset = size;
                     handle.DrawTextureRect(seTexture, new UIBox2(topLeft + seOffset, topLeft + seOffset + size), colorModulate);
                 }
-                if (GetTexture(adjustedShape, new Vector2i(x, y), Direction.SouthWest) is {} swTexture)
+                if (GetTexture(top, bottom, left, right, Direction.SouthWest) is {} swTexture) // CMU14
                 {
                     var swOffset = new Vector2(0, size.Y);
                     handle.DrawTextureRect(swTexture, new UIBox2(topLeft + swOffset, topLeft + swOffset + size), colorModulate);
@@ -262,13 +285,9 @@ public sealed partial class ItemGridPiece : Control, IEntityControl // CMU14: co
         OnPieceUnpressed?.Invoke(args, this);
     }
 
-    private Texture? GetTexture(IReadOnlyList<Box2i> boxes, Vector2i position, Direction corner)
+    // CMU14 method: neighbor membership is computed once per cell by the caller.
+    private Texture? GetTexture(bool top, bool bottom, bool left, bool right, Direction corner)
     {
-        var top = !boxes.Contains(position - Vector2i.Up);
-        var bottom = !boxes.Contains(position - Vector2i.Down);
-        var left = !boxes.Contains(position + Vector2i.Left);
-        var right = !boxes.Contains(position + Vector2i.Right);
-
         switch (corner)
         {
             case Direction.NorthEast:

@@ -1,20 +1,24 @@
 using System.Linq;
 using System.Numerics;
+using Content.Server._RuMC14.Reinforcements; // RuMC edit
 using Content.Server.Access.Systems;
 using Content.Server.CMU14.Diagnostics.Performance;
 using Content.Server.CMU14.Round;
 using Content.Server.CMU14.Threats;
 using Content.Server.CMU14.VendorMarker;
 using Content.Server.Chat.Systems;
+using Content.Shared.Chat;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Presets;
 using Content.Server.CMU14.Roles; // CMU14
 using Content.Server.Preferences.Managers;
+using Content.Shared.CMU14.ForceOnForce;
 using Content.Shared.CMU14.Threats;
 using Content.Shared._RMC14.Construction;
 using Content.Shared._RMC14.CrashLand;
 using Content.Shared._RMC14.Dropship;
 using Content.Shared._RMC14.Map;
+using Content.Shared._RuMC14.Reinforcements; // RuMC edit
 using Content.Shared.Access.Components;
 using Content.Shared.CMU14.util;
 using Content.Shared.GameTicking;
@@ -52,6 +56,7 @@ public sealed partial class ThirdPartySystem : EntitySystem
     [Dependency] private IPrototypeManager _prototypeManager = default!;
     [Dependency] private AuRoundSystem _auRoundSystem = default!;
     [Dependency] private ChatSystem _chat = default!;
+    [Dependency] private Content.Server.Chat.Managers.IChatManager _chatManager = default!;
     [Dependency] private SharedDropshipSystem _sharedDropshipSystem = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private IServerPreferencesManager _preferences = default!;
@@ -60,6 +65,7 @@ public sealed partial class ThirdPartySystem : EntitySystem
     [Dependency] private IdentitySystem _identity = default!;
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private RMCMapSystem _rmcMap = default!;
+    [Dependency] private PlatoonSpawnRuleSystem _platoons = default!;
     [Dependency] private SurvivorSupplementSystem _survivorSupplement = default!; // CMU14
     private static readonly ProtoId<JobPrototype> ThirdPartyLeaderJobId = new("AU14JobThirdPartyLeader");
     private static readonly ProtoId<JobPrototype> ThirdPartyMemberJobId = new("AU14JobThirdPartyMember");
@@ -201,8 +207,8 @@ public sealed partial class ThirdPartySystem : EntitySystem
     // faction's ship pad while the faction is shipside.
     public void SpawnThirdParty(ThirdPartyPrototype party, PartySpawnPrototype spawnProto, bool roundStart,
         Dictionary<NetUserId, (ProtoId<JobPrototype>?, EntityUid)>? assignedJobs = null, bool? overrideDropship = null,
-        string? summoningFaction = null)
-        => QueueThirdParty(party, spawnProto, roundStart, overrideDropship, true, assignedJobs, summoningFaction);
+        string? summoningFaction = null, RuMCReinforcementCall? call = null) // RuMC edit
+        => QueueThirdParty(party, spawnProto, roundStart, overrideDropship, true, assignedJobs, summoningFaction, call); // RuMC edit
 
     /// <summary>
     ///     Spawns a third party right away, skipping the wait for interested players. Its members spawn as open ghost
@@ -214,7 +220,8 @@ public sealed partial class ThirdPartySystem : EntitySystem
 
     private uint QueueThirdParty(ThirdPartyPrototype party, PartySpawnPrototype spawnProto, bool roundStart,
         bool? overrideDropship, bool ready,
-        Dictionary<NetUserId, (ProtoId<JobPrototype>?, EntityUid)>? assignedJobs = null, string? summoningFaction = null)
+        Dictionary<NetUserId, (ProtoId<JobPrototype>?, EntityUid)>? assignedJobs = null, string? summoningFaction = null, // RuMC edit
+        RuMCReinforcementCall? call = null) // RuMC edit
     {
         var bodies = spawnProto.LeadersToSpawn.Concat(spawnProto.GruntsToSpawn).Concat(spawnProto.EntitiesToSpawn)
             .GroupBy(pair => pair.Key).ToDictionary(group => group.Key, group => group.Sum(pair => Math.Max(0, pair.Value)));
@@ -224,7 +231,7 @@ public sealed partial class ThirdPartySystem : EntitySystem
         var id = _forceInterest.QueueDeployment(party.DisplayName ?? party.ID,
             _forceInterest.GetPlayableBodies(bodies),
             interested => SpawnThirdPartySteps(party, spawnProto, roundStart,
-                assignments.Where(pair => interested.Contains(pair.Key)).ToDictionary(), overrideDropship, summoningFaction).GetEnumerator(),
+                assignments.Where(pair => interested.Contains(pair.Key)).ToDictionary(), overrideDropship, summoningFaction, call).GetEnumerator(), // RuMC edit
             ready, assignments.Keys);
         _queuedParties.Add(id, party);
         return id;
@@ -245,7 +252,7 @@ public sealed partial class ThirdPartySystem : EntitySystem
 
     private IEnumerable<ForceDeploymentStep> SpawnThirdPartySteps(ThirdPartyPrototype party, PartySpawnPrototype spawnProto, bool roundStart,
         Dictionary<NetUserId, (ProtoId<JobPrototype>?, EntityUid)>? assignedJobs, bool? overrideDropship,
-        string? summoningFaction = null)
+        string? summoningFaction = null, RuMCReinforcementCall? call = null) // RuMC edit
     {
         const float SpawnTogetherRadius = 8f;
         using var preparation = new ShuttlePreparation(_mapLoader);
@@ -757,6 +764,19 @@ public sealed partial class ThirdPartySystem : EntitySystem
             }
         }
 
+        // In Force on Force a party whose allegiance matches exactly one side's platoon is part
+        // of that side: identification treats its members as teammates of it.
+        var alignedSide = ResolveFoFAlignedSide(party);
+        if (alignedSide != null)
+        {
+            foreach (var mob in spawnedLeaders.Concat(spawnedGrunts))
+            {
+                var side = _entityManager.EnsureComponent<ForceOnForceSideComponent>(mob);
+                side.Side = alignedSide;
+                _entityManager.Dirty(mob, side);
+            }
+        }
+
         // Spawn ents
         _sawmill.Debug("[ThirdPartySystem] Spawning ents...");
         foreach ((string protoId, int count) in entityBodies)
@@ -816,6 +836,14 @@ public sealed partial class ThirdPartySystem : EntitySystem
         // Run neighbor-marking now (only once per spawn operation, using the last used marker)
         MarkNeighborsIfNeeded();
 
+        // RuMC edit start
+        if (call != null)
+        {
+            var spawnedEv = new RuMCThirdPartySpawnedEvent(call, spawnedLeaders, spawnedGrunts);
+            RaiseLocalEvent(ref spawnedEv);
+        }
+        // RuMC edit end
+
         if (roundStart && party.AnnounceAsSurvivors) // CMU14
         {
             foreach (EntityUid survivor in spawnedLeaders.Concat(spawnedGrunts))
@@ -839,7 +867,16 @@ public sealed partial class ThirdPartySystem : EntitySystem
             AssignMinds(memberPlayers, spawnedGrunts, ThirdPartyMemberJobId.Id, "member");
         }
 
-        if (!string.IsNullOrWhiteSpace(party.AnnounceArrival))
+        if (!string.IsNullOrWhiteSpace(party.AnnounceArrival) && party.AnnounceArrivalTitle is { } arrivalTitle)
+        {
+            var arrival = LocalizeAnnouncement(party.AnnounceArrival);
+            var wrapped = Loc.GetString("cmu-third-party-titled-arrival",
+                ("title", FormattedMessage.EscapeText(Loc.GetString(arrivalTitle))),
+                ("message", FormattedMessage.EscapeText(arrival)));
+            _chatManager.ChatMessageToAll(ChatChannel.Radio, arrival, wrapped, default, false, true, Color.DarkOrange);
+            _sawmill.Info($"[ThirdPartySystem] Announced arrival for third party ({party.ID}): {party.AnnounceArrival}");
+        }
+        else if (!string.IsNullOrWhiteSpace(party.AnnounceArrival))
         {
             _chat.DispatchGlobalAnnouncement(LocalizeAnnouncement(party.AnnounceArrival), string.Empty, false,
                 colorOverride: Color.DarkOrange);
@@ -1016,6 +1053,26 @@ public sealed partial class ThirdPartySystem : EntitySystem
 
             _scheduledForces[i] = id;
         }
+    }
+
+    // A party fights for the side whose platoon shares its allegiance. When both sides rolled
+    // platoons of that allegiance the tie stays unaligned and shows the question mark to both.
+    private string? ResolveFoFAlignedSide(ThirdPartyPrototype party)
+    {
+        var ticker = _entityManager.System<GameTicker>();
+        var preset = ticker.CurrentPreset?.ID ?? ticker.Preset?.ID;
+        if (!string.Equals(preset, "ForceOnForce", StringComparison.OrdinalIgnoreCase))
+            return null;
+
+        if (party.Allegiance is not { } allegiance)
+            return null;
+
+        var govfor = _platoons.SelectedGovforPlatoon?.Allegiance == allegiance;
+        var opfor = _platoons.SelectedOpforPlatoon?.Allegiance == allegiance;
+        if (govfor == opfor)
+            return null;
+
+        return govfor ? "govfor" : "opfor";
     }
 
     private bool TrySpawnAtMarker(string protoId,

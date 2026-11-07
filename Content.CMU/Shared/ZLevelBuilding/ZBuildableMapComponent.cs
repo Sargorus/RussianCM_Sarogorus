@@ -43,6 +43,10 @@ public sealed partial class ZBuildableMapComponent : Component
     [DataField]
     public int ChunkSize = 8;
 
+    /// <summary>Shared vertical cavern geometry. Null preserves the legacy independent layers.</summary>
+    [DataField]
+    public CMUCavernSettings? Caverns = new();
+
     /// <summary>
     /// Content tile prototypes used for the floor of generated stone levels. Generation picks one at random per
     /// tile, giving a stone/dirt mix. These are the CM planet tiles used on maps like Barker's Lament, not the
@@ -70,6 +74,7 @@ public sealed partial class ZBuildableMapComponent : Component
     {
         Metal("RUMCRockWallIron", 0.15f),
         Metal("RUMCRockWallCopper", 0.12f),
+        Metal("CMURockWallZinc", 0.12f),
         Metal("RUMCRockWallAluminum", 0.10f),
         Metal("RUMCRockWallLead", 0.08f),
         Metal("RUMCRockWallSilver", 0.02f),
@@ -183,6 +188,7 @@ public sealed partial class ZBuildableMapComponent : Component
                 Metal("RUMCBlackRockWallUranium", 0.08f),
                 Metal("RUMCBlackRockWallIron", 0.10f),
                 Metal("RUMCBlackRockWallCopper", 0.08f),
+                Metal("CMUBlackRockWallZinc", 0.08f),
                 Metal("RUMCBlackRockWallAluminum", 0.07f),
                 Metal("RUMCBlackRockWallLead", 0.05f),
                 Metal("RUMCBlackRockWallChrome", 0.04f),

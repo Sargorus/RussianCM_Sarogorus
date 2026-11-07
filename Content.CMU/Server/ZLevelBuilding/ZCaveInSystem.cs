@@ -291,7 +291,7 @@ public sealed partial class ZCaveInSystem : EntitySystem
         var pending = stoneMap.Comp.PendingCollapse;
 
         // Solid (or not-yet-dug) tiles can't cave in; clear any stale pending state.
-        if (IsSolid(grid, tile, stoneMap.Comp, chunkSize))
+        if (stoneMap.Comp.NaturalCaves.Contains(tile) || IsSolid(grid, tile, stoneMap.Comp, chunkSize))
         {
             pending.Remove(tile);
             return false;
@@ -344,7 +344,7 @@ public sealed partial class ZCaveInSystem : EntitySystem
 
         while (frontier.TryDequeue(out var t) && region.Count < CollapseTileCap)
         {
-            if (IsSolid(grid, t, stoneMap.Comp, chunkSize))
+            if (stoneMap.Comp.NaturalCaves.Contains(t) || IsSolid(grid, t, stoneMap.Comp, chunkSize))
                 continue;
 
             // Built support beams shut off a spreading collapse like a valve: every open tile within a beam's
@@ -506,7 +506,7 @@ public sealed partial class ZCaveInSystem : EntitySystem
         // Keep a stable platform around any staircase: if a walk-through stair is on this tile or an adjacent
         // one, do not bury it and do not pull the floor out above it. Otherwise the tile a stair drops you onto
         // would vanish and you would instantly fall (and risk clipping through to the level below).
-        if (HasStairWithin(grid, tile, 1) ||
+        if (stoneMap.Comp.NaturalCaves.Contains(tile) || HasStairWithin(grid, tile, 1) ||
             IsSolid(grid, tile, stoneMap.Comp, Math.Max(2, settings.ChunkSize)) ||
             HasBuiltSupportWithin(grid, tile, Math.Max(1, settings.MaxRoofSpan)))
             return;
@@ -664,7 +664,8 @@ public sealed partial class ZCaveInSystem : EntitySystem
         var belowCoords = new MapCoordinates(worldPos, TryComp<MapComponent>(landingMap, out var landingComp) ? landingComp.MapId : belowMapComp.MapId);
         var surfaceMap = Transform(surfaceGridUid).MapUid;
 
-        // Only what would land inside something solid (a rock, a wall, a table) loses its collision; the rest keeps it.
+        // Furniture keeps its collision on open ground. Broken walls must remain inert even if
+        // another falling wall or newly generated rock reaches the landing tile later.
         var inside = _landing.LandsInsideSolid(landingMap, worldPos);
         // RUMC End
 
@@ -701,13 +702,7 @@ public sealed partial class ZCaveInSystem : EntitySystem
             RemComp<StructuralSupportComponent>(uid);
             _transform.SetMapCoordinates(uid, belowCoords);
 
-            // RUMC: only what lands inside a rock or a wall is rubble. What was here (kept), for everything that fell:
-            // RUMC was (kept): // Fallen structures are rubble: strip fixture hardness so a wall that lands inside (or later gets buried under) a cave rock can never sit there grinding
-            // RUMC was (kept): // contacts forever. That constant jitter was a physics drain that degraded server TPS (felt as ever-worsening UI lag) as the round ran on.
-            // RUMC was (kept): MakeFallenDebrisNonHard(uid);
-            // What lands inside a rock or a wall is rubble: strip fixture hardness so it can never sit there grinding contacts forever (that constant jitter was a physics drain that
-            // degraded server TPS). What lands on open floor keeps its collision.
-            if (inside)
+            if (_tag.HasTag(uid, WallTag) || inside)
                 MakeFallenDebrisNonHard(uid);
         }
 
@@ -720,7 +715,7 @@ public sealed partial class ZCaveInSystem : EntitySystem
                 continue;
 
             _transform.SetMapCoordinates(uid, belowCoords);
-            if (inside)
+            if (_tag.HasTag(uid, WallTag) || inside)
                 MakeFallenDebrisNonHard(uid);
         }
         // RUMC End

@@ -111,7 +111,8 @@ public sealed partial class CMUZLevelLadderSystem : EntitySystem
         StartClimb(ent, user, offset);
     }
 
-    private void StartClimb(Entity<CMUZLevelLadderComponent> ent, EntityUid user, int offset)
+    /// <summary>Starts the ordinary timed climb, including hatch and landing checks, for a nearby user.</summary>
+    public void StartClimb(Entity<CMUZLevelLadderComponent> ent, EntityUid user, int offset)
     {
         // RUMC: a hatch that is shut over the ladder is pushed open first, and the climb waits for the next try
         if (TryOpenClosedHatch(ent, user))
@@ -280,6 +281,20 @@ public sealed partial class CMUZLevelLadderSystem : EntitySystem
         CloseLook(user);
 
         var ladderPosition = _transform.GetWorldPosition(ent);
+
+        if (Transform(user).MapUid is not { } map || !_zLevels.TryMapOffset((map, null), offset, out var destination))
+        {
+            _popup.PopupEntity(Loc.GetString("cmu-zlevel-ladder-no-level"), ent, user, PopupType.SmallCaution);
+            return;
+        }
+
+        // Recheck when the climb finishes: the floor or supporting ladder may have disappeared during it.
+        if (!HasComp<GhostComponent>(user) &&
+            !_zLevels.HasClimbLanding(user, destination.Value, ladderPosition, ent.Comp.LandingLocalPosition))
+        {
+            _popup.PopupEntity(Loc.GetString("cmu-zlevel-ladder-no-footing"), ent, user, PopupType.SmallCaution);
+            return;
+        }
 
         if (!_zLevels.TryMove(user, offset, worldPosition: ladderPosition))
         {

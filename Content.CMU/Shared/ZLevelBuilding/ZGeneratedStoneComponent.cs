@@ -27,6 +27,13 @@ public sealed partial class ZGeneratedStoneComponent : Component
     [ViewVariables]
     public EntityUid StoneGrid;
 
+    /// <summary>
+    /// Original empty footprint beneath the entrance's grid on an authored level, inherited by deeper caves.
+    /// Captured before generation so generated floors and excavations cannot move the mapped boundary.
+    /// </summary>
+    [ViewVariables]
+    public HashSet<Vector2i>? CavernFootprint;
+
     // RUMC Layers Begin: what the generation of a layer of depth remembers: whether its dungeon was tried, the seed of its caves, and the caves themselves
     [ViewVariables]
     public bool DungeonAttempted;
@@ -34,6 +41,13 @@ public sealed partial class ZGeneratedStoneComponent : Component
     /// <summary>Seed of the noise that shapes the caves and pools of this level; chosen when the first chunk is made.</summary>
     [ViewVariables]
     public int NoiseSeed;
+
+    /// <summary>Shared volume used by server generation and the client's structural scanner.</summary>
+    [DataField, AutoNetworkedField]
+    public int CavernSeed;
+
+    [DataField, AutoNetworkedField]
+    public CMUCavernSettings? Caverns;
 
     /// <summary>Tiles of the natural, noise-made caves. They hold themselves up: they never cave in and a collapse does not spread into them.</summary>
     [ViewVariables]

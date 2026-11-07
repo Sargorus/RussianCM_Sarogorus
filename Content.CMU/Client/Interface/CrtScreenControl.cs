@@ -20,14 +20,12 @@ namespace Content.Client.CMU14.Interface;
 ///     UI is in a texture the shader can sample it at an offset, which is what produces the tear.
 ///     </para>
 ///     <para>
-///     Sits <em>after</em> <see cref="Source"/> in the tree, so the source has already drawn normally
-///     by the time this runs; the shaded copy is opaque and covers it. That avoids having to suppress
-///     the source's own drawing, which the UI system offers no hook for - a parent cannot skip its
-///     children, and hiding the source would stop <c>RenderControl</c> reaching it too.
+///     Sits after <see cref="Source"/> in a <see cref="CrtScreenContainer"/>. The container skips the
+///     source's ordinary draw while this pass is active, retaining layout, input and live updates.
+///     Other parents remain supported, but also draw the source normally beneath the shaded copy.
 ///     </para>
 ///     <para>
-///     Once the source is a texture, bloom and barrel curvature become possible in the same pass.
-///     Neither is implemented yet.
+///     The terminal shader applies barrel curvature and vignette to the captured surface.
 ///     </para>
 /// </remarks>
 public sealed partial class CrtScreenControl : Control
@@ -44,6 +42,9 @@ public sealed partial class CrtScreenControl : Control
 
     private IRenderTexture? _target;
     private Vector2i _targetSize;
+
+    /// <summary>Authored terminal passes supply their own raster; background materials must not double it.</summary>
+    public static bool CapturingSource { get; private set; }
 
     /// <summary>The subtree to draw through the shader. Must precede this control in the tree.</summary>
     public Control? Source { get; set; }
@@ -125,8 +126,11 @@ public sealed partial class CrtScreenControl : Control
     ///     palette, so turning the theme off left the grain running on the settings window.
     /// </remarks>
     public bool Drawing => _shader != null
+        && !CmuCrtCapture.Capturing
         && Source != null
+        && Source.Visible
         && Visible
+        && PixelSize.X > 0 && PixelSize.Y > 0
         && StyleNano.CrtUiEnabled
         && _cfg.GetCVar(CCVars.CMUCrtEffectIntensity) > 0f
         && LastError == null;
@@ -158,7 +162,7 @@ public sealed partial class CrtScreenControl : Control
         var handle = renderHandle.DrawingHandleScreen;
 
         // A failed render pass is retried every frame; LastError only gates Drawing for callers.
-        if (_shader == null || Source == null || !StyleNano.CrtUiEnabled)
+        if (_shader == null || Source == null || !StyleNano.CrtUiEnabled || CmuCrtCapture.Capturing)
             return;
 
         var intensity = _cfg.GetCVar(CCVars.CMUCrtEffectIntensity);
@@ -181,7 +185,19 @@ public sealed partial class CrtScreenControl : Control
             // Re-entrant render pass: we are inside the UI's own draw when this runs. If the engine
             // objects to that, it will surface here rather than taking the client down.
             handle.RenderInRenderTarget(_target,
-                () => _ui.RenderControl(renderHandle, Source, Vector2i.Zero),
+                () =>
+                {
+                    var previous = CapturingSource;
+                    CapturingSource = true;
+                    try
+                    {
+                        _ui.RenderControl(renderHandle, Source, Vector2i.Zero);
+                    }
+                    finally
+                    {
+                        CapturingSource = previous;
+                    }
+                },
                 Color.Transparent);
         }
         catch (Exception e)

@@ -97,6 +97,7 @@ cmu-guide-entry-research-hydroponics = Hydroponics
 # Antagonists
 cmu-guide-entry-hearing-loss = Hearing Loss
 cmu-guide-entry-cmu = Guidebook
+cmu-guide-entry-cas = Dropships and CAS
 cmu-guide-entry-mortar = Mortar
 cmu-guide-entry-explosives = Explosives
 cmu-guide-entry-forensics = Forensics
@@ -228,3 +229,4 @@ cmu-guide-entry-lore-ua-politics = Politics
 cmu-guide-entry-overwatch = Overwatch
 cmu-guide-entry-fob-security = FOB Security Squad
 cmu-guide-entry-skills = Skills
+cmu-guide-entry-rank-equivalencies = Rank Equivalencies

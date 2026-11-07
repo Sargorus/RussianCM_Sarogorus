@@ -1,5 +1,6 @@
 using Content.Shared.Body;
 using Content.Server.Humanoid;
+using Content.Server.Corvax.TTS;
 using Content.Shared.CCVar;
 using Content.Shared.CMU14.Yautja;
 using Content.Shared._RMC14.Vendors;
@@ -25,6 +26,7 @@ public sealed partial class YautjaProfileApplySystem : EntitySystem
 {
     [Dependency] private SharedVisualBodySystem _visualBody = default!;
     [Dependency] private HumanoidProfileSystem _humanoid = default!;
+    [Dependency] private TTSSystem _tts = default!;
     [Dependency] private IConfigurationManager _config = default!;
     [Dependency] private SharedContainerSystem _containers = default!;
     [Dependency] private ClothingSystem _clothing = default!;
@@ -54,6 +56,9 @@ public sealed partial class YautjaProfileApplySystem : EntitySystem
         ["CMUYautjaCapeQuarter"] = "back",
         ["CMUYautjaCapePoncho"] = "back",
         ["CMUYautjaCapeDamaged"] = "back",
+        ["CMUYautjaCapeBoneFull"] = "back",
+        ["CMUYautjaCapeBoneThird"] = "back",
+        ["CMUYautjaCapeBoneCeremonial"] = "back",
     };
 
     public override void Initialize()
@@ -102,6 +107,8 @@ public sealed partial class YautjaProfileApplySystem : EntitySystem
         TryComp<YautjaComponent>(ent.Owner, out var yautja);
         var humanoidProfile = BuildHumanoidProfile(applied.Profile, yautja);
         _humanoid.ApplyProfileTo((ent.Owner, humanoid), humanoidProfile);
+        // The shared humanoid system normalizes TTS by sex; restore the hunter's approved selection afterward.
+        _tts.ApplyYautjaProfileVoice(ent.Owner, applied.Profile.TTSVoice);
         _visualBody.ApplyProfileTo(ent.Owner, humanoidProfile);
     }
 
@@ -150,6 +157,7 @@ public sealed partial class YautjaProfileApplySystem : EntitySystem
 
         var humanoidProfile = BuildHumanoidProfile(profile, yautja);
         _humanoid.ApplyProfileTo((uid, humanoid), humanoidProfile);
+        _tts.ApplyYautjaProfileVoice(uid, profile.TTSVoice);
         _visualBody.ApplyProfileTo(uid, humanoidProfile);
 
         // The profile is authoritative for player-controlled Yautja appearance.
@@ -252,6 +260,9 @@ public sealed partial class YautjaProfileApplySystem : EntitySystem
             case "CMUYautjaCapeQuarter":
             case "CMUYautjaCapePoncho":
             case "CMUYautjaCapeDamaged":
+            case "CMUYautjaCapeBoneFull":
+            case "CMUYautjaCapeBoneThird":
+            case "CMUYautjaCapeBoneCeremonial":
                 ApplyVendedCapeColor(ent, slot, profile, args.Item);
                 return;
             default:
@@ -331,7 +342,10 @@ public sealed partial class YautjaProfileApplySystem : EntitySystem
     private void ApplyCapeColor(EntityUid cape, YautjaCharacterProfile profile)
     {
         var capeComp = EnsureComp<YautjaCapeComponent>(cape);
-        capeComp.Color = YautjaCharacterProfile.Default.CapeColor;
+        if (!capeComp.Recolorable)
+            return;
+
+        capeComp.Color = profile.CapeColor;
         Dirty(cape, capeComp);
     }
 

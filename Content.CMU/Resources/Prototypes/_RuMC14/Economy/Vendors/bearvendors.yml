@@ -94,6 +94,12 @@
         amount: 12
       - id: AU14ArmorGarbJunglePonchoUPP
         amount: 40
+      - id: RuMCUPPHelmetGarbOrthodoxCross
+        amount: 6
+      #- id: RuMCUPPHelmetGarbArmy
+      #  amount: 40
+      #- id: RuMCUPPHelmetGarbRedStar
+      #  amount: 40
     - name: au14-vendor-section-backpack
       entries:
       - id: RuMCUPPNavalInfantrySatchel
@@ -315,8 +321,12 @@
         amount: 1
       - id: RMCPowerCellHigh
         amount: 5
-      - id: RMCCableCoil
-        amount: 15
+      - id: CMUCableThinHVStack
+        amount: 5
+      - id: CMUCableThinMVStack
+        amount: 5
+      - id: CMUCableThinLVStack
+        amount: 5
     - name: au14-vendor-section-flares-lights
       entries:
       - id: RMCBoxFlashlights
@@ -521,12 +531,18 @@
     sprite: _RMC14/Structures/Machines/VendingMachines/ColMarTech/clothing.rsi
   - type: CMAutomatedVendor
     sections:
+    - name: cmu-vendor-advanced-gunship-crew-hud
+      choices: { CMUPlatoonAirCrewGunshipHUD: 1 }
+      entries:
+      - id: CMUVisorGunshipCrewAdvanced
+    - name: cmu-vendor-basic-gunship-crew-huds
+      entries:
+      - id: CMUVisorGunshipCrew
+        amount: 5
     - name: au14-vendor-section-fatigues
       choices: { CMUPlatoonAirCrewFatigues: 1 }
       entries:
-      - id: RuMCUniformBEAR
-      - id: RuMCUniformBEAR_Black
-      - id: RuMCUniformBEAR_Gray
+      - id: RuMCUPPFatiguesPilot
     - name: au14-vendor-section-body-armor
       choices: { CMUPlatoonAirCrewVest: 1 }
       entries:
@@ -545,10 +561,7 @@
     - name: au14-vendor-section-headgear
       choices: { CMUPlatoonAirCrewHeadgear: 1 }
       entries:
-      - id: RuMCBEARBoonieBlack
-      - id: RuMCBEARBoonieBrown
-      - id: RuMCBEARCapBlack
-      - id: RuMCBEARCapBrown
+      - id: RuMCUPPPilotHelmet
     - name: au14-vendor-section-webbings
       choices: { CMUPlatoonAirCrewWebbings: 1 }
       entries:
@@ -1471,7 +1484,11 @@
       - id: RuMCUPPNavalInfantryHeavyHelmet2
         amount: 4
       - id: RuMCUPPArmorCrew
-        amount: 10
+        amount: 4
+      - id: RuMCUPPCrewHelmet
+        amount: 4
+      - id: RuMCUPPFatiguesCrew
+        amount: 4
     - name: Radio Equipment
       entries:
       - id: RuMCANPRC117GRadioIssuedBare

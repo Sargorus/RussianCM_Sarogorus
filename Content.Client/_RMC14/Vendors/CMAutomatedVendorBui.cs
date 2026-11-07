@@ -1,7 +1,9 @@
 using System.Linq;
 using Content.Client.CMU14.Yautja;
+using Content.Client.CMU14.Vendors; // CMU14: localized vendor catalog labels
 using Content.Shared._RMC14.Holiday;
 using Content.Shared._RMC14.Marines.Roles.Ranks;
+using Content.Shared._RMC14.Marines.Squads.Specialization;
 using Content.Shared._RMC14.Medical.Refill;
 using Content.Shared._RMC14.Vendors;
 using Content.Shared.Mind;
@@ -25,11 +27,13 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
 {
     [Dependency] private IPlayerManager _player = default!;
     [Dependency] private IPrototypeManager _prototype = default!;
+    [Dependency] private ILocalizationManager _localization = default!; // CMU14
 
     private readonly SharedJobSystem _job;
     private readonly SharedMindSystem _mind;
     private readonly SharedRankSystem _rank;
     private readonly SharedRMCHolidaySystem _rmcHoliday;
+    private readonly SharedSquadSpecializationSystem _squadSpec;
 
     private CMAutomatedVendorWindow? _window;
 
@@ -39,13 +43,16 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
         _mind = EntMan.System<SharedMindSystem>();
         _rmcHoliday = EntMan.System<SharedRMCHolidaySystem>();
         _rank = EntMan.System<SharedRankSystem>();
+        _squadSpec = EntMan.System<SharedSquadSpecializationSystem>();
     }
 
     protected override void Open()
     {
         base.Open();
         _window = this.CreateWindow<CMAutomatedVendorWindow>();
-        _window.Title = EntMan.GetComponentOrNull<MetaDataComponent>(Owner)?.EntityName ?? "ColMarTech Vendor";
+        _window.Title = EntMan.GetComponentOrNull<MetaDataComponent>(Owner)?.EntityName
+            ?? Loc.GetString("cmu-vendor-default-name"); // CMU14: localized fallback
+        _window.Search.PlaceHolder = Loc.GetString("cmu-vendor-search"); // CMU14
         _window.ReagentsBar.ForegroundStyleBoxOverride = new StyleBoxFlat(Color.FromHex("#AF7F38"));
 
         if (EntMan.TryGetComponent(Owner, out CMAutomatedVendorComponent? vendor))
@@ -96,7 +103,7 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
             for (var entryIndex = 0; entryIndex < section.Entries.Count; entryIndex++)
             {
                 var entry = section.Entries[entryIndex];
-                var uiEntry = new CMAutomatedVendorEntry();
+                var uiEntry = new CMAutomatedVendorEntry { Entry = entry };
 
                 if (_prototype.TryIndex(entry.Id, out var entity))
                 {
@@ -109,7 +116,7 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
                         uiEntry.Texture.Modulate = firstLayer.Color;
                     }
 
-                    uiEntry.Panel.Button.TextLabel.Text = entry.Name?.Replace("\\n", "\n") ?? entity.Name;
+                    uiEntry.Panel.Button.TextLabel.Text = CMUVendorLocalization.GetItemName(entry, entity, _localization); // CMU14
 
                     var name = entity.Name;
                     var color = CMAutomatedVendorPanel.DefaultColor;
@@ -124,7 +131,7 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
 
                     if (section.TakeAll != null || section.TakeOne != null || entry.Mandatory)
                     {
-                        name = $"Mandatory: {name}";
+                        name = Loc.GetString("cmu-vendor-mandatory-item", ("name", name)); // CMU14
                         color = vendor.UiStyle == CMVendorUiStyle.Yautja ? Color.FromHex("#240909") : Color.FromHex("#251A0C");
                         borderColor = vendor.UiStyle == CMVendorUiStyle.Yautja ? YautjaBracerUiStyle.HotRed : Color.FromHex("#805300");
                         hoverColor = borderColor;
@@ -132,7 +139,7 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
                     else if (entry.Recommended)
                     {
                         uiEntry.Panel.Button.TextLabel.Text = $"★ {uiEntry.Panel.Button.TextLabel.Text}";
-                        name = $"Recommended: {name}";
+                        name = Loc.GetString("cmu-vendor-recommended-item", ("name", name)); // CMU14
                         color = vendor.UiStyle == CMVendorUiStyle.Yautja ? Color.FromHex("#200606") : Color.FromHex("#102919");
                         borderColor = vendor.UiStyle == CMVendorUiStyle.Yautja ? YautjaBracerUiStyle.Red : Color.FromHex("#3A9B52");
                         hoverColor = borderColor;
@@ -239,7 +246,21 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
                 validHoliday = true;
         }
 
-        return validJob && validHoliday && validRank;
+        var validSpec = true;
+        if (section.SquadSpecializations.Count > 0 || section.ExcludeSquadSpecializations.Count > 0)
+        {
+            var userSpec = _player.LocalEntity != null
+                ? _squadSpec.GetSquadSpecialization(_player.LocalEntity.Value)
+                : null;
+
+            if (section.SquadSpecializations.Count > 0 && (userSpec == null || !section.SquadSpecializations.Contains(userSpec.Value)))
+                validSpec = false;
+
+            if (section.ExcludeSquadSpecializations.Count > 0 && userSpec != null && section.ExcludeSquadSpecializations.Contains(userSpec.Value))
+                validSpec = false;
+        }
+
+        return validJob && validHoliday && validRank && validSpec;
     }
 
     private void OnButtonPressed(int sectionIndex, int entryIndex, List<int> linkedEntryIndexes)
@@ -251,6 +272,27 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
     private void OnSearchChanged(LineEditEventArgs args)
     {
         ApplySearchFilter(args.Text);
+    }
+
+    private bool IsEntrySpecializationValid(CMVendorEntry? entry)
+    {
+        if (entry == null)
+            return true;
+
+        if (entry.SquadSpecializations.Count == 0 && entry.ExcludeSquadSpecializations.Count == 0)
+            return true;
+
+        var userSpec = _player.LocalEntity != null
+            ? _squadSpec.GetSquadSpecialization(_player.LocalEntity.Value)
+            : null;
+
+        if (entry.SquadSpecializations.Count > 0 && (userSpec == null || !entry.SquadSpecializations.Contains(userSpec.Value)))
+            return false;
+
+        if (entry.ExcludeSquadSpecializations.Count > 0 && userSpec != null && entry.ExcludeSquadSpecializations.Contains(userSpec.Value))
+            return false;
+
+        return true;
     }
 
     private void ApplySearchFilter(string? text)
@@ -269,10 +311,16 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
                 if (entriesControl is not CMAutomatedVendorEntry entry)
                     continue;
 
+                if (!IsEntrySpecializationValid(entry.Entry))
+                {
+                    entry.Visible = false;
+                    continue;
+                }
+
                 if (string.IsNullOrWhiteSpace(text))
                     entry.Visible = true;
                 else
-                    entry.Visible = entry.Panel.Button.TextLabel.Text?.Contains(text, OrdinalIgnoreCase) ?? false;
+                    entry.Visible = entry.Panel.Button.TextLabel.Text?.Contains(text, CurrentCultureIgnoreCase) ?? false; // CMU14: localized equipment search
 
                 if (entry.Visible)
                     any = true;
@@ -300,14 +348,15 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
         if (vendor.UseObjectivePoints)
         {
             userPoints = vendor.CachedFactionWinPoints;
-            pointsLabel = $"{vendor.Faction.ToUpperInvariant()} Win Points: {userPoints}";
+            pointsLabel = Loc.GetString("cmu-vendor-faction-points",
+                ("faction", vendor.Faction.ToUpperInvariant()), ("count", userPoints)); // CMU14
         }
         else
         {
             userPoints = vendor.PointsType == null
                 ? user?.Points ?? 0
                 : user?.ExtraPoints?.GetValueOrDefault(vendor.PointsType) ?? 0;
-            pointsLabel = $"Points Remaining: {userPoints}";
+            pointsLabel = Loc.GetString("cmu-vendor-points", ("count", userPoints)); // CMU14
         }
 
         if (NeedsSectionRebuild(vendor))
@@ -318,6 +367,7 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
             var section = vendor.Sections[sectionIndex];
             var uiSection = (CMAutomatedVendorSection) _window.Sections.GetChild(sectionIndex);
             uiSection.Label.SetMessage(GetSectionName(user, section));
+            uiSection.Visible = IsSectionValid(section);
 
             var sectionDisabled = false;
             if (section.Choices is { } choices)
@@ -334,6 +384,13 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
             {
                 var entry = section.Entries[entryIndex];
                 var uiEntry = (CMAutomatedVendorEntry) uiSection.Entries.GetChild(entryIndex);
+
+                if (!IsEntrySpecializationValid(entry))
+                {
+                    uiEntry.Visible = false;
+                    continue;
+                }
+
                 var personalRemaining = entry.MaxPerUser is { } maxPerUser
                     ? maxPerUser - (user?.PurchaseCounts.GetValueOrDefault(entry.Id.Id) ?? 0)
                     : (int?) null;
@@ -358,7 +415,7 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
                 if (entry.Points != null)
                 {
                     anyEntryWithPoints = true;
-                    uiEntry.Amount.Text = $"{entry.Points}P";
+                    uiEntry.Amount.Text = Loc.GetString("cmu-vendor-points-value", ("count", entry.Points.Value)); // CMU14
 
                     var notEnoughPoints = vendor.UseObjectivePoints
                         ? userPoints < entry.Points
@@ -425,7 +482,8 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
         _window.ReagentsBar.MinValue = 0;
         _window.ReagentsBar.MaxValue = max.Int();
         _window.ReagentsBar.SetAsRatio((refiller.Current / refiller.Max).Float());
-        _window.ReagentsLabel.Text = $"{current.Int()} units";
+        _window.ReagentsLabel.Text = Loc.GetString("cmu-vendor-reagent-amount",
+            ("current", current.Int()), ("max", max.Int())); // CMU14
     }
 
     protected override void ReceiveMessage(BoundUserInterfaceMessage message)
@@ -438,14 +496,10 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
         }
     }
 
+    // CMU14 method: localized category identity and remaining selection instructions.
     private FormattedMessage GetSectionName(CMVendorUserComponent? user, CMVendorSection section)
     {
-        var name = new FormattedMessage();
-        // cmu edit start: section names may be locale keys
-        var sectionName = IoCManager.Resolve<ILocalizationManager>().TryGetString(section.Name, out var localized) ? localized : section.Name;
-        name.PushTag(new MarkupNode("bold", new MarkupParameter(sectionName.ToUpperInvariant()), null));
-        name.AddText(sectionName.ToUpperInvariant());
-        // cmu edit end
+        var sectionName = CMUVendorLocalization.GetSectionName(section.Name, _localization);
 
         if (section.TakeAll != null)
         {
@@ -454,7 +508,7 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
             {
                 if (takeAll == null || !takeAll.Contains((section.TakeAll, entry.Id)))
                 {
-                    name.AddText(" (TAKE ALL)");
+                    sectionName = Loc.GetString("cmu-vendor-section-take-all", ("name", sectionName));
                     break;
                 }
             }
@@ -463,23 +517,24 @@ public sealed partial class CMAutomatedVendorBui : BoundUserInterface
         {
             var takeOne = user?.TakeOne;
             if (takeOne == null || !takeOne.Contains(section.TakeOne))
-                name.AddText(" (TAKE ONE)");
+                sectionName = Loc.GetString("cmu-vendor-section-take-one", ("name", sectionName));
         }
         else if (section.Choices is { } choices)
         {
             if (user == null)
             {
-                name.AddText($" (CHOOSE {choices.Amount})");
+                sectionName = Loc.GetString("cmu-vendor-section-choose", ("name", sectionName), ("count", choices.Amount));
             }
             else
             {
                 var left = choices.Amount - user.Choices.GetValueOrDefault(choices.Id);
                 if (left > 0)
-                    name.AddText($" (CHOOSE {left})");
+                    sectionName = Loc.GetString("cmu-vendor-section-choose", ("name", sectionName), ("count", left));
             }
         }
 
-        name.Pop();
+        var name = new FormattedMessage();
+        name.AddMarkupOrThrow($"[bold]{FormattedMessage.EscapeText(sectionName)}[/bold]");
         return name;
     }
 }
